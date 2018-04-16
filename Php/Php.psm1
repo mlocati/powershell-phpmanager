@@ -583,6 +583,3 @@ function Get-PhpExtensions() {
     $Ini = [PhpIni]::new($IniPath)
     return $Ini.GetEnabledExtensions()
 }
-
-
-Export-ModuleMember -Function Install-Php, Update-Php, Get-InstalledPhp, Get-PhpExtensions
