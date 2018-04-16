@@ -270,20 +270,41 @@ function DownloadAndExtractPHP([PhpVersion] $PhpVersion, [string] $DestinationDi
     }
 }
 
-function UpdatePhpIni([string] $IniPath, [System.Collections.Hashtable] $Dictionary) {
-    if ([System.IO.FIle]::Exists($IniPath)) {
-        $Ini = [IO.File]::ReadAllText($IniPath) -replace "`r`n", "`n"
-        $Lines = $Ini.Split("`n")
-    } else {
-        $Lines = @()
+class PhpIni
+{
+    [string] $IniPath
+    [System.String[]] $Lines
+    PhpIni([string] $Path) {
+        $this.IniPath = [System.IO.Path]::GetFullPath($Path)
+        if ([System.IO.File]::Exists($this.IniPath)) {
+            $Contents = [IO.File]::ReadAllText($this.IniPath) -replace "`r`n", "`n"
+            $this.Lines = $Contents.TrimEnd().Split("`n")
+        } else {
+            $this.Lines = @()
+        }
     }
-    foreach ($Enumerator in $Dictionary.GetEnumerator()) {
-        $DictionaryKey = $Enumerator.Name
-        $DictionaryValue = $Enumerator.Value
-        $RxSearch = '^(\s*([;#])*\s*' + [Regex]::Escape($DictionaryKey) + '\s*)=(.*)$'
+    [PhpIni] Save() {
+        $Contents = [system.String]::Join("`r`n", $this.Lines).TrimEnd("`r", "`n") + "`r`n"
+        [IO.File]::WriteAllText($this.IniPath, $Contents)
+        return $this
+    }
+    [PhpIni] DisableKey([string] $Key) {
+        $RxSearch = '^\s*' + [Regex]::Escape($Key) + '\s*='
+        for ($LineIndex = 0; $LineIndex -lt $this.Lines.Length; $LineIndex++) {
+            $RxMatch = $this.Lines[$LineIndex] | Select-String -Pattern $RxSearch
+            if ($RxMatch -ne $null) {
+                if ($RxMatch.Matches[0].Groups[2].Length -eq 0) {
+                    $this.Lines[$LineIndex] = ';' + $this.Lines[$LineIndex]
+                }
+            }
+        }
+        return $this
+    }
+    [PhpIni] SetKey([string] $Key, [string] $Value) {
+        $RxSearch = '^(\s*([;#]*)\s*' + [Regex]::Escape($Key) + '\s*)=(.*)$'
         $FoundLineIndex = -1
-        for ($LineIndex = 0; $LineIndex -lt $Lines.Length; $LineIndex++) {
-            $RxMatch = $Lines[$LineIndex] | Select-String -Pattern $RxSearch
+        for ($LineIndex = 0; $LineIndex -lt $this.Lines.Length; $LineIndex++) {
+            $RxMatch = $this.Lines[$LineIndex] | Select-String -Pattern $RxSearch
             if ($RxMatch -ne $null) {
                 if ($FoundLineIndex -lt 0) {
                     $FoundLineIndex = $LineIndex
@@ -293,22 +314,66 @@ function UpdatePhpIni([string] $IniPath, [System.Collections.Hashtable] $Diction
             }
         }
         if ($FoundLineIndex -lt 0) {
-            if ($DictionaryValue -ne $false) {
-                $NewLine = $DictionaryKey + '=' + $DictionaryValue
-                $Lines += $NewLine
-            }
+            $this.Lines += $Key + '=' + $Value
         } else {
-            if ($DictionaryValue -eq $false) {
-                $Lines[$FoundLineIndex] = ';' + $Lines[$FoundLineIndex].TrimStart(' ', "`t", '#', ';')
-            } else {
-                $Lines[$FoundLineIndex] = $DictionaryKey + '=' + $DictionaryValue
+            $this.Lines[$FoundLineIndex] = $Key + '=' + $Value
+        }
+        return $this
+    }
+    [string[]] GetEnabledExtensions() {
+        $Result = @()
+        foreach ($Line in $this.Lines) {
+            $RxMatch = $Line  | Select-String -Pattern '^\s*extension\s*=\s*((php_)?(\S+)\.dll)\s*$'
+            if ($RxMatch -ne $null) {
+                $Result += $RxMatch.Matches[0].Groups[3].Value
             }
         }
+        return $Result
     }
-    $Ini = [system.String]::Join("`r`n", $Lines)
-    $Ini = $Ini.TrimEnd("`r", "`n") + "`r`n"
-    [IO.File]::WriteAllText($IniPath, $Ini)
+    [bool] IsExtensionEnabled([string] $Filename) {
+        $RxSearch = '^\s*extension\s*=\s*' + [Regex]::Escape($Filename) + '\s*$'
+        foreach ($Line in $this.Lines) {
+            $RxMatch = $Line  | Select-String -Pattern $RxSearch
+            if ($RxMatch -ne $null) {
+                return $true
+            }
+        }
+        return $false
+    }
+    [PhpIni] DisableExtension([string] $Filename) {
+        return $this.DisableExtension($Filename, $false)
+    }
+    [PhpIni] DisableExtension([string] $Filename, [bool] $RemoveLine) {
+        $NewLines = @()
+        $RxSearch = '^(\s*[;#]+)?\s*(extension\s*=\s*' + [Regex]::Escape($Filename) + ')\s*$'
+        foreach ($Line in $this.Lines) {
+            $RxMatch = $Line  | Select-String -Pattern $RxSearch
+            if ($RxMatch -eq $null) {
+                $NewLines += $Line
+            } elseif (-Not($RemoveLine)) {
+                $NewLines += ';' + $RxMatch.Matches[0].Groups[2].Value
+            }
+        }
+        $this.Lines = $NewLines
+        return $this
+    }
+    [PhpIni] EnableExtension([string] $Filename) {
+        if ($this.IsExtensionEnabled($Filename)) {
+            return $this
+        }
+        $RxSearch = '^\s*[;#]+\s*(extension\s*=\s*' + [Regex]::Escape($Filename) + ')\s*$'
+        for ($LineIndex = 0; $LineIndex -lt $this.Lines.Length; $LineIndex++) {
+            $RxMatch = $this.Lines[$LineIndex] | Select-String -Pattern $RxSearch
+            if ($RxMatch -ne $null) {
+                $this.Lines[$LineIndex] = $RxMatch.Matches[0].Groups[1].Value
+                return $this
+            }
+        }
+        $this.Lines += "extension=$Filename"
+        return $this
+    }
 }
+
 <#
 .Synopsis
 Installs PHP.
@@ -380,11 +445,11 @@ function Install-Php() {
         if ($TimeZone -eq $null -or $TimeZone -eq '') {
             $TimeZone = 'UTC'
         }
-        UpdatePhpIni $IniPath @{
-            'date.timezone' = $TimeZone
-            'default_charset' = 'UTF-8'
-            'extension_dir' = [System.IO.Path]::Combine($Path, 'ext')
-        }
+        $PhpIni = [PhpIni]::new($IniPath)
+        $PhpIni.SetKey('date.timezone', $TimeZone)
+        $PhpIni.SetKey('default_charset', 'UTF-8')
+        $PhpIni.SetKey('extension_dir', [System.IO.Path]::Combine($Path, 'ext'))
+        $PhpIni.Save()
     }
 }
 
@@ -491,6 +556,33 @@ function Get-InstalledPhp() {
     }
     return $Result
 }
-#>
 
-Export-ModuleMember -Function Install-Php, Update-Php, Get-InstalledPhp
+<#
+.Synopsis
+Get the installed and enabled PHP extensions
+
+.Description
+Get the list of PHP extensions enabled for a specific PHP installation, excluding the ones bundled with PHP.
+To list the PHP extensions bundled in PHP, wimply run `php -n -m`
+
+.Parameter Path
+Get the details about PHP installed in this location.
+#>
+function Get-PhpExtensions() {
+    Param(
+        [Parameter(Mandatory = $true)] [ValidateLength(1, [int]::MaxValue)] [string] $Path
+    )
+    $Path = [System.IO.Path]::GetFullPath($Path)
+    if ([System.IO.File]::Exists($Path)) {
+        $Path = [System.IO.Path]::GetDirectoryName($Path)
+    }
+    $IniPath = [System.IO.Path]::Combine($Path, 'php.ini')
+    if (-Not([System.IO.File]::Exists($IniPath))) {
+        throw "$IniPath does not exist"
+    }
+    $Ini = [PhpIni]::new($IniPath)
+    return $Ini.GetEnabledExtensions()
+}
+
+
+Export-ModuleMember -Function Install-Php, Update-Php, Get-InstalledPhp, Get-PhpExtensions
