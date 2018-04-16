@@ -151,7 +151,7 @@ class PhpDownloads {
     hidden static [PhpVersion[]] $Archives
     hidden static [PhpVersion[]] ParseUrl ([string] $PageUrl, [PhpReleaseState] $ReleaseState) {
         [PhpVersion[]] $Result = @()
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
         $WebResponse = Invoke-WebRequest -UseBasicParsing -Uri $PageUrl
         foreach ($Link in $WebResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {
             $Result += [PhpVersion]::FromUrl($PageUrl, $Link.Href, $ReleaseState)
@@ -262,7 +262,7 @@ function DownloadAndExtractPHP([PhpVersion] $PhpVersion, [string] $DestinationDi
                 break
             }
         }
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
         Invoke-WebRequest -UseBasicParsing $PhpVersion.DownloadUrl -OutFile $LocalTemp
         Expand-Archive -LiteralPath $LocalTemp -DestinationPath $DestinationDirectory -Force
     } finally {
@@ -270,6 +270,45 @@ function DownloadAndExtractPHP([PhpVersion] $PhpVersion, [string] $DestinationDi
     }
 }
 
+function UpdatePhpIni([string] $IniPath, [System.Collections.Hashtable] $Dictionary) {
+    if ([System.IO.FIle]::Exists($IniPath)) {
+        $Ini = [IO.File]::ReadAllText($IniPath) -replace "`r`n", "`n"
+        $Lines = $Ini.Split("`n")
+    } else {
+        $Lines = @()
+    }
+    foreach ($Enumerator in $Dictionary.GetEnumerator()) {
+        $DictionaryKey = $Enumerator.Name
+        $DictionaryValue = $Enumerator.Value
+        $RxSearch = '^(\s*([;#])*\s*' + [Regex]::Escape($DictionaryKey) + '\s*)=(.*)$'
+        $FoundLineIndex = -1
+        for ($LineIndex = 0; $LineIndex -lt $Lines.Length; $LineIndex++) {
+            $RxMatch = $Lines[$LineIndex] | Select-String -Pattern $RxSearch
+            if ($RxMatch -ne $null) {
+                if ($FoundLineIndex -lt 0) {
+                    $FoundLineIndex = $LineIndex
+                } elseif ($RxMatch.Matches[0].Groups[2].Length -eq 0) {
+                    $FoundLineIndex = $FoundLineIndex
+                }
+            }
+        }
+        if ($FoundLineIndex -lt 0) {
+            if ($DictionaryValue -ne $false) {
+                $NewLine = $DictionaryKey + '=' + $DictionaryValue
+                $Lines += $NewLine
+            }
+        } else {
+            if ($DictionaryValue -eq $false) {
+                $Lines[$FoundLineIndex] = ';' + $Lines[$FoundLineIndex].TrimStart(' ', "`t", '#', ';')
+            } else {
+                $Lines[$FoundLineIndex] = $DictionaryKey + '=' + $DictionaryValue
+            }
+        }
+    }
+    $Ini = [system.String]::Join("`r`n", $Lines)
+    $Ini = $Ini.TrimEnd("`r", "`n") + "`r`n"
+    [IO.File]::WriteAllText($IniPath, $Ini)
+}
 <#
 .Synopsis
 Installs PHP.
@@ -298,7 +337,10 @@ You usually install the ThreadSafe version if you plan to use PHP with Apache, o
 .Parameter Path
 The path of the directory where PHP will be installed
 
-.Parameter AllowNonEmptyPath
+.Parameter TimeZone
+The PHP time zone to configure if php.ini does not exist (if not specified: we'll use UTC).
+
+.Parameter Force
 Use this switch to enable installing PHP even if the destination directory already exists and it's not empty.
 #>
 function Install-Php() {
@@ -307,16 +349,17 @@ function Install-Php() {
         [Parameter(Mandatory = $true)] [ValidateSet(32, 64)] [int] $Bits,
         [Parameter(Mandatory = $true)] [bool] $ThreadSafe,
         [Parameter(Mandatory = $true)] [ValidateLength(1, [int]::MaxValue)] [string] $Path,
-        [switch] $AllowNonEmptyPath
+        [Parameter(Mandatory = $false)] [string] $TimeZone,
+        [switch] $Force
     )
     $Path = [System.IO.Path]::GetFullPath($Path)
     if ([System.IO.File]::Exists($Path)) {
         throw "The specified installation path ($Path) points to an existing file"
     }
-    if (-Not($AllowNonEmptyPath)) {
+    if (-Not($Force)) {
         if ([System.IO.Directory]::Exists($Path)) {
             if (Test-Path -Path $([System.IO.Path]::Combine($Path, '*'))) {
-                throw "The specified installation path ($Path) exists and it's not empty (use the -AllowNonEmptyPath flag to force the installation)"
+                throw "The specified installation path ($Path) exists and it's not empty (use the -Force flag to force the installation)"
             }
         }
     }
@@ -330,8 +373,19 @@ function Install-Php() {
     if ($PhpVersion -eq $null) {
         throw "No PHP version matching $Bits and thread-safety"
     }
-    Write-Host $('Instaling PHP ' + $PhpVersion.DescribeVersion())
+    Write-Host $('Installing PHP ' + $PhpVersion.DescribeVersion())
     DownloadAndExtractPHP $PhpVersion $Path
+    $IniPath = [System.IO.Path]::Combine($Path, 'php.ini');
+    if (-Not([System.IO.File]::Exists($IniPath))) {
+        if ($TimeZone -eq $null -or $TimeZone -eq '') {
+            $TimeZone = 'UTC'
+        }
+        UpdatePhpIni $IniPath @{
+            'date.timezone' = $TimeZone
+            'default_charset' = 'UTF-8'
+            'extension_dir' = [System.IO.Path]::Combine($Path, 'ext')
+        }
+    }
 }
 
 <#
@@ -344,10 +398,13 @@ Checks if a new PHP version is available: if so updates an existing PHP installa
 .Parameter Path
 The path of the directory where PHP is installed.
 
+.Parameter Force
+Use this switch to force updating PHP even if the newest available version is not newer than the installed one.
 #>
 function Update-Php() {
     Param(
-        [Parameter(Mandatory = $true)] [ValidateLength(1, [int]::MaxValue)] [string] $Path
+        [Parameter(Mandatory = $true)] [ValidateLength(1, [int]::MaxValue)] [string] $Path,
+        [switch] $Force
     )
     $InstalledVersion = $null
     $Path = [System.IO.Path]::GetFullPath($Path)
@@ -384,12 +441,12 @@ function Update-Php() {
             break
         }
     }
-    if ($BestNewVersion -eq $null -or $BestNewVersion.CompareVersion($InstalledVersion) -le 0) {
-        if ($BestNewVersion -eq $null) {
-            Write-Host $('No new version available.');
-        } else {
-            Write-Host $('No new version available (latest version is ' + $BestNewVersion.DescribeVersion() + ')')
-        }
+    if ($BestNewVersion -eq $null) {
+        Write-Host $('No new version available.');
+        return $false
+    }
+    if (-Not($force) -and $BestNewVersion.CompareVersion($InstalledVersion) -le 0) {
+        Write-Host $('No new version available (latest version is ' + $BestNewVersion.DescribeVersion() + ')')
         return $false
     }
     Write-Host $('Installing new version: ' + $BestNewVersion.DescribeVersion())
