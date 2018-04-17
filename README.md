@@ -4,11 +4,8 @@ This repository contains a PowerShell module that implements functions to instal
 
 # Available Commands
 
-- `Install-Php`  
-  To install a new PHP version
-- `Update-Php`  
-  To update an existing PHP version to a newer version
-- `Get-InstalledPhp`  
-  To get the details about an installed PHP version
+To get the list of installed commands, type:
 
-...more coming soon...
+```ps
+Get-Command -Module Php
+```
