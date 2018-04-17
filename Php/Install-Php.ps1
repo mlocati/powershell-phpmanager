@@ -30,6 +30,10 @@ function Install-Php() {
     .Parameter TimeZone
     The PHP time zone to configure if php.ini does not exist (if not specified: we'll use UTC).
 
+    .Parameter AddToPath
+    Specify if you want to add the PHP installation folder to the user ('User') or system ('System') PATH environment variable.
+    Please remark that using 'System' usually requires administrative rights.
+
     .Parameter Force
     Use this switch to enable installing PHP even if the destination directory already exists and it's not empty.
     #>
@@ -47,6 +51,9 @@ function Install-Php() {
         [string] $Path,
         [Parameter(Mandatory = $false, Position = 4, HelpMessage = 'The PHP time zone to configure if php.ini does not exist (if not specified: we''ll use UTC)')]
         [string] $TimeZone,
+        [Parameter(Mandatory = $false, Position = 5, HelpMessage = 'Specify if you want to add the PHP installation folder to the user (''User'') or system (''System'') PATH environment variable')]
+        [ValidateSet('User', 'System')]
+        [string] $AddToPath,
         [switch] $Force
     )
     $Path = [System.IO.Path]::GetFullPath($Path)
@@ -120,5 +127,8 @@ function Install-Php() {
         Set-PhpIni -Path $IniPath -Key 'date.timezone' -Value $TimeZone
         Set-PhpIni -Path $IniPath -Key 'default_charset' -Value 'UTF-8'
         Set-PhpIni -Path $IniPath -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext'))
+    }
+    If ($AddToPath -ne $null -and $AddToPath -ne '') {
+        Add-FolderToPath -Path $Path -Persist $AddToPath -CurrentProcess
     }
 }
