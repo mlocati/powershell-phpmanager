@@ -124,9 +124,9 @@ function Install-Php() {
         if ($TimeZone -eq $null -or $TimeZone -eq '') {
             $TimeZone = 'UTC'
         }
-        Set-PhpIni -Path $IniPath -Key 'date.timezone' -Value $TimeZone
-        Set-PhpIni -Path $IniPath -Key 'default_charset' -Value 'UTF-8'
-        Set-PhpIni -Path $IniPath -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext'))
+        Set-PhpIniKey -Path $IniPath -Key 'date.timezone' -Value $TimeZone
+        Set-PhpIniKey -Path $IniPath -Key 'default_charset' -Value 'UTF-8'
+        Set-PhpIniKey -Path $IniPath -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext'))
     }
     If ($AddToPath -ne $null -and $AddToPath -ne '') {
         Add-FolderToPath -Path $Path -Persist $AddToPath -CurrentProcess
