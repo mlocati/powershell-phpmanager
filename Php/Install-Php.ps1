@@ -99,7 +99,7 @@ function Install-Php() {
     # Filter the list of available PHP versions, and get the latest one
     $versionToInstall = $null
     ForEach ($searchReleaseState in $searchReleaseStates) {
-        $compatibleVersions = Get-PhpAvailableVersions -State $searchReleaseState | Where {$_.FullVersion -match $rxSearchVersion} | Where {$_.Architecture -eq $Architecture} | Where {$_.ThreadSafe -eq $ThreadSafe}
+        $compatibleVersions = Get-PhpAvailableVersions -State $searchReleaseState | Where-Object {$_.FullVersion -match $rxSearchVersion} | Where-Object {$_.Architecture -eq $Architecture} | Where-Object {$_.ThreadSafe -eq $ThreadSafe}
         ForEach ($compatibleVersion in $compatibleVersions) {
             If ($versionToInstall -eq $null) {
                 $versionToInstall = $compatibleVersion

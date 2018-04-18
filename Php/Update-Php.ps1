@@ -49,7 +49,7 @@ function Update-Php() {
         }
         $compatibleVersions = $null
         foreach ($possibleReleaseState in $possibleReleaseStates) {
-            $compatibleVersions = Get-PhpAvailableVersions -State $possibleReleaseState | Where {Get-PhpVersionsCompatibility -A $installedVersion -B $_}
+            $compatibleVersions = Get-PhpAvailableVersions -State $possibleReleaseState | Where-Object {Get-PhpVersionsCompatibility -A $installedVersion -B $_}
             if ($compatibleVersions -ne $null) {
                 break
             }

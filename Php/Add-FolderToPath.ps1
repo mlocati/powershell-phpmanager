@@ -43,7 +43,7 @@ Function Add-FolderToPath
         }
         ForEach ($target in $targets) {
             $currentPathParts = [System.Environment]::GetEnvironmentVariable('Path', $target).Split($pathSeparator)
-            $found = $currentPathParts | Where {$_ -eq $Path -or $_ -eq $alternativePath}
+            $found = $currentPathParts | Where-Object {$_ -eq $Path -or $_ -eq $alternativePath}
             if ($found -eq $null) {
                 $currentPathParts += $Path
                 $joinedPath = $currentPathParts -join $pathSeparator

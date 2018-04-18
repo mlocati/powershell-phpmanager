@@ -28,7 +28,7 @@ Function Remove-FolderFromPaths
         ForEach ($target in $targets) {
             $originalPath = [System.Environment]::GetEnvironmentVariable('Path', $target)
             $parts = $originalPath.Split($pathSeparator)
-            $parts = $parts | Where {$_ -ne $Path -and $_ -ne $alternativePath}
+            $parts = $parts | Where-Object {$_ -ne $Path -and $_ -ne $alternativePath}
             $newPath = $parts -join $pathSeparator
             if ($originalPath -ne $newPath) {
                 $requireRunAs = $false
