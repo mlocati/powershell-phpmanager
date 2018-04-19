@@ -1,10 +1,5 @@
 build: off
 
-only_commits:
-  files:
-    - Php/
-    - src/
-
 install:
   - ps: Import-Module -Force .\Php
 
