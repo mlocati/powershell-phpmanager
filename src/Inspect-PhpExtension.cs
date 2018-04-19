@@ -189,10 +189,10 @@ class Program
                 {
                     zend_extension_entry zee = (zend_extension_entry)Marshal.PtrToStructure(pGetZendExtensionEntry, typeof(zend_extension_entry));
                     extensionType = "Zend";
-                    if (extensionName == "") {
+                    if (zee.name != "") {
                         extensionName = zee.name;
                     }
-                    if (extensionVersion == "") {
+                    if (zee.version == "") {
                         extensionVersion = zee.version;
                     }
                 }
