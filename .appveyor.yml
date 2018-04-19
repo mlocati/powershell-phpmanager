@@ -10,6 +10,7 @@ install:
 
 test_script:
   - ps: |
+      Set-StrictMode -Version 2.0
       $ProgressPreference = 'SilentlyContinue'
       $ErrorActionPreference = 'Stop'
       $latest72 = Get-PhpAvailableVersions -State Release | Where-Object { $_.BaseVersion -match '^7.2\.' -and $_.Architecture -eq 'x86' -and $_.ThreadSafe -eq $true }
@@ -35,6 +36,7 @@ test_script:
       Write-Host ('Zend extensions found: ' + $zendExtensions.Count)
       $enabledExtensions = @($allExtensions | Where-Object { $_.State -eq 'Enabled' })
       If ($enabledExtensions.Count -ne 0) { Throw 'Some PHP extensions (in addition to the builtin ones) are already enabled!' }
+      Enable-PhpExtension -Extension curl -Path $installPath
       Uninstall-Php $installPath
       If ($Env:Path -like "*$installPath*") { Throw 'Installation directory not removed from PATH' }
       
