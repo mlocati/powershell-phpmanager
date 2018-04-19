@@ -32,6 +32,11 @@ test_script:
       $enabledExtensions = @($allExtensions | Where-Object { $_.State -eq 'Enabled' })
       If ($enabledExtensions.Count -ne 0) { Throw 'Some PHP extensions (in addition to the builtin ones) are already enabled!' }
       Enable-PhpExtension -Extension curl -Path $installPath
+      $enabledExtensions = @(Get-PhpExtensions $installPath | Where-Object { $_.Type -eq 'Php' -and $_.State -eq 'Enabled' })
+      If ($enabledExtensions.Count -ne 1) { Throw 'Expected 1 PHP enabled installation' }
+      Disable-PhpExtension -Extension curl -Path $installPath
+      $enabledExtensions = @(Get-PhpExtensions $installPath | Where-Object { $_.Type -eq 'Php' -and $_.State -eq 'Enabled' })
+      If ($enabledExtensions.Count -ne 0) { Throw 'Expected 0 PHP enabled installation' }
       Uninstall-Php $installPath
       If ($Env:Path -like "*$installPath*") { Throw 'Installation directory not removed from PATH' }
       
