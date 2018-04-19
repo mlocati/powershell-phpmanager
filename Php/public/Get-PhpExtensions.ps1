@@ -33,7 +33,6 @@ function Get-PhpExtensions() {
             }
             $phpVersion = $phpVersionsInPath[0]
         } Else {
-            $Path = [System.IO.Path]::GetFullPath($Path)
             If (-Not(Test-Path -Path $Path)) {
                 throw "Unable to find the directory/file $Path"
             }
