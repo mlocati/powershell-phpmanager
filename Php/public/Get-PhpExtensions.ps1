@@ -24,14 +24,7 @@ function Get-PhpExtensions() {
     }
     Process {
         If ($Path -eq $null -or $Path -eq '') {
-            $phpVersionsInPath = Get-Php
-            If ($phpVersionsInPath.Count -eq 0) {
-                Throw "No PHP versions found in the current PATHs: use the -Path argument to specify the location of installed PHP"
-            }
-            If ($phpVersionsInPath.Count -gt 1) {
-                Throw "Multiple PHP versions found in the current PATHs: use the -Path argument to specify the location of installed PHP"
-            }
-            $phpVersion = $phpVersionsInPath[0]
+            $phpVersion = Get-OnePhpVersionFromEnvironment
         } Else {
             If (-Not(Test-Path -Path $Path)) {
                 throw "Unable to find the directory/file $Path"
