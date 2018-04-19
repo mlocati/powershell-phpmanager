@@ -23,21 +23,27 @@ function Install-PhpFromUrl() {
     }
     Process {
         $temporaryFile = [System.IO.Path]::GetTempFileName()
-        try {
+        Try {
             $temporaryDirectory = [System.IO.Path]::GetDirectoryName($temporaryFile)
             $temporaryName = [System.IO.Path]::GetFileNameWithoutExtension($temporaryFile)
-            for ($i = 0;; $i++) {
+            For ($i = 0;; $i++) {
                 $newTemporaryFile = [System.IO.Path]::Combine($temporaryDirectory, $temporaryName + '-' + [string] $i + '.zip')
-                if (-Not( Test-Path $newTemporaryFile)) {
+                If (-Not( Test-Path $newTemporaryFile)) {
                     Rename-Item $temporaryFile $newTemporaryFile
                     $temporaryFile = $newTemporaryFile
-                    break
+                    Break
                 }
             }
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
+            Try {
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
+            }
+            Catch {
+            }
+            Write-Debug "Downloading from $Url"
             Invoke-WebRequest -UseBasicParsing $Url -OutFile $temporaryFile
+            Write-Debug "Extracting $temporaryFile"
             Expand-Archive -LiteralPath $temporaryFile -DestinationPath $Path -Force
-        } finally {
+        } Finally {
             Remove-Item -Path $temporaryFile
         }
     }

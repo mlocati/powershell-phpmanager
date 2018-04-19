@@ -32,23 +32,28 @@ Function Add-PhpFolderToPath
         $alternativePath = $Path + $directorySeparator
         $targets = @()
         If ($CurrentProcess) {
-            $targets += [System.EnvironmentVariableTarget]::Process
+            $targets += $Script:ENVTARGET_PROCESS
         }
         If ($Persist -ne $null) {
             If ($Persist -eq 'User') {
-                $targets += [System.EnvironmentVariableTarget]::User
+                $targets += $Script:ENVTARGET_USER
             } ElseIf ($Persist -eq 'System') {
-                $targets += [System.EnvironmentVariableTarget]::Machine
+                $targets += $Script:ENVTARGET_MACHINE
             }
         }
         ForEach ($target in $targets) {
-            $currentPathParts = [System.Environment]::GetEnvironmentVariable('Path', $target).Split($pathSeparator)
+            If ($target -eq $Script:ENVTARGET_PROCESS) {
+                $currentPath = $Env:Path
+            } Else {
+                $currentPath = [System.Environment]::GetEnvironmentVariable('Path', $target).Split($pathSeparator)
+            }
+            $currentPathParts = $currentPath.Split($pathSeparator)
             $found = $currentPathParts | Where-Object {$_ -eq $Path -or $_ -eq $alternativePath}
             if ($found -eq $null) {
                 $currentPathParts += $Path
                 $joinedPath = $currentPathParts -join $pathSeparator
                 $requireRunAs = $false
-                If ($target -eq [System.EnvironmentVariableTarget]::Machine) {
+                If ($target -eq $Script:ENVTARGET_MACHINE) {
                     $currentUser = [System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()
                     If (-Not($currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
                         $requireRunAs = $true
@@ -56,10 +61,14 @@ Function Add-PhpFolderToPath
                 }
                 If ($requireRunAs) {
                     $escapedJoinedPath = $joinedPath -replace "'", "''"
-                    $exeCommand = "[System.Environment]::SetEnvironmentVariable('Path', '$escapedJoinedPath', [System.EnvironmentVariableTarget]::Machine)"
+                    $exeCommand = "[System.Environment]::SetEnvironmentVariable('Path', '$escapedJoinedPath', '$Script:ENVTARGET_MACHINE')"
                     Start-Process -FilePath 'powershell.exe' -ArgumentList "-Command ""$exeCommand""" -Verb RunAs
                 } else {
-                    [System.Environment]::SetEnvironmentVariable('Path', $joinedPath, $target)
+                    If ($target -eq $Script:ENVTARGET_PROCESS) {
+                        $Env:Path = $joinedPath
+                    } Else {
+                        [System.Environment]::SetEnvironmentVariable('Path', $joinedPath, $target)
+                    }
                 }
             }
         }

@@ -20,19 +20,30 @@ Function Remove-PhpFolderFromPaths
         $directorySeparator = [System.IO.Path]::DirectorySeparatorChar
         $Path = [System.IO.Path]::GetFullPath($Path).TrimEnd($directorySeparator)
         $alternativePath = $Path + $directorySeparator
-        $targets = @(
-            [System.EnvironmentVariableTarget]::Process,
-            [System.EnvironmentVariableTarget]::User,
-            [System.EnvironmentVariableTarget]::Machine
-        )
+        If ([System.Environment]::GetEnvironmentVariable[0].OverloadDefinitions.Count -lt 2) {
+            Write-Warning "The current PowerShell version does not support saving environment variables for the User/Machine: we'll set the Path only for the current process"
+            $targets = @(
+                $Script:ENVTARGET_PROCESS
+            )
+        } Else {
+            $targets = @(
+                $Script:ENVTARGET_PROCESS,
+                $Script:ENVTARGET_USER,
+                $Script:ENVTARGET_MACHINE
+            )
+        }
         ForEach ($target in $targets) {
-            $originalPath = [System.Environment]::GetEnvironmentVariable('Path', $target)
+            If ($target -eq $Script:ENVTARGET_PROCESS) {
+                $originalPath = $Env:Path
+            } Else {
+                $originalPath = [System.Environment]::GetEnvironmentVariable('Path', $target)
+            }
             $parts = $originalPath.Split($pathSeparator)
             $parts = $parts | Where-Object {$_ -ne $Path -and $_ -ne $alternativePath}
             $newPath = $parts -join $pathSeparator
             if ($originalPath -ne $newPath) {
                 $requireRunAs = $false
-                If ($target -eq [System.EnvironmentVariableTarget]::Machine) {
+                If ($target -eq $Script:ENVTARGET_MACHINE) {
                     $currentUser = [System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()
                     If (-Not($currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
                         $requireRunAs = $true
@@ -40,10 +51,14 @@ Function Remove-PhpFolderFromPaths
                 }
                 If ($requireRunAs) {
                     $escapedNewPath = $newPath -replace "'", "''"
-                    $exeCommand = "[System.Environment]::SetEnvironmentVariable('Path', '$escapedNewPath', [System.EnvironmentVariableTarget]::Machine)"
+                    $exeCommand = "[System.Environment]::SetEnvironmentVariable('Path', '$escapedNewPath', '$Script:ENVTARGET_MACHINE')"
                     Start-Process -FilePath 'powershell.exe' -ArgumentList "-Command ""$exeCommand""" -Verb RunAs
                 } Else {
-                    [System.Environment]::SetEnvironmentVariable('Path', $newPath, $target)
+                    If ($target -eq $Script:ENVTARGET_PROCESS) {
+                        $Env:Path = $newPath
+                    } Else {
+                        [System.Environment]::SetEnvironmentVariable('Path', $newPath, $target)
+                    }
                 }
             }
         }

@@ -20,3 +20,8 @@ New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_DISABLED' -Val
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONTYPE_BUILTIN' -Value 'Builtin'
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONTYPE_PHP' -Value 'Php'
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONTYPE_ZEND' -Value 'Zend'
+
+# [System.EnvironmentVariableTarget] May not exist
+New-Variable -Option Constant -Scope Script -Name 'ENVTARGET_PROCESS' -Value 'Process'
+New-Variable -Option Constant -Scope Script -Name 'ENVTARGET_USER' -Value 'User'
+New-Variable -Option Constant -Scope Script -Name 'ENVTARGET_MACHINE' -Value 'Machine'

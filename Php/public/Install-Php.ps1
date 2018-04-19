@@ -132,7 +132,12 @@ function Install-Php() {
             Set-PhpIniKey -Path $IniPath -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext'))
         }
         If ($AddToPath -ne $null -and $AddToPath -ne '') {
-            Add-PhpFolderToPath -Path $Path -Persist $AddToPath -CurrentProcess
+            If ([System.Environment]::GetEnvironmentVariable[0].OverloadDefinitions.Count -lt 2) {
+                Write-Warning "The current PowerShell version does not support saving environment variables to ${AddToPath}: we'll set the Path only for the current process"
+                Add-PhpFolderToPath -Path $Path -CurrentProcess
+            } Else {
+                Add-PhpFolderToPath -Path $Path -Persist $AddToPath -CurrentProcess
+            }
         }
     }
     End {

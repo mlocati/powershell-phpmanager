@@ -28,15 +28,19 @@ Function Get-PhpAvailableVersions
     }
     Process {
         $listVariableName = 'AVAILABLEVERSIONS_' + $State
-        if (-Not $Reload) {
+        If (-Not $Reload) {
             $result = Get-Variable -Name $listVariableName -ValueOnly -Scope Script
         }
-        if ($result -eq $null) {
+        If ($result -eq $null) {
             $result = @()
             $urlList = Get-Variable -Name $('URL_LIST_' + $State) -ValueOnly -Scope Script
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
+            Try {
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
+            }
+            Catch {
+            }
             $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $urlList
-            foreach ($link in $webResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {
+            ForEach ($link In $webResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {
                 $result += Get-PhpVersionFromUrl -Url $link.Href -PageUrl $urlList -ReleaseState $State
             }
             Set-Variable -Scope Script -Name $listVariableName -Value $result -Force
