@@ -2,22 +2,22 @@ Function Get-PhpVersionsCompatibility
 {
     <#
     .Synopsis
-    Checks if two PHP version objects are compatible.
+    Checks if two PhpVersion instances are compatible.
     
     .Parameter A
-    The first PHP version object to check
+    The first PhpVersion instance to check.
 
     .Parameter B
-    The second PHP version object to check
+    The second PhpVersion instance to check.
 
     .Outputs
     bool
     #>
     Param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The first PHP version object to compare')]
+        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The first PhpVersion instance to compare')]
         [ValidateNotNull()]
         [PSObject]$A,
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The first PHP version object to compare')]
+        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The second PhpVersion instance to compare')]
         [ValidateNotNull()]
         [PSObject]$B
     )

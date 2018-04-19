@@ -7,7 +7,11 @@ function Update-Php() {
     Checks if a new PHP version is available: if so updates an existing PHP installation.
 
     .Parameter Path
-    The path of the directory where PHP is installed.
+    The path of the PHP installation.
+    If omitted we'll use the one found in the PATH environment variable.
+
+    .Parameter ConfirmAuto
+    If -Path is omitted, specify this flag to assume that the PHP installation found in PATH is the correct one.
 
     .Parameter Force
     Use this switch to force updating PHP even if the newest available version is not newer than the installed one.
@@ -16,32 +20,42 @@ function Update-Php() {
     bool
     #>
     Param(
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path of the directory where PHP is installed')]
+        [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path of the PHP installation; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Path,
+        [switch] $ConfirmAuto,
         [switch] $Force
     )
     Begin {
         $updated = $null
     }
     Process {
-        $Path = [System.IO.Path]::GetFullPath($Path)
-        # Check existency
-        If (Test-Path -Path $Path -PathType Leaf) {
-            If ($([System.IO.Path]::GetFileName($Path)) -ne 'php.exe') {
-                Throw 'Path must be the name of a directory (or the path to php.exe).'
+        If ($Path -eq $null -or $Path -eq '') {
+            $installedVersion = Get-OnePhpVersionFromEnvironment
+            $confirmAutomaticallyFoundPhp = $true
+        } Else {
+            If (-Not(Test-Path -Path $Path)) {
+                throw "Unable to find the directory/file $Path"
             }
-            $Path = [System.IO.Path]::GetDirectoryName($Path)
-        } ElseIf (-Not(Test-Path -Path $Path -PathType Container)) {
-            Throw 'Unable to find the Path specified.'
+            $installedVersion = Get-PhpVersionFromPath -Path $Path
+            $confirmAutomaticallyFoundPhp = $false
         }
-        $executablePath = [System.IO.Path]::Combine($Path, 'php.exe')
-        If (-Not(Test-Path -Path $executablePath -PathType Leaf)) {
-            Throw 'Unable to find the PHP executable in the specified Path.'
+        $folder = [System.IO.Path]::GetDirectoryName($installedVersion.ExecutablePath)
+        If ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
+            Write-Host "The PHP installation has been found at $folder"
+            $confirmed = $false
+            While (-Not($confirmed)) {
+                $answer = Read-Host -Prompt "Do you confirm updating this installation [use -ConfirmAuto to confirm autumatically]? [y/n]"
+                If ($answer -match '^\s*y') {
+                    $confirmed = $true
+                } ElseIf ($answer -match '^\s*n') {
+                    throw 'Operation aborted.'
+                } Else {
+                    Write-Host 'Please answer with Y or N'
+                }
+            }
         }
-        $installedVersion = Get-PhpVersionFromExecutable -ExecutablePath $executablePath
-        Write-Host $('Found PHP version: ' + $installedVersion.DisplayName)
         if ($installedVersion.RC -eq '') {
             $possibleReleaseStates = @($Script:RELEASESTATE_RELEASE, $Script:RELEASESTATE_ARCHIVE)
         } else {
@@ -73,7 +87,7 @@ function Update-Php() {
                 $updated = $false
             } else {
                 Write-Host $('Installing new version: ' + $bestNewVersion.DisplayName)
-                Install-PhpFromUrl -Url $bestNewVersion.DownloadUrl -Path $Path
+                Install-PhpFromUrl -Url $bestNewVersion.DownloadUrl -Path ([System.IO.Path]::GetDirectoryName($installedVersion.ExecutablePath))
                 $updated = $true
             }
         }

@@ -8,7 +8,7 @@ Function New-PhpVersion
     This function creates a new object containing the details about a PHP version.
 
     .Parameter Dictionary
-    The dictionary with the property values
+    The dictionary with the property values.
 
     .Outputs
     PSCustomObject
@@ -22,7 +22,9 @@ Function New-PhpVersion
         'VCVersion' = 15;
         'ReleaseState' = $Script:RELEASESTATE_RELEASE;
         'DownloadUrl' = 'http://www.example.com';
-        'ExePath' = 'C:\Dev\PHP\php.exe'
+        'ExecutablePath' = 'C:\Dev\PHP\php.exe'
+        'IniPath' => 'C:\Dev\PHP\php.ini'
+        'ExtensionsPath' => 'C:\Dev\PHP\ext'
     }
     #>
     Param (
@@ -34,8 +36,8 @@ Function New-PhpVersion
         $result = New-Object PSObject
     }
     Process {
-        $result | Add-Member -MemberType NoteProperty -Name 'BaseVersion' -Value $([string]$Dictionary.Item('BaseVersion'))
-        $result | Add-Member -MemberType NoteProperty -Name 'RC' -Value $( If ($Dictionary.ContainsKey('RC')) { [string]$Dictionary.RC } Else { '' } ) 
+        $result | Add-Member -MemberType NoteProperty -Name 'BaseVersion' -Value ([string]$Dictionary['BaseVersion'])
+        $result | Add-Member -MemberType NoteProperty -Name 'RC' -Value $( If ($Dictionary.ContainsKey('RC')) { [string]$Dictionary['RC'] } Else { '' } )
         $fullVersion = $result.BaseVersion
         $comparableVersion = $result.BaseVersion
         If ($result.RC -eq '') {
@@ -46,7 +48,7 @@ Function New-PhpVersion
         }
         $result | Add-Member -MemberType NoteProperty -Name 'FullVersion' -Value $fullVersion
         $result | Add-Member -MemberType NoteProperty -Name 'ComparableVersion' -Value $([System.Version]$comparableVersion
-        $result | Add-Member -MemberType NoteProperty -Name 'Architecture' -Value $([string]$Dictionary.Item('Architecture')))
+        $result | Add-Member -MemberType NoteProperty -Name 'Architecture' -Value $([string]$Dictionary['Architecture']))
         $result | Add-Member -MemberType NoteProperty -Name 'ThreadSafe' -Value $([bool]$Dictionary['ThreadSafe'])
         $result | Add-Member -MemberType NoteProperty -Name 'VCVersion' -Value $([int]$Dictionary['VCVersion'])
         If ($Dictionary.ContainsKey('ReleaseState') -and [string]$Dictionary['ReleaseState'] -ne '' -and [string]$Dictionary['ReleaseState'] -ne $Script:RELEASESTATE_UNKNOWN) {
@@ -55,8 +57,14 @@ Function New-PhpVersion
         If ($Dictionary.ContainsKey('DownloadUrl') -and [string]$Dictionary['DownloadUrl'] -ne '') {
             $result | Add-Member -MemberType NoteProperty -Name 'DownloadUrl' -Value $([string]$Dictionary['DownloadUrl'])
         }
-        If ($Dictionary.ContainsKey('ExePath') -and [string]$Dictionary['ExePath'] -ne '') {
-            $result | Add-Member -MemberType NoteProperty -Name 'ExePath' -Value $([string]$Dictionary['ExePath'])
+        If ($Dictionary.ContainsKey('ExecutablePath') -and [string]$Dictionary['ExecutablePath'] -ne '') {
+            $result | Add-Member -MemberType NoteProperty -Name 'ExecutablePath' -Value $([string]$Dictionary['ExecutablePath'])
+        }
+        If ($Dictionary.ContainsKey('IniPath') -and [string]$Dictionary['IniPath'] -ne '') {
+            $result | Add-Member -MemberType NoteProperty -Name 'IniPath' -Value $([string]$Dictionary['IniPath'])
+        }
+        If ($Dictionary.ContainsKey('ExtensionsPath') -and [string]$Dictionary['ExtensionsPath'] -ne '') {
+            $result | Add-Member -MemberType NoteProperty -Name 'ExtensionsPath' -Value $([string]$Dictionary['ExtensionsPath'])
         }
         $displayName = 'PHP ' + $result.FullVersion + ' ' + $result.Architecture
         if ($result.Architecture -eq $Script:ARCHITECTURE_32BITS) {

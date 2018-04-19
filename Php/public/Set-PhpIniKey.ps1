@@ -2,22 +2,22 @@ Function Set-PhpIniKey
 {
     <#
     .Synopsis
-    Sets the value of an entry in the php.ini file
+    Sets the value of an entry in the php.ini file.
 
     .Parameter Path
-    The path to the php.ini (or to the folder containing it)
+    The path to a php.ini file, the path to a php.exe file or the folder containing php.exe.
 
     .Parameter Key
-    The key of the php.ini to be set
+    The key of the php.ini to be set.
 
     .Parameter Value
-    The value of the php.ini key to be set
+    The value of the php.ini key to be set.
 
     .Parameter Delete
-    Specify this switch to delete the key in the php.ini
+    Specify this switch to delete the key in the php.ini.
 
     .Parameter Comment
-    Specify this switch to comment the key in the php.ini
+    Specify this switch to comment the key in the php.ini.
 
     .Example
     Set-PhpIniKey 'C:\Dev\PHP\php.ini' 'default_charset' 'UTF-8'
@@ -28,7 +28,7 @@ Function Set-PhpIniKey
     Set-PhpIniKey 'C:\Dev\PHP\php.ini' 'default_charset' -Delete
     #>
     Param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to the php.ini (or to the folder containing it)')]
+        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to a php.ini file, the path to a php.exe file or the folder containing php.exe')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path,
@@ -45,6 +45,15 @@ Function Set-PhpIniKey
         $newLines = @()
     }
     Process {
+        If (Test-Path -Path $Path -PathType Container -or $Path -like '*.exe') {
+            $phpVersion = Get-PhpVersionFromPath -Path $Path
+            $iniFile = $phpVersion.IniPath
+            If (-Not($iniFile)) {
+                Throw "The PHP at $Path does not have a configured php.ini"
+            }
+        } Else {
+            $iniFile = $Path
+        }
         If ($Key -match '\bextension\b') {
             Throw 'You can''t use this command to set the extension key'
         }
@@ -69,13 +78,13 @@ Function Set-PhpIniKey
         }
         $rxSearch = '^\s*([;#][\s;#]*)?(' + [Regex]::Escape($Key) + '\s*)=(.*)$'
         $found = $false
-        ForEach ($line in $(Get-PhpIniLines -Path $Path)) {
-            $rxMatch = $line | Select-String -Pattern $rxSearch
-            if ($rxMatch -eq $null) {
+        ForEach ($line in $(Get-PhpIniLines -Path $iniPath)) {
+            $match = $line | Select-String -Pattern $rxSearch
+            if ($match -eq $null) {
                 $newLines += $line
             } ElseIf ($found) {
                 If ($operation -ne 'DELETE') {
-                    If ($rxMatch.Matches[0].Groups[1].Length -eq 0) {
+                    If ($match.Matches[0].Groups[1].Length -eq 0) {
                         $newLines += ';' + $line;
                     } else {
                         $newLines += $line
@@ -84,7 +93,7 @@ Function Set-PhpIniKey
             } else {
                 $found = $true
                 If ($operation -eq 'COMMENT') {
-                    If ($rxMatch.Matches[0].Groups[1].Length -eq 0) {
+                    If ($match.Matches[0].Groups[1].Length -eq 0) {
                         $newLines += ';' + $line;
                     } Else {
                         $newLines += $line;
@@ -99,6 +108,6 @@ Function Set-PhpIniKey
         }
     }
     End {
-        Set-PhpIniLines -Path $Path -Lines $newLines
+        Set-PhpIniLines -Path $iniPath -Lines $newLines
     }
 }

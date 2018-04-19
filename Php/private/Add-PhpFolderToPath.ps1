@@ -1,20 +1,20 @@
-Function Add-FolderToPath
+Function Add-PhpFolderToPath
 {
     <#
     .Synopsis
-    Adds a folder to the PATH environment variable
+    Adds a folder to the PATH environment variable.
 
     .Parameter Path
-    The path to the directory to be added to the PATH environment variable
+    The path of the directory to be added to the PATH environment variable.
 
     .Parameter Persist
-    Permamently set the PATH for either the current user ('User') or for the whole system ('System')
+    Permamently set the PATH for either the current user ('User') or for the whole system ('System').
 
     .Parameter CurrentProcess
-    Specify this switch to add Path to the current PATH environment variable
+    Specify this switch to add Path to the current PATH environment variable.
     #>
     Param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to the directory to be added to the PATH environment variable')]
+        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path of the directory to be added to the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path,
@@ -27,9 +27,9 @@ Function Add-FolderToPath
     }
     Process {
         $pathSeparator = [System.IO.Path]::PathSeparator
-        $directorySeparatorChar = [System.IO.Path]::DirectorySeparatorChar
-        $Path = [System.IO.Path]::GetFullPath($Path).TrimEnd($directorySeparatorChar)
-        $alternativePath = $Path + $directorySeparatorChar
+        $directorySeparator = [System.IO.Path]::DirectorySeparatorChar
+        $Path = [System.IO.Path]::GetFullPath($Path).TrimEnd($directorySeparator)
+        $alternativePath = $Path + $directorySeparator
         $targets = @()
         If ($CurrentProcess) {
             $targets += [System.EnvironmentVariableTarget]::Process

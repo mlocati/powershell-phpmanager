@@ -7,13 +7,15 @@ function Install-PhpFromUrl() {
     The URL where the binary archive can be downloaded from.
 
     .Parameter Path
-    The path where the archive should be extracted to
+    The path where the archive should be extracted to.
     #>
     Param(
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The URL where the binary archive can be downloaded from')]
+        [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Url,
         [Parameter(Mandatory = $true, Position = 1, HelpMessage = 'The path where the archive should be extracted to')]
+        [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Path
     )

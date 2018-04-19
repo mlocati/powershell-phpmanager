@@ -1,0 +1,41 @@
+build: off
+
+only_commits:
+  files:
+    - Php/
+    - src/
+
+install:
+  - ps: Import-Module -Force .\Php
+
+test_script:
+  - ps: |
+      $ProgressPreference = 'SilentlyContinue'
+      $ErrorActionPreference = 'Stop'
+      $latest72 = Get-PhpAvailableVersions -State Release | Where-Object { $_.BaseVersion -match '^7.2\.' -and $_.Architecture -eq 'x86' -and $_.ThreadSafe -eq $true }
+      If (-Not($latest72)) { Throw 'PHP release 7.2 not not found!' }
+      $installPath = 'C:\Test\PHP'
+      Install-Php -Version 7.2.0 -Architecture x86 -ThreadSafe $true -Path $installPath -AddToPath User
+      Write-Host 'Version installed:'
+      Get-Php -Path $installPath
+      If (-Not($Env:Path -like "*$installPath*")) { Throw 'Installation directory not added to PATH' }
+      If (-Not(Update-Php -Path $installPath)) { Throw 'PHP not updated!' }
+      $installedPhp = Get-Php -Path $installPath
+      Write-Host 'Version updated:'
+      $installedPhp
+      If ($latest72.FullVersion -ne $installedPhp.FullVersion) { Throw 'Wrong new PHP version!' }
+      $allExtensions = Get-PhpExtensions $installPath
+      $builtinExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Builtin' })
+      If ($builtinExtensions.Count -eq 0) { Throw 'No PHP builtin extensions found!' }
+      Write-Host ('Builtin extensions found: ' + $builtinExtensions.Count)
+      $phpExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Php' })
+      If ($phpExtensions.Count -eq 0) { Throw 'No PHP extensions found!' }
+      Write-Host ('PHP extensions found: ' + $phpExtensions.Count)
+      $zendExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Zend' })
+      Write-Host ('Zend extensions found: ' + $zendExtensions.Count)
+      $enabledExtensions = @($allExtensions | Where-Object { $_.State -eq 'Enabled' })
+      If ($enabledExtensions.Count -ne 0) { Throw 'Some PHP extensions (in addition to the builtin ones) are already enabled!' }
+      Uninstall-Php $installPath
+      If ($Env:Path -like "*$installPath*") { Throw 'Installation directory not removed from PATH' }
+      
+deploy: off

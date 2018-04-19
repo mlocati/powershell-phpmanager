@@ -1,11 +1,11 @@
-Function Remove-FolderFromPaths
+Function Remove-PhpFolderFromPaths
 {
     <#
     .Synopsis
-    Removes a folder to the PATH environment variables (current process, current user, and system)
+    Removes a folder to the PATH environment variables (current process, current user, and system).
 
     .Parameter Path
-    The path to the directory to be removed to the PATH environment variable
+    The path to the directory to be removed to the PATH environment variable.
     #>
     Param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to the directory to be removed to the PATH environment variable')]
@@ -17,9 +17,9 @@ Function Remove-FolderFromPaths
     }
     Process {
         $pathSeparator = [System.IO.Path]::PathSeparator
-        $directorySeparatorChar = [System.IO.Path]::DirectorySeparatorChar
-        $Path = [System.IO.Path]::GetFullPath($Path).TrimEnd($directorySeparatorChar)
-        $alternativePath = $Path + $directorySeparatorChar
+        $directorySeparator = [System.IO.Path]::DirectorySeparatorChar
+        $Path = [System.IO.Path]::GetFullPath($Path).TrimEnd($directorySeparator)
+        $alternativePath = $Path + $directorySeparator
         $targets = @(
             [System.EnvironmentVariableTarget]::Process,
             [System.EnvironmentVariableTarget]::User,

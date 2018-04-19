@@ -5,23 +5,23 @@ Function Get-PhpAvailableVersions
     Gets the list of available versions.
 
     .Parameter State
-    The release state (can be QA, Release or Archive)
+    The release state (can be 'Release', 'Archive' or 'QA').
 
     .Parameter Reload
-    Force the reload of the list
+    Force the reload of the list.
 
     .Outputs
     System.Array
     
     .Example
-    Get-PhpAvailableVersions 'Release'
+    Get-PhpAvailableVersions -State Release
     #>
     Param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The release state (can be QA, RELEASE or Archive)')]
+        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The release state (can be ''Release'' or ''Archive'' or ''QA'')')]
         [ValidateSet('QA', 'Release', 'Archive')]
         [string]$State,
-        [Parameter(Mandatory = $False, Position = 1, HelpMessage = 'Force the reload of the list')]
-        [bool]$Reload
+        [Parameter(Mandatory = $False,HelpMessage = 'Force the reload of the list')]
+        [switch]$Reload
     )
     Begin {
         $result = $null
@@ -39,7 +39,7 @@ Function Get-PhpAvailableVersions
             foreach ($link in $webResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {
                 $result += Get-PhpVersionFromUrl -Url $link.Href -PageUrl $urlList -ReleaseState $State
             }
-            Set-Variable -Name $listVariableName -Value $result -Force -Scope Script
+            Set-Variable -Scope Script -Name $listVariableName -Value $result -Force
         }
     }
     End {

@@ -11,3 +11,12 @@ New-Variable -Option Constant -Scope Script -Name 'ARCHITECTURE_32BITS' -Value '
 New-Variable -Option Constant -Scope Script -Name 'ARCHITECTURE_64BITS' -Value 'x64'
 
 New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE' -Value 'php-(\d+\.\d+\.\d+)(?:RC([1-9]\d*))?(-nts)?-Win32-VC(\d{1,2})-(x86|x64)\.zip'
+
+New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_BUILTIN' -Value 'Builtin'
+New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_UNKNOWN' -Value 'Unknown'
+New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_ENABLED' -Value 'Enabled'
+New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_DISABLED' -Value 'Disabled'
+
+New-Variable -Option Constant -Scope Script -Name 'EXTENSIONTYPE_BUILTIN' -Value 'Builtin'
+New-Variable -Option Constant -Scope Script -Name 'EXTENSIONTYPE_PHP' -Value 'Php'
+New-Variable -Option Constant -Scope Script -Name 'EXTENSIONTYPE_ZEND' -Value 'Zend'
