@@ -105,6 +105,7 @@ function Enable-PhpExtension() {
             }
             $extensionToInstall.State = $Script:EXTENSIONSTATE_ENABLED
             Set-PhpIniLines -Path $iniPath -Lines $newIniLines
+            Write-Host ('The extension ' + $extensionToInstall.Name + ' v' + $extensionToInstall.Version + ' has been enabled')
         }
     }
     End {
