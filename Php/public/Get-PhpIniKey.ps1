@@ -4,37 +4,46 @@ Function Get-PhpIniKey
     .Synopsis
     Get the value of an entry in the php.ini file.
 
-    .Parameter Path
-    The path to a php.ini file, the path to a php.exe file or the folder containing php.exe.
-
     .Parameter Key
     The key of the php.ini to get.
 
-    .Example
-    Get-PhpIniKey 'C:\Dev\PHP\php.ini' 'default_charset'
+    .Parameter Path
+    The path to a php.ini file, the path to a php.exe file or the folder containing php.exe.
+    If omitted we'll use the one found in the PATH environment variable.
 
     .Example
-    Get-PhpIniKey 'C:\Dev\PHP' 'default_charset'
+    Get-PhpIniKey 'default_charset'
 
     .Example
-    Get-PhpIniKey 'C:\Dev\PHP\php.exe' 'default_charset'
+    Get-PhpIniKey 'default_charset' 'C:\Dev\PHP\php.ini'
+
+    .Example
+    Get-PhpIniKey 'default_charset' 'C:\Dev\PHP'
+
+    .Example
+    Get-PhpIniKey 'default_charset' 'C:\Dev\PHP\php.exe'
     #>
     Param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to a php.ini file, the path to a php.exe file or the folder containing php.exe')]
+        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The key of the php.ini to get')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
-        [string]$Path,
-        [Parameter(Mandatory = $True, Position = 1, HelpMessage = 'The key of the php.ini to get')]
+        [string]$Key,
+        [Parameter(Mandatory = $True, Position = 1, HelpMessage = 'The path to a php.ini file, the path to a php.exe file or the folder containing php.exe; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
-        [string]$Key
+        [string]$Path
     )
     Begin {
         $result = $null
     }
     Process {
-        If ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
+        $phpVersion = $null
+        If ($Path -eq $null -or $Path -eq '') {
+            $phpVersion = Get-OnePhpVersionFromEnvironment
+        } ElseIf ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
+        }
+        If ($phpVersion -ne $null) {
             $iniPath = $phpVersion.IniPath
             If (-Not($iniPath)) {
                 Throw "The PHP at $Path does not have a configured php.ini"

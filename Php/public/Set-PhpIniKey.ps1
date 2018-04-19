@@ -4,14 +4,15 @@ Function Set-PhpIniKey
     .Synopsis
     Sets the value of an entry in the php.ini file.
 
-    .Parameter Path
-    The path to a php.ini file, the path to a php.exe file or the folder containing php.exe.
-
     .Parameter Key
     The key of the php.ini to set.
 
     .Parameter Value
     The value of the php.ini key to set.
+
+    .Parameter Path
+    The path to a php.ini file, the path to a php.exe file or the folder containing php.exe.
+    If omitted we'll use the one found in the PATH environment variable.
 
     .Parameter Delete
     Specify this switch to delete the key in the php.ini.
@@ -23,32 +24,37 @@ Function Set-PhpIniKey
     Specify this switch to uncomment the key in the php.ini.
 
     .Example
-    Set-PhpIniKey 'C:\Dev\PHP\php.ini' 'default_charset' 'UTF-8'
+    Set-PhpIniKey 'default_charset' 'UTF-8' 'C:\Dev\PHP\php.ini'
 
     .Example
-    Set-PhpIniKey 'C:\Dev\PHP' 'default_charset' 'UTF-8'
+    Set-PhpIniKey 'default_charset' 'UTF-8' 'C:\Dev\PHP\php.exe'
 
     .Example
-    Set-PhpIniKey 'C:\Dev\PHP\php.exe' 'default_charset' 'UTF-8'
+    Set-PhpIniKey 'default_charset' 'UTF-8' 'C:\Dev\PHP'
 
     .Example
-    Set-PhpIniKey 'C:\Dev\PHP\php.ini' 'default_charset' -Comment
-
+    Set-PhpIniKey 'default_charset' 'UTF-8'
 
     .Example
-    Set-PhpIniKey 'C:\Dev\PHP\php.ini' 'default_charset' -Delete
+    Set-PhpIniKey 'default_charset' -Delete
+
+    .Example
+    Set-PhpIniKey 'default_charset' -Comment
+
+    .Example
+    Set-PhpIniKey 'default_charset' -Uncomment
     #>
     Param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to a php.ini file, the path to a php.exe file or the folder containing php.exe')]
-        [ValidateNotNull()]
-        [ValidateLength(1, [int]::MaxValue)]
-        [string]$Path,
-        [Parameter(Mandatory = $True, Position = 1, HelpMessage = 'The key of the php.ini to set')]
+        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The key of the php.ini to set')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Key,
-        [Parameter(Mandatory = $False, Position = 2, HelpMessage = 'The value of the php.ini key to set')]
+        [Parameter(Mandatory = $False, Position = 1, HelpMessage = 'The value of the php.ini key to set')]
         [string]$Value,
+        [Parameter(Mandatory = $False, Position = 2, HelpMessage = 'The path to a php.ini file, the path to a php.exe file or the folder containing php.exe; if omitted we''ll use the one found in the PATH environment variable')]
+        [ValidateNotNull()]
+        [ValidateLength(1, [int]::MaxValue)]
+        [string]$Path,
         [switch]$Delete,
         [switch]$Comment,
         [switch]$Uncomment
@@ -57,8 +63,13 @@ Function Set-PhpIniKey
         $newLines = @()
     }
     Process {
-        If ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
+        $phpVersion = $null
+        If ($Path -eq $null -or $Path -eq '') {
+            $phpVersion = Get-OnePhpVersionFromEnvironment
+        } ElseIf ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
+        }
+        If ($phpVersion -ne $null) {
             $iniPath = $phpVersion.IniPath
             If (-Not($iniPath)) {
                 Throw "The PHP at $Path does not have a configured php.ini"

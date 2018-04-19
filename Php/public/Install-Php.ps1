@@ -127,9 +127,9 @@ function Install-Php() {
             if ($TimeZone -eq $null -or $TimeZone -eq '') {
                 $TimeZone = 'UTC'
             }
-            Set-PhpIniKey -Path $IniPath -Key 'date.timezone' -Value $TimeZone
-            Set-PhpIniKey -Path $IniPath -Key 'default_charset' -Value 'UTF-8'
-            Set-PhpIniKey -Path $IniPath -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext'))
+            Set-PhpIniKey -Key 'date.timezone' -Value $TimeZone -Path $IniPath
+            Set-PhpIniKey -Key 'default_charset' -Value 'UTF-8' -Path $IniPath
+            Set-PhpIniKey -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext')) -Path $IniPath
         }
         If ($AddToPath -ne $null -and $AddToPath -ne '') {
             If ([System.Environment]::GetEnvironmentVariable[0].OverloadDefinitions.Count -lt 2) {
