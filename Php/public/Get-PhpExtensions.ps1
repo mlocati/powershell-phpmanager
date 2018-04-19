@@ -7,14 +7,14 @@ function Get-PhpExtensions() {
     Lists all the extensions found in a PHP installation (Builtin, Enabled and Disabled).
 
     .Parameter Path
-    The path to the PHP installation.
+    The path to the PHP installation (or the path to the php.exe file).
     If omitted we'll use the one found in the PATH environment variable.
 
     .Outputs
     System.Array
     #>
     Param(
-        [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path to the PHP installation; if omitted we''ll use the one found in the PATH environment variable')]
+        [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path to the PHP installation (or the path to the php.exe file); if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Path
