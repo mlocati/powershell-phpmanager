@@ -12,7 +12,7 @@ function Get-OnePhpVersionFromEnvironment() {
         $result = $null
     }
     Process {
-        $phpVersionsInPath = Get-Php
+        $phpVersionsInPath = @(Get-Php)
         If ($phpVersionsInPath.Count -eq 0) {
             Throw "No PHP versions found in the current PATHs: use the -Path argument to specify the location of installed PHP"
         }

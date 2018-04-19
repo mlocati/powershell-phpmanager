@@ -45,7 +45,8 @@ Function Set-PhpIniKey
         $newLines = @()
     }
     Process {
-        If (Test-Path -Path $Path -PathType Container -or $Path -like '*.exe') {
+        If ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
+            Write-Host "Ciao2"
             $phpVersion = Get-PhpVersionFromPath -Path $Path
             $iniFile = $phpVersion.IniPath
             If (-Not($iniFile)) {
