@@ -45,16 +45,18 @@ function Enable-PhpExtension() {
                 throw "Multiple extensions match the name (or handle) `"$Extension`""
             }
         }
-        $extensionToInstall = $foundExtensions[0]
-        If ($extensionToInstall.State -eq $Script:EXTENSIONSTATE_BUILTIN) {
-            Write-Host ('The extension "' + $extensionToInstall.Name + '" is builtin: it''s enabled by default')
-        } ElseIf ($extensionToInstall.State -eq $Script:EXTENSIONSTATE_ENABLED) {
-            Write-Host ('The extension "' + $extensionToInstall.Name + '" is already enabled')
+        $extensionToEnable = $foundExtensions[0]
+        If ($extensionToEnable.State -eq $Script:EXTENSIONSTATE_BUILTIN) {
+            Write-Host ('The extension "' + $extensionToEnable.Name + '" is builtin: it''s enabled by default')
+        } ElseIf ($extensionToEnable.State -eq $Script:EXTENSIONSTATE_ENABLED) {
+            Write-Host ('The extension "' + $extensionToEnable.Name + '" is already enabled')
+        } ElseIf ($extensionToEnable.State -ne $Script:EXTENSIONSTATE_DISABLED) {
+            Throw ('Unknown extension state: "' + $extensionToEnable.State + '"')
         } Else {
-            Switch ($extensionToInstall.Type) {
+            Switch ($extensionToEnable.Type) {
                 $Script:EXTENSIONTYPE_PHP { $iniKey = 'extension' }
                 $Script:EXTENSIONTYPE_ZEND { $iniKey = 'zend_extension' }
-                default { Throw ('Unrecognized extension type: ' + $extensionToInstall.Type) }
+                default { Throw ('Unrecognized extension type: ' + $extensionToEnable.Type) }
             }
             $iniPath = $phpVersion.IniPath
             If (-Not($iniPath)) {
@@ -62,11 +64,11 @@ function Enable-PhpExtension() {
             }
             $extensionDir = $phpVersion.ExtensionsPath
             If (-Not($extensionDir)) {
-                $extensionDir = [System.IO.Path]::GetDirectoryName($extensionToInstall.Filename)
+                $extensionDir = [System.IO.Path]::GetDirectoryName($extensionToEnable.Filename)
                 Set-PhpIniKey -Key 'extension_dir' -Value $extensionDir -Path $iniPath
             }
             $extensionDir = $extensionDir.TrimEnd('/', '\') + [System.IO.Path]::DirectorySeparatorChar
-            $filename = [System.IO.Path]::GetFileName($extensionToInstall.Filename)
+            $filename = [System.IO.Path]::GetFileName($extensionToEnable.Filename)
             $canUseBaseName = [System.Version]$phpVersion.BaseVersion -ge [System.Version]'7.2'
             $rxSearch = '^(\s*)([;#][\s;#]*)?(\s*(?:zend_)?extension\s*=\s*)('
             $rxSearch += '(?:(?:.*[/\\])?' + [regex]::Escape($filename) + ')';
@@ -77,8 +79,8 @@ function Enable-PhpExtension() {
                 }
             }
             $rxSearch += ')\s*$'
-            If ($extensionToInstall.Filename -like ($extensionDir + '*')) {
-                $newIniValue = $extensionToInstall.Filename.SubString($extensionDir.Length)
+            If ($extensionToEnable.Filename -like ($extensionDir + '*')) {
+                $newIniValue = $extensionToEnable.Filename.SubString($extensionDir.Length)
                 If ($canUseBaseName) {
                     $match = $newIniValue | Select-String -Pattern  '^php_(.+)\.dll$'
                     If ($match) {
@@ -86,7 +88,7 @@ function Enable-PhpExtension() {
                     }
                 }
             } Else {
-                $newIniValue = $extensionToInstall.Filename
+                $newIniValue = $extensionToEnable.Filename
             }
             $found = $false
             $newIniLines = @()
@@ -103,9 +105,9 @@ function Enable-PhpExtension() {
             If (-Not($found)) {
                 $newIniLines += "$iniKey=$newIniValue"
             }
-            $extensionToInstall.State = $Script:EXTENSIONSTATE_ENABLED
             Set-PhpIniLines -Path $iniPath -Lines $newIniLines
-            Write-Host ('The extension ' + $extensionToInstall.Name + ' v' + $extensionToInstall.Version + ' has been enabled')
+            $extensionToEnable.State = $Script:EXTENSIONSTATE_ENABLED
+            Write-Host ('The extension ' + $extensionToEnable.Name + ' v' + $extensionToEnable.Version + ' has been enabled')
         }
     }
     End {
