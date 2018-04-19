@@ -64,7 +64,7 @@ Function Get-PhpExtensionDetail
                 throw 'Failed to inspect extension(s)'
             }
             ForEach ($inspectorResult in $inspectorResults) {
-                $match = $inspectorResult | Select-String -Pattern ('^architecture:' + [regex]::Escape($PhpVersion.Architecture) + '\ttype:(\w+)\tname:(.*)\tversion:(.*)\tfilename:(.+)$')
+                $match = $inspectorResult | Select-String -Pattern ('^architecture:' + [regex]::Escape($PhpVersion.Architecture) + '\ttype:(\w+)\tname:(.+)\tversion:(.*)\tfilename:(.+)$')
                 If (-Not($match)) {
                     If ($inspectingSingleFile) {
                         throw "Failed to inspect extension: $inspectorResult"
