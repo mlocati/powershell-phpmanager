@@ -38,26 +38,28 @@ Function Remove-PhpFolderFromPaths
             } Else {
                 $originalPath = [System.Environment]::GetEnvironmentVariable('Path', $target)
             }
-            $parts = $originalPath.Split($pathSeparator)
-            $parts = $parts | Where-Object {$_ -ne $Path -and $_ -ne $alternativePath}
-            $newPath = $parts -join $pathSeparator
-            if ($originalPath -ne $newPath) {
-                $requireRunAs = $false
-                If ($target -eq $Script:ENVTARGET_MACHINE) {
-                    $currentUser = [System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()
-                    If (-Not($currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
-                        $requireRunAs = $true
+            If ($originalPath) {
+                $parts = $originalPath.Split($pathSeparator)
+                $parts = $parts | Where-Object {$_ -ne $Path -and $_ -ne $alternativePath}
+                $newPath = $parts -join $pathSeparator
+                if ($originalPath -ne $newPath) {
+                    $requireRunAs = $false
+                    If ($target -eq $Script:ENVTARGET_MACHINE) {
+                        $currentUser = [System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()
+                        If (-Not($currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
+                            $requireRunAs = $true
+                        }
                     }
-                }
-                If ($requireRunAs) {
-                    $escapedNewPath = $newPath -replace "'", "''"
-                    $exeCommand = "[System.Environment]::SetEnvironmentVariable('Path', '$escapedNewPath', '$Script:ENVTARGET_MACHINE')"
-                    Start-Process -FilePath 'powershell.exe' -ArgumentList "-Command ""$exeCommand""" -Verb RunAs
-                } Else {
-                    If ($target -eq $Script:ENVTARGET_PROCESS) {
-                        $Env:Path = $newPath
+                    If ($requireRunAs) {
+                        $escapedNewPath = $newPath -replace "'", "''"
+                        $exeCommand = "[System.Environment]::SetEnvironmentVariable('Path', '$escapedNewPath', '$Script:ENVTARGET_MACHINE')"
+                        Start-Process -FilePath 'powershell.exe' -ArgumentList "-Command ""$exeCommand""" -Verb RunAs
                     } Else {
-                        [System.Environment]::SetEnvironmentVariable('Path', $newPath, $target)
+                        If ($target -eq $Script:ENVTARGET_PROCESS) {
+                            $Env:Path = $newPath
+                        } Else {
+                            [System.Environment]::SetEnvironmentVariable('Path', $newPath, $target)
+                        }
                     }
                 }
             }

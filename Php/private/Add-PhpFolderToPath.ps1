@@ -47,6 +47,9 @@ Function Add-PhpFolderToPath
             } Else {
                 $currentPath = [System.Environment]::GetEnvironmentVariable('Path', $target).Split($pathSeparator)
             }
+            If ($currentPath -eq $null) {
+                $currentPath = ''
+            }
             $currentPathParts = $currentPath.Split($pathSeparator)
             $found = $currentPathParts | Where-Object {$_ -eq $Path -or $_ -eq $alternativePath}
             if ($found -eq $null) {
