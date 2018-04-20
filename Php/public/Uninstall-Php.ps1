@@ -27,9 +27,6 @@ function Uninstall-Php() {
             $phpVersion = Get-OnePhpVersionFromEnvironment
             $confirmAutomaticallyFoundPhp = $true
         } Else {
-            If (-Not(Test-Path -Path $Path)) {
-                throw "Unable to find the directory/file $Path"
-            }
             $phpVersion = Get-PhpVersionFromPath -Path $Path
             $confirmAutomaticallyFoundPhp = $false
         }

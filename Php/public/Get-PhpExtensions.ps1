@@ -26,9 +26,6 @@ function Get-PhpExtensions() {
         If ($Path -eq $null -or $Path -eq '') {
             $phpVersion = Get-OnePhpVersionFromEnvironment
         } Else {
-            If (-Not(Test-Path -Path $Path)) {
-                throw "Unable to find the directory/file $Path"
-            }
             $phpVersion = Get-PhpVersionFromPath -Path $Path
         }
         $result += Get-PhpBuiltinExtensions -PhpVersion $phpVersion

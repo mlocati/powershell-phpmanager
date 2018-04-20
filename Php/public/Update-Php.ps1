@@ -35,9 +35,6 @@ function Update-Php() {
             $installedVersion = Get-OnePhpVersionFromEnvironment
             $confirmAutomaticallyFoundPhp = $true
         } Else {
-            If (-Not(Test-Path -Path $Path)) {
-                throw "Unable to find the directory/file $Path"
-            }
             $installedVersion = Get-PhpVersionFromPath -Path $Path
             $confirmAutomaticallyFoundPhp = $false
         }
