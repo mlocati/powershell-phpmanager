@@ -24,17 +24,21 @@ function Get-Php() {
         If ($Path -ne $null -and $Path -ne '') {
             $result += Get-PhpVersionFromPath -Path $Path
         } Else {
-            $donePaths = @{}
-            ForEach ($pathFromEnv in @($env:Path.split(';'))) {
-                $executablePath = [System.IO.Path]::Combine($pathFromEnv, 'php.exe')
-                If (Test-Path -Path $executablePath -PathType Leaf) {
-                    $executablePath = [System.IO.Path]::GetFullPath($executablePath)
-                    $key = $executablePath.ToLowerInvariant()
-                    If (-Not($donePaths.ContainsKey($key))) {
-                        $donePaths[$key] = $true
-                        $result += Get-PhpVersionFromPath -Path $executablePath
+            $envPath = $env:Path
+            If ($envPath -ne $null) {
+                $donePaths = @{}
+                $pathSeparator = [System.IO.Path]::PathSeparator
+                ForEach ($pathFromEnv in @($envPath.Split($pathSeparator))) {
+                    $executablePath = [System.IO.Path]::Combine($pathFromEnv, 'php.exe')
+                    If (Test-Path -Path $executablePath -PathType Leaf) {
+                        $executablePath = [System.IO.Path]::GetFullPath($executablePath)
+                        $key = $executablePath.ToLowerInvariant()
+                        If (-Not($donePaths.ContainsKey($key))) {
+                            $donePaths[$key] = $true
+                            $result += Get-PhpVersionFromPath -Path $executablePath
+                        }
                     }
-                }
+               }
             }
         }
     }
