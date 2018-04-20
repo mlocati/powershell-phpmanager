@@ -5,21 +5,27 @@ install:
 
 test_script:
   - ps: |
+      # Setup
       Set-StrictMode -Version 2.0
       $ProgressPreference = 'SilentlyContinue'
       $ErrorActionPreference = 'Stop'
+      # Check that Get-PhpAvailableVersions works
       $latest72 = Get-PhpAvailableVersions -State Release | Where-Object { $_.BaseVersion -match '^7.2\.' -and $_.Architecture -eq 'x86' -and $_.ThreadSafe -eq $true }
       If (-Not($latest72)) { Throw 'PHP release 7.2 not not found!' }
+      # Check that Install-Php works
       $installPath = 'C:\Test\PHP'
       Install-Php -Version 7.2.0 -Architecture x86 -ThreadSafe $true -Path $installPath -AddToPath User
+      # Check that Get-Php works
       Write-Host 'Version installed:'
       Get-Php -Path $installPath
       If (-Not($Env:Path -like "*$installPath*")) { Throw 'Installation directory not added to PATH' }
+      # Check that Update-Php works
       If (-Not(Update-Php -Path $installPath)) { Throw 'PHP not updated!' }
       $installedPhp = Get-Php -Path $installPath
       Write-Host 'Version updated:'
       $installedPhp
       If ($latest72.FullVersion -ne $installedPhp.FullVersion) { Throw 'Wrong new PHP version!' }
+      # Check that Get-PhpExtensions works
       $allExtensions = Get-PhpExtensions $installPath
       $builtinExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Builtin' })
       If ($builtinExtensions.Count -eq 0) { Throw 'No PHP builtin extensions found!' }
@@ -31,12 +37,19 @@ test_script:
       Write-Host ('Zend extensions found: ' + $zendExtensions.Count)
       $enabledExtensions = @($allExtensions | Where-Object { $_.State -eq 'Enabled' })
       If ($enabledExtensions.Count -ne 0) { Throw 'Some PHP extensions (in addition to the builtin ones) are already enabled!' }
+      # Check that Enable-PhpExtension works
       Enable-PhpExtension -Extension curl -Path $installPath
       $enabledExtensions = @(Get-PhpExtensions $installPath | Where-Object { $_.Type -eq 'Php' -and $_.State -eq 'Enabled' })
       If ($enabledExtensions.Count -ne 1) { Throw 'Expected 1 PHP enabled installation' }
+      # Check that Disable-PhpExtension works
       Disable-PhpExtension -Extension curl -Path $installPath
       $enabledExtensions = @(Get-PhpExtensions $installPath | Where-Object { $_.Type -eq 'Php' -and $_.State -eq 'Enabled' })
       If ($enabledExtensions.Count -ne 0) { Throw 'Expected 0 PHP enabled installation' }
+      # Check that Install-PhpExtension works
+      Install-PhpExtension -Extension imagick -MinimumStability snapshot -Path $installPath
+      $imagickEnabled = @(Get-PhpExtensions $installPath | Where-Object { $_.Handle -eq 'imagick' -and $_.State -eq 'Enabled' })
+      If ($enabledExtensions.Count -ne 0) { Throw 'The ImageMagick extension has not been installed and enabled' }
+      # Check that Uninstall-Php works
       Uninstall-Php $installPath
       If ($Env:Path -like "*$installPath*") { Throw 'Installation directory not removed from PATH' }
       
