@@ -58,13 +58,22 @@ Function Get-PhpExtensionDetail
             }
         }
         If ($somethingToInspect) {
+            $rxGood = '^'
+            $rxGood += 'php:' + $PhpVersion.ComparableVersion.Major + '\.' + $PhpVersion.ComparableVersion.Minor
+            $rxGood += '\tarchitecture:' + $PhpVersion.Architecture
+            $rxGood += '\tthreadSafe:' + ([int]$PhpVersion.ThreadSafe)
+            $rxGood += '\ttype:(Php|Zend)'
+            $rxGood += '\tname:(.+)'
+            $rxGood += '\tversion:(.*)'
+            $rxGood += '\tfilename:(.+)'
+            $rxGood += '$'
             $inspectorPath = [System.IO.Path]::Combine($PSScriptRoot, 'bin', 'Inspect-PhpExtension-' + $PhpVersion.Architecture + '.exe')
             $inspectorResults = & $inspectorPath $inspectorParameters
             If ($LASTEXITCODE -ne 0) {
                 throw 'Failed to inspect extension(s)'
             }
             ForEach ($inspectorResult in $inspectorResults) {
-                $match = $inspectorResult | Select-String -Pattern ('^architecture:' + [regex]::Escape($PhpVersion.Architecture) + '\ttype:(\w+)\tname:(.+)\tversion:(.*)\tfilename:(.+)$')
+                $match = $inspectorResult | Select-String -Pattern $rxGood
                 If (-Not($match)) {
                     If ($inspectingSingleFile) {
                         throw "Failed to inspect extension: $inspectorResult"
