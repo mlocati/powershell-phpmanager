@@ -124,7 +124,7 @@ Get-PhpAvailableVersions Release | Where { $_.Architecture -eq 'x64' -and $_.Thr
 In order to retrieve the name and the version of the locally available extensions, as well as to determine if the are PHP extensions (to be added in the `php.ini` file with `extension=...`) or Zend extensions (to be added in the `php.ini` file with `zend_extension=...`), we need to inspect the extension DLL files.  
 This is done with [this C# code](https://github.com/mlocati/powershell-php/blob/master/src/Inspect-PhpExtension.cs).  
 
-You could think that this C# code could be included in the PowerShell scripts with the [`Add-Type -Lanuage CSharp`](http://go.microsoft.com/fwlink/?LinkId=821749) cmdlet.  
+You could think that this C# code could be included in the PowerShell scripts with the [`Add-Type -Language CSharp`](http://go.microsoft.com/fwlink/?LinkId=821749) cmdlet.  
 Sadly, we have to inspect DLLs that are compiled both for 32 and for 64 bits architectures, and the code would be able to inspect DLL with the same architecture used by PowerShell.
 So, if PowerShell is running in 64-bit mode, we won't be able to inspect 32-bit DLLs.
 That's why we need these executables: the will be started in 32 bits (`Inspect-PhpExtension-x86.exe`) or in 64 bits (`Inspect-PhpExtension-x64.exe`).
