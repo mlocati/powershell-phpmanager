@@ -26,7 +26,7 @@ function Enable-PhpExtension() {
     Begin {
     }
     Process {
-        If ($Path -eq $null -or $Path -eq '') {
+        If ($null -eq  $Path -or $Path -eq '') {
             $phpVersion = Get-OnePhpVersionFromEnvironment
         } Else {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
@@ -92,7 +92,7 @@ function Enable-PhpExtension() {
             $iniLines = Get-PhpIniLines -Path $iniPath
             ForEach ($line in $iniLines) {
                 $match = $line | Select-String -Pattern $rxSearch
-                if ($match -eq $null) {
+                if ($null -eq $match) {
                     $newIniLines += $line
                 } ElseIf (-Not($found)) {
                     $found = $true

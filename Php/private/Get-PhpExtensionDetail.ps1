@@ -39,7 +39,7 @@ Function Get-PhpExtensionDetail
         } Else {
             $result = @()
             $inspectingSingleFile = $false
-            If ($Path -eq $null -or $Path -eq '') {
+            If ($null -eq  $Path -or $Path -eq '') {
                 $folder = $PhpVersion.ExtensionsPath
             } Else {
                 $folder = $Path

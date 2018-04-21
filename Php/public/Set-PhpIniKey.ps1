@@ -64,7 +64,7 @@ Function Set-PhpIniKey
     }
     Process {
         $phpVersion = $null
-        If ($Path -eq $null -or $Path -eq '') {
+        If ($null -eq $Path -or $Path -eq '') {
             $phpVersion = Get-OnePhpVersionFromEnvironment
         } ElseIf ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
@@ -80,7 +80,7 @@ Function Set-PhpIniKey
         If ($Key -match '\bextension\b') {
             Throw 'You can''t use this command to set the extension key'
         }
-        If ($Value -eq $null) {
+        If ($null -eq $Value) {
             $Value = ''
         }
         $operation = 'SET'
@@ -113,7 +113,7 @@ Function Set-PhpIniKey
         $found = $false
         ForEach ($line in $(Get-PhpIniLines -Path $iniPath)) {
             $match = $line | Select-String -Pattern $rxSearch
-            if ($match -eq $null) {
+            if ($null -eq $match) {
                 $newLines += $line
             } ElseIf ($found) {
                 If ($operation -ne 'DELETE') {

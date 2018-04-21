@@ -23,7 +23,7 @@ function Uninstall-Php() {
     Begin {
     }
     Process {
-        If ($Path -eq $null -or $Path -eq '') {
+        If ($null -eq $Path -or $Path -eq '') {
             $phpVersion = Get-OnePhpVersionFromEnvironment
             $confirmAutomaticallyFoundPhp = $true
         } Else {

@@ -31,7 +31,7 @@ function Update-Php() {
         $updated = $null
     }
     Process {
-        If ($Path -eq $null -or $Path -eq '') {
+        If ($null -eq $Path -or $Path -eq '') {
             $installedVersion = Get-OnePhpVersionFromEnvironment
             $confirmAutomaticallyFoundPhp = $true
         } Else {
@@ -68,14 +68,14 @@ function Update-Php() {
         $bestNewVersion = $null
         if ($compatibleVersions -ne $null) {
             ForEach ($compatibleVersion in $compatibleVersions) {
-                If ($bestNewVersion -eq $null) {
+                If ($null -eq $bestNewVersion) {
                     $bestNewVersion = $compatibleVersion
                 } ElseIf ($(Compare-PhpVersions -A $compatibleVersion -B $bestNewVersion) -gt 0) {
                     $bestNewVersion = $compatibleVersion
                 }
             }
         }
-        if ($bestNewVersion -eq $null) {
+        if ($null -eq $bestNewVersion) {
             Write-Output 'No PHP compatible version found'
             $updated = $false
         } else {

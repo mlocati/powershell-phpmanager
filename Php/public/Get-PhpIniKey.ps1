@@ -38,7 +38,7 @@ Function Get-PhpIniKey
     }
     Process {
         $phpVersion = $null
-        If ($Path -eq $null -or $Path -eq '') {
+        If ($null -eq $Path -or $Path -eq '') {
             $phpVersion = Get-OnePhpVersionFromEnvironment
         } ElseIf ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
             $phpVersion = Get-PhpVersionFromPath -Path $Path

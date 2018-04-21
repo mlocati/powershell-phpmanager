@@ -37,7 +37,7 @@ Function Get-PhpActivatedExtensions
                 If ($line -match '^\s*\[.*\]\s*$') {
                     throw "Unrecognized 'php -m' line: $line"
                 }
-                If ($type -eq $null) {
+                If ($null -eq  $type) {
                     throw "Unexpected 'php -m' line: $line"
                 }
                 $extensionName = $line -replace '^\s+', '' -replace '\s+$', ''

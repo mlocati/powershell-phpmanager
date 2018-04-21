@@ -71,7 +71,7 @@ function Install-Php() {
         }
         # Check $Version format
         $match = $Version | Select-String -Pattern '^([1-9]\d*)(?:\.(\d+))?(?:\.(\d+))?(RC(\d*))?$'
-        If ($match -eq $null) {
+        If ($null -eq $match) {
             Throw "The specified PHP version ($Version) is malformed"
         }
         # Build the regular expression to match the version, and determine the list of release states
@@ -104,7 +104,7 @@ function Install-Php() {
         ForEach ($searchReleaseState in $searchReleaseStates) {
             $compatibleVersions = Get-PhpAvailableVersions -State $searchReleaseState | Where-Object {$_.FullVersion -match $rxSearchVersion} | Where-Object {$_.Architecture -eq $Architecture} | Where-Object {$_.ThreadSafe -eq $ThreadSafe}
             ForEach ($compatibleVersion in $compatibleVersions) {
-                If ($versionToInstall -eq $null) {
+                If ($null -eq $versionToInstall) {
                     $versionToInstall = $compatibleVersion
                 } ElseIf ($(Compare-PhpVersions -A $compatibleVersion -B $versionToInstall) -gt 0) {
                     $versionToInstall = $compatibleVersion
@@ -114,7 +114,7 @@ function Install-Php() {
                 break
             }
         }
-        if ($versionToInstall -eq $null) {
+        if ($null -eq $versionToInstall) {
             Throw 'No PHP version matches the specified criterias'
         }
         # Install the found PHP version
@@ -124,7 +124,7 @@ function Install-Php() {
         # Initialize the php.ini
         $IniPath = [System.IO.Path]::Combine($Path, 'php.ini');
         If (-Not(Test-Path -Path $IniPath -PathType Leaf)) {
-            if ($TimeZone -eq $null -or $TimeZone -eq '') {
+            if ($null -eq $TimeZone -or $TimeZone -eq '') {
                 $TimeZone = 'UTC'
             }
             Set-PhpIniKey -Key 'date.timezone' -Value $TimeZone -Path $IniPath

@@ -44,7 +44,7 @@ function Install-PhpExtension() {
     Begin {
     }
     Process {
-        If ($Path -eq $null -or $Path -eq '') {
+        If ($null -eq $Path -or $Path -eq '') {
             $phpVersion = Get-OnePhpVersionFromEnvironment
         } Else {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
@@ -60,7 +60,7 @@ function Install-PhpExtension() {
                 }
                 $dllPath = [System.IO.Path]::GetFullPath($Extension)
             } Else {
-                If ($MinimumStability -eq $null -or $MinimumStability -eq '') {
+                If ($null -eq $MinimumStability -or $MinimumStability -eq '') {
                     $MinimumStability = $Script:PEARSTATE_STABLE
                 }
                 $peclPackages = Get-PeclAvailablePackages
@@ -77,7 +77,7 @@ function Install-PhpExtension() {
                 $peclPackageHandle = $foundPeclPackages[0]
                 $peclPackageVersions = @(Get-PeclPackageVersions -Handle $peclPackageHandle -Version $Version -MinimumStability $MinimumStability)
                 If ($peclPackageVersions.Count -eq 0) {
-                    If ($Version -eq $null -or $Version -eq '') {
+                    If ($null -eq $Version -or $Version -eq '') {
                         Throw "The PECL package $peclPackageHandle does not have any version with a $MinimumStability minimum stability"
                     }
                     Throw "The PECL package $peclPackageHandle does not have any $Version version with a $MinimumStability minimum stability"
@@ -92,7 +92,7 @@ function Install-PhpExtension() {
                         break
                     }
                 }
-                If ($foundDll -eq $null) {
+                If ($null -eq $foundDll) {
                     Throw "No compatible Windows DLL found for PECL package $peclPackageHandle with a $MinimumStability minimum stability"
                 }
                 Write-Verbose ("Downloading PECL package {0} {1} from {2}" -f $peclPackageHandle, $foundDll.Version, $foundDll.Url)

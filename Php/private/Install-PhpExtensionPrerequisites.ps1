@@ -39,7 +39,7 @@ function Install-PhpExtensionPrerequisites() {
                         break
                     }
                 }
-                If ($zipUrl -eq $null) {
+                If ($null -eq  $zipUrl) {
                     Throw ('Unable to find the imagick package dependencies on {0} for {1}' -f $pageUrl, $PhpVersion.DisplayName)
                 }
                 $zipFile = Get-ZipFromUrl -Url $zipUrl

@@ -31,7 +31,7 @@ Function Get-PhpAvailableVersions
         If (-Not $Reload) {
             $result = Get-Variable -Name $listVariableName -ValueOnly -Scope Script
         }
-        If ($result -eq $null) {
+        If ($null -eq $result) {
             $result = @()
             $urlList = Get-Variable -Name $('URL_LIST_' + $State) -ValueOnly -Scope Script
             Try {

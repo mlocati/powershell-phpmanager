@@ -41,7 +41,7 @@ Function Get-PeclPackageVersions
             $Script:PEARSTATE_STABLE { $minimumStabilityInt = 4 }
             default { Throw "Unrecognized value of MinimumStability: $MinimumStability" }
         }
-        If ($Version -eq $null -or $Version -eq '') {
+        If ($null -eq  $Version -or $Version -eq '') {
             $rxVersion = $null
         } Else {
             $rxVersion = '^' + [regex]::Escape($Version) + '($|\.|[a-z])'
@@ -60,7 +60,7 @@ Function Get-PeclPackageVersions
                 default { Throw ('Unrecognized value of stability read in XML' + $xmlVersion.s) }
             }
             If ($stabilityInt -ge $minimumStabilityInt) {
-                If ($rxVersion -eq $null -or $xmlVersion.v -match $rxVersion) {
+                If ($null -eq  $rxVersion -or $xmlVersion.v -match $rxVersion) {
                     $result += $xmlVersion.v
                 }
             }

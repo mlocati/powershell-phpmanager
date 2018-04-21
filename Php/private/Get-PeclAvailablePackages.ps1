@@ -20,7 +20,7 @@ Function Get-PeclAvailablePackages
         If (-Not $Reload) {
             $result = $Script:PECL_PACKAGES
         }
-        If ($result -eq $null) {
+        If ($null -eq $result) {
             Try {
                 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
             }
