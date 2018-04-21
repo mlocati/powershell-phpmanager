@@ -9,7 +9,7 @@ if errorlevel 1 (
 
 set CSC_OPTIONS=/target:exe /debug- /optimize+ /warnaserror+ /checked+ /unsafe- /nologo /noconfig /reference:System.dll /nostdlib-
 set SRC_FILE="%~dp0Inspect-PhpExtension.cs"
-set DST_FOLDER=%~dp0..\Php\private\bin
+set DST_FOLDER=%~dp0..\PhpManager\private\bin
 echo Compiling for x86...
 %CSC% %CSC_OPTIONS% /platform:x86 /out:"%DST_FOLDER%/Inspect-PhpExtension-x86.exe" %SRC_FILE%
 if errorlevel 1 exit /b 1
