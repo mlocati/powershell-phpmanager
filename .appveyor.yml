@@ -59,17 +59,19 @@ test_script:
       # Check that Install-PhpExtension works
       Install-PhpExtension -Extension imagick -MinimumStability snapshot -Path $installPath
       $imagickEnabled = @(Get-PhpExtension $installPath | Where-Object { $_.Handle -eq 'imagick' -and $_.State -eq 'Enabled' })
-      If ($enabledExtensions.Count -ne 0) { Throw 'The ImageMagick extension has not been installed and enabled' }
+      $enabledExtensions = @(Get-PhpExtension $installPath | Where-Object { $_.Type -eq 'Php' -and $_.State -eq 'Enabled' })
+      If ($enabledExtensions.Count -ne 1) { Throw 'The ImageMagick extension has not been installed and enabled' }
       # Check that Uninstall-Php works
       Uninstall-Php $installPath
       If ($Env:Path -like "*$installPath*") { Throw 'Installation directory not removed from PATH' }
 
 deploy_script:
   - ps: |
-      If ($Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
+      If ($true -eq $Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
         $newVersion = $Env:APPVEYOR_REPO_TAG_NAME + '.' + $Env:APPVEYOR_BUILD_NUMBER
+        Write-Host "Publishing new version: $newVersion"
         $psd = Get-Content -Path .\PhpManager\PhpManager.psd1
-        $psd = $psd -replace '^(\s*ModuleVersion\s*=\s*(["''])).*?(\2.*)$', '$1a$3'
+        $psd = $psd -replace '^(\s*ModuleVersion\s*=\s*(["''])).*?(\2.*)$', ('$1' + $newVersion + '$3')
         Set-Content -Path .\PhpManager\PhpManager.psd1 -Value $psd
         Import-Module -Force .\PhpManager
         Publish-Module -Repository PSGallery -Name PhpManager -NuGetApiKey $Env:PsgKey -Force
