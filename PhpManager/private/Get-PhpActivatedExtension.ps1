@@ -22,7 +22,7 @@ Function Get-PhpActivatedExtension
         $extensions = @()
     }
     Process {
-        $builtinExtensions = Get-PhpBuiltinExtension -PhpVersion $PhpVersion
+        $builtinExtensions = @(Get-PhpBuiltinExtension -PhpVersion $PhpVersion)
         $executableParameters = @('-m')
         $executableResult = & $PhpVersion.ExecutablePath $executableParameters
         $lines = $executableResult | Where-Object {$_ -notmatch '^\s*$'}

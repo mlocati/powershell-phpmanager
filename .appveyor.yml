@@ -6,7 +6,7 @@ skip_commits:
     - README.md
 
 install:
-  - ps: Import-Module -Force .\Php
+  - ps: Import-Module -Force .\PhpManager
 
 build: off
 

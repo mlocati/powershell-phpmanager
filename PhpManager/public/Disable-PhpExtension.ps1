@@ -74,7 +74,7 @@ function Disable-PhpExtension() {
             $rxSearch += '))\s*$'
             $disabled = $false
             $newIniLines = @()
-            $iniLines = Get-PhpIniLine -Path $iniPath
+            $iniLines = @(Get-PhpIniLine -Path $iniPath)
             ForEach ($line in $iniLines) {
                 $match = $line | Select-String -Pattern $rxSearch
                 if ($null -eq  $match) {

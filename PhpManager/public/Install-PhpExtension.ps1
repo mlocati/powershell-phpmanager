@@ -63,7 +63,7 @@ function Install-PhpExtension() {
                 If ($null -eq $MinimumStability -or $MinimumStability -eq '') {
                     $MinimumStability = $Script:PEARSTATE_STABLE
                 }
-                $peclPackages = Get-PeclAvailablePackage
+                $peclPackages = @(Get-PeclAvailablePackage)
                 $foundPeclPackages = @($peclPackages | Where-Object {$_ -eq $Extension})
                 If ($foundPeclPackages.Count -ne 1) {
                     $foundPeclPackages = @($peclPackages | Where-Object {$_ -like "*$Extension*"})

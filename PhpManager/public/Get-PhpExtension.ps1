@@ -29,8 +29,8 @@ function Get-PhpExtension() {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
         }
         $result += Get-PhpBuiltinExtension -PhpVersion $phpVersion
-        $dllExtensions = Get-PhpExtensionDetail -PhpVersion $phpVersion
-        $activatedExtensions = Get-PhpActivatedExtension -PhpVersion $phpVersion
+        $dllExtensions = @(Get-PhpExtensionDetail -PhpVersion $phpVersion)
+        $activatedExtensions = @(Get-PhpActivatedExtension -PhpVersion $phpVersion)
         ForEach ($dllExtension in $dllExtensions) {
             If ($activatedExtensions | Where-Object {$_.Handle -eq $dllExtension.Handle}) {
                 $dllExtension.State = $Script:EXTENSIONSTATE_ENABLED
