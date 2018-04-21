@@ -77,8 +77,8 @@ Function Set-PhpIniKey
         } Else {
             $iniPath = $Path
         }
-        If ($Key -match '\bextension\b') {
-            Throw 'You can''t use this command to set the extension key'
+        If ($Key -match '^\s*(zend_)?extension\s*$') {
+            Throw 'You can''t use this command to set the extensions'
         }
         If ($null -eq $Value) {
             $Value = ''

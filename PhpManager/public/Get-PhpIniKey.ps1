@@ -51,8 +51,8 @@ Function Get-PhpIniKey
         } Else {
             $iniPath = $Path
         }
-        If ($Key -match '\bextension\b') {
-            Throw 'You can''t use this command to get the extension key'
+        If ($Key -match '^\s*(zend_)?extension\s*$') {
+            Throw 'You can''t use this command to get the extensions'
         }
         $rxSearch = '^\s*' + [Regex]::Escape($Key) + '\s*=\s*(.*?)\s*$'
         ForEach ($line in $(Get-PhpIniLine -Path $iniPath)) {
