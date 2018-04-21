@@ -74,5 +74,5 @@ deploy_script:
         $psd = $psd -replace '^(\s*ModuleVersion\s*=\s*(["''])).*?(\2.*)$', ('${1}' + $newVersion + '${3}')
         Set-Content -Path .\PhpManager\PhpManager.psd1 -Value $psd
         Import-Module -Force .\PhpManager
-        Publish-Module -Repository PSGallery -Name PhpManager -NuGetApiKey $Env:PsgKey -Force
+        Publish-Module -Repository PSGallery -Path .\hpManager -NuGetApiKey $Env:PsgKey -Force
       }
