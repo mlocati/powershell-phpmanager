@@ -69,7 +69,7 @@ Function Set-PhpIniKey
         } ElseIf ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
         }
-        If ($phpVersion -ne $null) {
+        If ($null -ne $phpVersion) {
             $iniPath = $phpVersion.IniPath
             If (-Not($iniPath)) {
                 Throw "The PHP at $Path does not have a configured php.ini"

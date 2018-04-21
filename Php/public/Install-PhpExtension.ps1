@@ -52,10 +52,10 @@ function Install-PhpExtension() {
         $tempFolder = $null
         Try {
             If (Test-Path -Path $Extension -PathType Leaf) {
-                If ($Version -ne $null -and $Version -ne '') {
+                If ($null -ne $Version -and $Version -ne '') {
                     Throw 'You can''t specify the -Version argument if you specify an existing file with the -Extension argument'
                 }
-                If ($MinimumStability -ne $null -and $MinimumStability -ne '') {
+                If ($null -ne $MinimumStability -and $MinimumStability -ne '') {
                     Throw 'You can''t specify the -MinimumStability argument if you specify an existing file with the -Extension argument'
                 }
                 $dllPath = [System.IO.Path]::GetFullPath($Extension)
@@ -123,7 +123,7 @@ function Install-PhpExtension() {
             }
             $newExtension = Get-PhpExtensionDetail -PhpVersion $phpVersion -Path $dllPath
             $oldExtension = Get-PhpExtensions -Path $phpVersion.ExecutablePath | Where-Object {$_.Handle -eq $newExtension.Handle}
-            If ($oldExtension -ne $null) {
+            If ($null -ne $oldExtension) {
                 If ($oldExtension.Type -eq $Script:EXTENSIONTYPE_BUILTIN) {
                     Write-Output ("'{0}' is a builtin extension" -f $oldExtension.Name)
                 }
@@ -143,7 +143,7 @@ function Install-PhpExtension() {
             }
         }
         Finally {
-            If ($tempFolder -ne $null) {
+            If ($null -ne $tempFolder) {
                 Try {
                     Remove-Item -Path $tempFolder -Recurse -Force
                 }

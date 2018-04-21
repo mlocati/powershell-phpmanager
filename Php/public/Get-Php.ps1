@@ -21,11 +21,11 @@ function Get-Php() {
         $result = @()
     }
     Process {
-        If ($Path -ne $null -and $Path -ne '') {
+        If ($null -ne $Path -and $Path -ne '') {
             $result += Get-PhpVersionFromPath -Path $Path
         } Else {
             $envPath = $env:Path
-            If ($envPath -ne $null) {
+            If ($null -ne $envPath) {
                 $donePaths = @{}
                 $pathSeparator = [System.IO.Path]::PathSeparator
                 ForEach ($pathFromEnv in @($envPath.Split($pathSeparator))) {

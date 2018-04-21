@@ -34,7 +34,7 @@ Function Add-PhpFolderToPath
         If ($CurrentProcess) {
             $targets += $Script:ENVTARGET_PROCESS
         }
-        If ($Persist -ne $null) {
+        If ($null -ne $Persist) {
             If ($Persist -eq 'User') {
                 $targets += $Script:ENVTARGET_USER
             } ElseIf ($Persist -eq 'System') {

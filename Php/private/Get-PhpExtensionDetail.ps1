@@ -31,7 +31,7 @@ Function Get-PhpExtensionDetail
     }
     Process {
         $inspectorParameters = @()
-        If ($Path -ne $null -and $Path -ne '' -and (Test-Path -Path $Path -PathType Leaf)) {
+        If ($null -ne $Path -and $Path -ne '' -and (Test-Path -Path $Path -PathType Leaf)) {
             $result = $null
             $inspectingSingleFile = $true
             $inspectorParameters += $Path

@@ -61,12 +61,12 @@ function Update-Php() {
         $compatibleVersions = $null
         foreach ($possibleReleaseState in $possibleReleaseStates) {
             $compatibleVersions = Get-PhpAvailableVersions -State $possibleReleaseState | Where-Object {Get-PhpVersionsCompatibility -A $installedVersion -B $_}
-            if ($compatibleVersions -ne $null) {
+            if ($null -ne $compatibleVersions) {
                 break
             }
         }
         $bestNewVersion = $null
-        if ($compatibleVersions -ne $null) {
+        if ($null -ne $compatibleVersions) {
             ForEach ($compatibleVersion in $compatibleVersions) {
                 If ($null -eq $bestNewVersion) {
                     $bestNewVersion = $compatibleVersion

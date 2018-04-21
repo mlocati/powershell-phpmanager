@@ -43,7 +43,7 @@ Function Get-PhpVersionFromUrl
         $data['ThreadSafe'] = $match.Matches.Groups[3].Value -ne '-nts';
         $data['VCVersion'] = $match.Matches.Groups[4].Value;
         $data['ReleaseState'] = $ReleaseState;
-        If ($PageUrl -ne $null -and $PageUrl -ne '') {
+        If ($null -ne $PageUrl -and $PageUrl -ne '') {
             $data['DownloadUrl'] = [Uri]::new([Uri]$PageUrl, $Url).AbsoluteUri
         } else {
             $data['DownloadUrl'] = $Url
