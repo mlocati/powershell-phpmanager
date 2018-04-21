@@ -59,9 +59,9 @@ Function Get-PhpExtensionDetail
         }
         If ($somethingToInspect) {
             $rxGood = '^'
-            $rxGood += 'php:' + $PhpVersion.ComparableVersion.Major + '\.' + $PhpVersion.ComparableVersion.Minor
+            $rxGood += 'php:(?:' + $PhpVersion.ComparableVersion.Major + '\.' + $PhpVersion.ComparableVersion.Minor + '(?:\.\d+)*)?'
             $rxGood += '\tarchitecture:' + $PhpVersion.Architecture
-            $rxGood += '\tthreadSafe:' + ([int]$PhpVersion.ThreadSafe)
+            $rxGood += '\tthreadSafe:(?:' + ([int]$PhpVersion.ThreadSafe) + ')?'
             $rxGood += '\ttype:(Php|Zend)'
             $rxGood += '\tname:(.+)'
             $rxGood += '\tversion:(.*)'
