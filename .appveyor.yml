@@ -63,8 +63,8 @@ test_script:
       # Check that Uninstall-Php works
       Uninstall-Php $installPath
       If ($Env:Path -like "*$installPath*") { Throw 'Installation directory not removed from PATH' }
-      
-deploy:
+
+deploy_script:
   - ps: |
       If ($Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
         $newVersion = $Env:APPVEYOR_REPO_TAG_NAME + '.' + $Env:APPVEYOR_BUILD_NUMBER
