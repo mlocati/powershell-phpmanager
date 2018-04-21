@@ -20,7 +20,7 @@ function Install-PhpExtensionPrerequisites() {
     Begin {
     }
     Process {
-        Write-Host ('Checking prerequisites for {0}' -f $Extension.Name)
+        Write-Output ('Checking prerequisites for {0}' -f $Extension.Name)
         switch ($Extension.Handle) {
             imagick {
                 $rxSearch = '/ImageMagick-[\d\.\-]+-vc' + $PhpVersion.VCVersion + '-' + $PhpVersion.Architecture + '\.zip$'

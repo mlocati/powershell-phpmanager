@@ -32,7 +32,7 @@ function Uninstall-Php() {
         }
         $folder = [System.IO.Path]::GetDirectoryName($phpVersion.ExecutablePath)
         If ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
-            Write-Host "The PHP installation has been found at $folder"
+            Write-Output "The PHP installation has been found at $folder"
             $confirmed = $false
             While (-Not($confirmed)) {
                 $answer = Read-Host -Prompt "Do you confirm removing this installation [use -ConfirmAuto to confirm autumatically]? [y/n]"
@@ -41,13 +41,13 @@ function Uninstall-Php() {
                 } ElseIf ($answer -match '^\s*n') {
                     throw 'Operation aborted.'
                 } Else {
-                    Write-Host 'Please answer with Y or N'
+                    Write-Output 'Please answer with Y or N'
                 }
             }
         }
         Remove-Item -Path $folder -Recurse -Force
         Remove-PhpFolderFromPaths -Path $folder
-        Write-Host ($phpVersion.DisplayName + ' has been uninstalled from ' + $folder)
+        Write-Output ($phpVersion.DisplayName + ' has been uninstalled from ' + $folder)
     }
     End {
     }

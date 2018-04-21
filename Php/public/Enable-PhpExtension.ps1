@@ -44,9 +44,9 @@ function Enable-PhpExtension() {
         }
         $extensionToEnable = $foundExtensions[0]
         If ($extensionToEnable.State -eq $Script:EXTENSIONSTATE_BUILTIN) {
-            Write-Host ('The extension "' + $extensionToEnable.Name + '" is builtin: it''s enabled by default')
+            Write-Output ('The extension "' + $extensionToEnable.Name + '" is builtin: it''s enabled by default')
         } ElseIf ($extensionToEnable.State -eq $Script:EXTENSIONSTATE_ENABLED) {
-            Write-Host ('The extension "' + $extensionToEnable.Name + '" is already enabled')
+            Write-Output ('The extension "' + $extensionToEnable.Name + '" is already enabled')
         } ElseIf ($extensionToEnable.State -ne $Script:EXTENSIONSTATE_DISABLED) {
             Throw ('Unknown extension state: "' + $extensionToEnable.State + '"')
         } Else {
@@ -104,7 +104,7 @@ function Enable-PhpExtension() {
             }
             Set-PhpIniLines -Path $iniPath -Lines $newIniLines
             $extensionToEnable.State = $Script:EXTENSIONSTATE_ENABLED
-            Write-Host ('The extension ' + $extensionToEnable.Name + ' v' + $extensionToEnable.Version + ' has been enabled')
+            Write-Output ('The extension ' + $extensionToEnable.Name + ' v' + $extensionToEnable.Version + ' has been enabled')
         }
     }
     End {

@@ -16,25 +16,25 @@ test_script:
       $installPath = 'C:\Test\PHP'
       Install-Php -Version 7.2.0 -Architecture x86 -ThreadSafe $true -Path $installPath -AddToPath User
       # Check that Get-Php works
-      Write-Host 'Version installed:'
+      Write-Output 'Version installed:'
       Get-Php -Path $installPath
       If (-Not($Env:Path -like "*$installPath*")) { Throw 'Installation directory not added to PATH' }
       # Check that Update-Php works
       If (-Not(Update-Php -Path $installPath)) { Throw 'PHP not updated!' }
       $installedPhp = Get-Php -Path $installPath
-      Write-Host 'Version updated:'
+      Write-Output 'Version updated:'
       $installedPhp
       If ($latest72.FullVersion -ne $installedPhp.FullVersion) { Throw 'Wrong new PHP version!' }
       # Check that Get-PhpExtensions works
       $allExtensions = Get-PhpExtensions $installPath
       $builtinExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Builtin' })
       If ($builtinExtensions.Count -eq 0) { Throw 'No PHP builtin extensions found!' }
-      Write-Host ('Builtin extensions found: ' + $builtinExtensions.Count)
+      Write-Output ('Builtin extensions found: ' + $builtinExtensions.Count)
       $phpExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Php' })
       If ($phpExtensions.Count -eq 0) { Throw 'No PHP extensions found!' }
-      Write-Host ('PHP extensions found: ' + $phpExtensions.Count)
+      Write-Output ('PHP extensions found: ' + $phpExtensions.Count)
       $zendExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Zend' })
-      Write-Host ('Zend extensions found: ' + $zendExtensions.Count)
+      Write-Output ('Zend extensions found: ' + $zendExtensions.Count)
       $enabledExtensions = @($allExtensions | Where-Object { $_.State -eq 'Enabled' })
       If ($enabledExtensions.Count -ne 0) { Throw 'Some PHP extensions (in addition to the builtin ones) are already enabled!' }
       # Check that Enable-PhpExtension works

@@ -40,7 +40,7 @@ function Update-Php() {
         }
         $folder = [System.IO.Path]::GetDirectoryName($installedVersion.ExecutablePath)
         If ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
-            Write-Host "The PHP installation has been found at $folder"
+            Write-Output "The PHP installation has been found at $folder"
             $confirmed = $false
             While (-Not($confirmed)) {
                 $answer = Read-Host -Prompt "Do you confirm updating this installation [use -ConfirmAuto to confirm autumatically]? [y/n]"
@@ -49,7 +49,7 @@ function Update-Php() {
                 } ElseIf ($answer -match '^\s*n') {
                     throw 'Operation aborted.'
                 } Else {
-                    Write-Host 'Please answer with Y or N'
+                    Write-Output 'Please answer with Y or N'
                 }
             }
         }
@@ -76,14 +76,14 @@ function Update-Php() {
             }
         }
         if ($bestNewVersion -eq $null) {
-            Write-Host 'No PHP compatible version found'
+            Write-Output 'No PHP compatible version found'
             $updated = $false
         } else {
             if (-Not($Force) -and $(Compare-PhpVersions -A $bestNewVersion -B $installedVersion) -le 0) {
-                Write-Host $('No new version available (latest version is ' + $bestNewVersion.FullVersion + ')')
+                Write-Output $('No new version available (latest version is ' + $bestNewVersion.FullVersion + ')')
                 $updated = $false
             } else {
-                Write-Host $('Installing new version: ' + $bestNewVersion.DisplayName)
+                Write-Output $('Installing new version: ' + $bestNewVersion.DisplayName)
                 Install-PhpFromUrl -Url $bestNewVersion.DownloadUrl -Path ([System.IO.Path]::GetDirectoryName($installedVersion.ExecutablePath))
                 $updated = $true
             }

@@ -53,7 +53,6 @@ function Install-PhpExtension() {
         Try {
             If (Test-Path -Path $Extension -PathType Leaf) {
                 If ($Version -ne $null -and $Version -ne '') {
-                    Write-Host "Version>$Version<"
                     Throw 'You can''t specify the -Version argument if you specify an existing file with the -Extension argument'
                 }
                 If ($MinimumStability -ne $null -and $MinimumStability -ne '') {
@@ -125,15 +124,15 @@ function Install-PhpExtension() {
             $oldExtension = Get-PhpExtensions -Path $phpVersion.ExecutablePath | Where-Object {$_.Handle -eq $newExtension.Handle}
             If ($oldExtension -ne $null) {
                 If ($oldExtension.Type -eq $Script:EXTENSIONTYPE_BUILTIN) {
-                    Write-Host ("'{0}' is a builtin extension" -f $oldExtension.Name)
+                    Write-Output ("'{0}' is a builtin extension" -f $oldExtension.Name)
                 }
-                Write-Host ("Upgrading extension '{0}' from version {1} to version {2}" -f $oldExtension.Name, $oldExtension.Version, $newExtension.Version)
+                Write-Output ("Upgrading extension '{0}' from version {1} to version {2}" -f $oldExtension.Name, $oldExtension.Version, $newExtension.Version)
                 Move-Item -Path $dllPath -Destination $oldExtension.Filename -Force
                 If ($oldExtension.State -eq $Script:EXTENSIONSTATE_DISABLED -and -Not($DontEnable)) {
                     Enable-PhpExtension -Extension $oldExtension.Name -Path $phpVersion.ExecutablePath
                 }
             } Else {
-                Write-Host ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
+                Write-Output ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
                 Install-PhpExtensionPrerequisites -PhpVersion $phpVersion -Extension $newExtension
                 $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($dllPath))
                 Move-Item -Path $dllPath -Destination $newExtensionFilename

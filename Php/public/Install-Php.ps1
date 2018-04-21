@@ -119,7 +119,7 @@ function Install-Php() {
         }
         # Install the found PHP version
         
-        Write-Host $('Installing PHP ' + $versionToInstall.DisplayName)
+        Write-Output $('Installing PHP ' + $versionToInstall.DisplayName)
         Install-PhpFromUrl -Url $versionToInstall.DownloadUrl -Path $Path
         # Initialize the php.ini
         $IniPath = [System.IO.Path]::Combine($Path, 'php.ini');
