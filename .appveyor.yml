@@ -1,7 +1,14 @@
-build: off
+skip_commits:
+  files:
+    - src/
+    - .gitignore
+    - LICENSE
+    - README.md
 
 install:
   - ps: Import-Module -Force .\Php
+
+build: off
 
 test_script:
   - ps: |
