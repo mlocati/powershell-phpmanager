@@ -5,6 +5,10 @@ skip_commits:
     - LICENSE
     - README.md
 
+environment:
+  PsgKey:
+    secure: tlhLuUS6x8FcP159+X/EIBDlj9m+u5KCTTuqwzsiNHlPX6K4AolpaZcfAP4ClOdB
+
 install:
   - ps: Import-Module -Force .\PhpManager
 
@@ -60,4 +64,13 @@ test_script:
       Uninstall-Php $installPath
       If ($Env:Path -like "*$installPath*") { Throw 'Installation directory not removed from PATH' }
       
-deploy: off
+deploy:
+  - ps: |
+      If ($Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
+        $newVersion = $Env:APPVEYOR_REPO_TAG_NAME + '.' + $Env:APPVEYOR_BUILD_NUMBER
+        $psd = Get-Content -Path .\PhpManager\PhpManager.psd1
+        $psd = $psd -replace '^(\s*ModuleVersion\s*=\s*(["''])).*?(\2.*)$', '$1a$3'
+        Set-Content -Path .\PhpManager\PhpManager.psd1 -Value $psd
+        Import-Module -Force .\PhpManager
+        Publish-Module -Repository PSGallery -Name PhpManager -NuGetApiKey $Env:PsgKey -Force
+      }
