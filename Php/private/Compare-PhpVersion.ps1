@@ -1,4 +1,4 @@
-Function Compare-PhpVersions
+Function Compare-PhpVersion
 {
     <#
     .Synopsis

@@ -46,7 +46,7 @@ function Uninstall-Php() {
             }
         }
         Remove-Item -Path $folder -Recurse -Force
-        Remove-PhpFolderFromPaths -Path $folder
+        Remove-PhpFolderFromPath -Path $folder
         Write-Output ($phpVersion.DisplayName + ' has been uninstalled from ' + $folder)
     }
     End {

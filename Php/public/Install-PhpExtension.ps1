@@ -63,7 +63,7 @@ function Install-PhpExtension() {
                 If ($null -eq $MinimumStability -or $MinimumStability -eq '') {
                     $MinimumStability = $Script:PEARSTATE_STABLE
                 }
-                $peclPackages = Get-PeclAvailablePackages
+                $peclPackages = Get-PeclAvailablePackage
                 $foundPeclPackages = @($peclPackages | Where-Object {$_ -eq $Extension})
                 If ($foundPeclPackages.Count -ne 1) {
                     $foundPeclPackages = @($peclPackages | Where-Object {$_ -like "*$Extension*"})
@@ -75,7 +75,7 @@ function Install-PhpExtension() {
                     }
                 }
                 $peclPackageHandle = $foundPeclPackages[0]
-                $peclPackageVersions = @(Get-PeclPackageVersions -Handle $peclPackageHandle -Version $Version -MinimumStability $MinimumStability)
+                $peclPackageVersions = @(Get-PeclPackageVersion -Handle $peclPackageHandle -Version $Version -MinimumStability $MinimumStability)
                 If ($peclPackageVersions.Count -eq 0) {
                     If ($null -eq $Version -or $Version -eq '') {
                         Throw "The PECL package $peclPackageHandle does not have any version with a $MinimumStability minimum stability"
@@ -84,7 +84,7 @@ function Install-PhpExtension() {
                 }
                 $foundDll = $null
                 ForEach ($peclPackageVersion in $peclPackageVersions) {
-                    $dlls = @(Get-PeclDlls -Handle $peclPackageHandle -Version $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability)
+                    $dlls = @(Get-PeclDll -Handle $peclPackageHandle -Version $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability)
                     If ($dlls.Count -eq 0) {
                         Write-Verbose ("No Windows DLLs found for PECL package {0} {1} compatible with {2}" -f $peclPackageHandle, $peclPackageVersion, $phpVersion.DisplayName)
                     } Else {
@@ -122,7 +122,7 @@ function Install-PhpExtension() {
                 }
             }
             $newExtension = Get-PhpExtensionDetail -PhpVersion $phpVersion -Path $dllPath
-            $oldExtension = Get-PhpExtensions -Path $phpVersion.ExecutablePath | Where-Object {$_.Handle -eq $newExtension.Handle}
+            $oldExtension = Get-PhpExtension -Path $phpVersion.ExecutablePath | Where-Object {$_.Handle -eq $newExtension.Handle}
             If ($null -ne $oldExtension) {
                 If ($oldExtension.Type -eq $Script:EXTENSIONTYPE_BUILTIN) {
                     Write-Output ("'{0}' is a builtin extension" -f $oldExtension.Name)
@@ -134,7 +134,7 @@ function Install-PhpExtension() {
                 }
             } Else {
                 Write-Output ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
-                Install-PhpExtensionPrerequisites -PhpVersion $phpVersion -Extension $newExtension
+                Install-PhpExtensionPrerequisite -PhpVersion $phpVersion -Extension $newExtension
                 $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($dllPath))
                 Move-Item -Path $dllPath -Destination $newExtensionFilename
                 If (-Not($DontEnable)) {

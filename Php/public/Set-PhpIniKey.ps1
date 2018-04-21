@@ -111,7 +111,7 @@ Function Set-PhpIniKey
         }
         $rxSearch = '^(\s*)([;#][\s;#]*)?(' + [Regex]::Escape($Key) + '\s*=.*)$'
         $found = $false
-        ForEach ($line in $(Get-PhpIniLines -Path $iniPath)) {
+        ForEach ($line in $(Get-PhpIniLine -Path $iniPath)) {
             $match = $line | Select-String -Pattern $rxSearch
             if ($null -eq $match) {
                 $newLines += $line
@@ -147,6 +147,6 @@ Function Set-PhpIniKey
         }
     }
     End {
-        Set-PhpIniLines -Path $iniPath -Lines $newLines
+        Set-PhpIniLine -Path $iniPath -Lines $newLines
     }
 }

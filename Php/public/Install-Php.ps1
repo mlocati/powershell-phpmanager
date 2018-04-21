@@ -102,11 +102,11 @@ function Install-Php() {
         # Filter the list of available PHP versions, and get the latest one
         $versionToInstall = $null
         ForEach ($searchReleaseState in $searchReleaseStates) {
-            $compatibleVersions = Get-PhpAvailableVersions -State $searchReleaseState | Where-Object {$_.FullVersion -match $rxSearchVersion} | Where-Object {$_.Architecture -eq $Architecture} | Where-Object {$_.ThreadSafe -eq $ThreadSafe}
+            $compatibleVersions = Get-PhpAvailableVersion -State $searchReleaseState | Where-Object {$_.FullVersion -match $rxSearchVersion} | Where-Object {$_.Architecture -eq $Architecture} | Where-Object {$_.ThreadSafe -eq $ThreadSafe}
             ForEach ($compatibleVersion in $compatibleVersions) {
                 If ($null -eq $versionToInstall) {
                     $versionToInstall = $compatibleVersion
-                } ElseIf ($(Compare-PhpVersions -A $compatibleVersion -B $versionToInstall) -gt 0) {
+                } ElseIf ($(Compare-PhpVersion -A $compatibleVersion -B $versionToInstall) -gt 0) {
                     $versionToInstall = $compatibleVersion
                 }
             }

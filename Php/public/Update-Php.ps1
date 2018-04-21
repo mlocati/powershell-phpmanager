@@ -60,7 +60,7 @@ function Update-Php() {
         }
         $compatibleVersions = $null
         foreach ($possibleReleaseState in $possibleReleaseStates) {
-            $compatibleVersions = Get-PhpAvailableVersions -State $possibleReleaseState | Where-Object {Get-PhpVersionsCompatibility -A $installedVersion -B $_}
+            $compatibleVersions = Get-PhpAvailableVersion -State $possibleReleaseState | Where-Object {Get-PhpVersionsCompatibility -A $installedVersion -B $_}
             if ($null -ne $compatibleVersions) {
                 break
             }
@@ -70,7 +70,7 @@ function Update-Php() {
             ForEach ($compatibleVersion in $compatibleVersions) {
                 If ($null -eq $bestNewVersion) {
                     $bestNewVersion = $compatibleVersion
-                } ElseIf ($(Compare-PhpVersions -A $compatibleVersion -B $bestNewVersion) -gt 0) {
+                } ElseIf ($(Compare-PhpVersion -A $compatibleVersion -B $bestNewVersion) -gt 0) {
                     $bestNewVersion = $compatibleVersion
                 }
             }
@@ -79,7 +79,7 @@ function Update-Php() {
             Write-Output 'No PHP compatible version found'
             $updated = $false
         } else {
-            if (-Not($Force) -and $(Compare-PhpVersions -A $bestNewVersion -B $installedVersion) -le 0) {
+            if (-Not($Force) -and $(Compare-PhpVersion -A $bestNewVersion -B $installedVersion) -le 0) {
                 Write-Output $('No new version available (latest version is ' + $bestNewVersion.FullVersion + ')')
                 $updated = $false
             } else {

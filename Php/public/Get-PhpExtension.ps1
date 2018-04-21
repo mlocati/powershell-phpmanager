@@ -1,4 +1,4 @@
-function Get-PhpExtensions() {
+function Get-PhpExtension() {
     <#
     .Synopsis
     Lists the extensions for PHP installation.
@@ -28,9 +28,9 @@ function Get-PhpExtensions() {
         } Else {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
         }
-        $result += Get-PhpBuiltinExtensions -PhpVersion $phpVersion
+        $result += Get-PhpBuiltinExtension -PhpVersion $phpVersion
         $dllExtensions = Get-PhpExtensionDetail -PhpVersion $phpVersion
-        $activatedExtensions = Get-PhpActivatedExtensions -PhpVersion $phpVersion
+        $activatedExtensions = Get-PhpActivatedExtension -PhpVersion $phpVersion
         ForEach ($dllExtension in $dllExtensions) {
             If ($activatedExtensions | Where-Object {$_.Handle -eq $dllExtension.Handle}) {
                 $dllExtension.State = $Script:EXTENSIONSTATE_ENABLED

@@ -55,7 +55,7 @@ Function Get-PhpIniKey
             Throw 'You can''t use this command to get the extension key'
         }
         $rxSearch = '^\s*' + [Regex]::Escape($Key) + '\s*=\s*(.*?)\s*$'
-        ForEach ($line in $(Get-PhpIniLines -Path $iniPath)) {
+        ForEach ($line in $(Get-PhpIniLine -Path $iniPath)) {
             $match = $line | Select-String -Pattern $rxSearch
             if ($match) {
                 $result = $match.Matches[0].Groups[1].Value

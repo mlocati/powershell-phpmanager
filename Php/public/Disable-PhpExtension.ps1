@@ -35,7 +35,7 @@ function Disable-PhpExtension() {
         } Else {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
         }
-        $allExtensions = Get-PhpExtensions -Path $phpVersion.ExecutablePath
+        $allExtensions = Get-PhpExtension -Path $phpVersion.ExecutablePath
         $foundExtensions = @($allExtensions | Where-Object {$_.Name -like $Extension})
         If ($foundExtensions.Count -ne 1) {
             $foundExtensions = @($allExtensions | Where-Object {$_.Handle -like $Extension})
@@ -74,7 +74,7 @@ function Disable-PhpExtension() {
             $rxSearch += '))\s*$'
             $disabled = $false
             $newIniLines = @()
-            $iniLines = Get-PhpIniLines -Path $iniPath
+            $iniLines = Get-PhpIniLine -Path $iniPath
             ForEach ($line in $iniLines) {
                 $match = $line | Select-String -Pattern $rxSearch
                 if ($null -eq  $match) {
@@ -93,7 +93,7 @@ function Disable-PhpExtension() {
             If (-Not($disabled)) {
                 Throw "The entry in the php.ini file has not been found (?)"
             }
-            Set-PhpIniLines -Path $iniPath -Lines $newIniLines
+            Set-PhpIniLine -Path $iniPath -Lines $newIniLines
             $extensionToDisable.State = $Script:EXTENSIONSTATE_ENABLED
             Write-Output ('The extension ' + $extensionToDisable.Name + ' v' + $extensionToDisable.Version + ' has been disabled')
         }

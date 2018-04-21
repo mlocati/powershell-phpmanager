@@ -1,4 +1,4 @@
-Function Get-PeclDlls
+Function Get-PeclDll
 {
     <#
     .Synopsis

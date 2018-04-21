@@ -1,4 +1,4 @@
-Function Get-PeclAvailablePackages
+Function Get-PeclAvailablePackage
 {
     <#
     .Synopsis

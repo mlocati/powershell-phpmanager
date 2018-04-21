@@ -1,4 +1,4 @@
-Function Get-PhpIniLines
+Function Get-PhpIniLine
 {
     <#
     .Synopsis

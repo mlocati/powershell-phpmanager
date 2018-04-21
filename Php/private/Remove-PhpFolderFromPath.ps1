@@ -1,4 +1,4 @@
-Function Remove-PhpFolderFromPaths
+Function Remove-PhpFolderFromPath
 {
     <#
     .Synopsis

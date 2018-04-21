@@ -71,15 +71,15 @@ Set-PhpIniKey default_charset UTF-8 C:\PHP
 
 ### Getting the list of PHP extensions
 
-You can use the `Get-PhpExtensions` command to get the PHP extensions currently available (enabled or disabled) in the PHP installation.
+You can use the `Get-PhpExtension` command to get the PHP extensions currently available (enabled or disabled) in the PHP installation.
 
 ```powershell
 # List the builtin extensions
-Get-PhpExtensions C:\PHP | Where { $_.Type -eq 'Builtin' }
+Get-PhpExtension C:\PHP | Where { $_.Type -eq 'Builtin' }
 # List the enabled extensions
-Get-PhpExtensions C:\PHP | Where { $_.State -eq 'Enabled' }
+Get-PhpExtension C:\PHP | Where { $_.State -eq 'Enabled' }
 # List the Zend extensions (xdebug, opcache, ...)
-Get-PhpExtensions C:\PHP | Where { $_.Type -eq 'Zend' }
+Get-PhpExtension C:\PHP | Where { $_.Type -eq 'Zend' }
 ```
 
 ### Enabling and disabling PHP extensions
@@ -108,13 +108,13 @@ PS: `Install-PhpExtension` can also be used to upgrade (or downgrade) a PHP exte
 
 ### Getting the list of PHP versions available online
 
-Use the command `Get-PhpAvailableVersions` to list the PHP versions available online.
+Use the command `Get-PhpAvailableVersion` to list the PHP versions available online.
 You can specify to list the `Release` versions (that is, the ones currently supported), as well as the `Archive` versions (the ones at end-of-life) and the `QA` versions (that is, the release candidates).
 
 For instance, to list all the 64-bit thread-safe releases you can use this command:
 
 ```powershell
-Get-PhpAvailableVersions Release | Where { $_.Architecture -eq 'x64' -and $_.ThreadSafe -eq $true }
+Get-PhpAvailableVersion Release | Where { $_.Architecture -eq 'x64' -and $_.ThreadSafe -eq $true }
 ```
 
 ## FAQ

@@ -1,4 +1,4 @@
-Function Get-PhpBuiltinExtensions
+Function Get-PhpBuiltinExtension
 {
     <#
     .Synopsis
@@ -11,7 +11,7 @@ Function Get-PhpBuiltinExtensions
     System.Array
     
     .Example
-    Get-PhpBuiltinExtensions -PhpVersion $phpVersion
+    Get-PhpBuiltinExtension -PhpVersion $phpVersion
     #>
     Param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want the extensions')]

@@ -1,4 +1,4 @@
-Function Get-PhpAvailableVersions
+Function Get-PhpAvailableVersion
 {
     <#
     .Synopsis
@@ -14,7 +14,7 @@ Function Get-PhpAvailableVersions
     System.Array
     
     .Example
-    Get-PhpAvailableVersions -State Release
+    Get-PhpAvailableVersion -State Release
     #>
     Param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The release state (can be ''Release'' or ''Archive'' or ''QA'')')]

@@ -1,4 +1,4 @@
-function Install-PhpExtensionPrerequisites() {
+function Install-PhpExtensionPrerequisite() {
     <#
     .Synopsis
     Installs the prerequisites of a PHP extension.

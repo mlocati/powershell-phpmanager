@@ -31,7 +31,7 @@ function Enable-PhpExtension() {
         } Else {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
         }
-        $allExtensions = Get-PhpExtensions -Path $phpVersion.ExecutablePath
+        $allExtensions = Get-PhpExtension -Path $phpVersion.ExecutablePath
         $foundExtensions = @($allExtensions | Where-Object {$_.Name -like $Extension})
         If ($foundExtensions.Count -ne 1) {
             $foundExtensions = @($allExtensions | Where-Object {$_.Handle -like $Extension})
@@ -89,7 +89,7 @@ function Enable-PhpExtension() {
             }
             $found = $false
             $newIniLines = @()
-            $iniLines = Get-PhpIniLines -Path $iniPath
+            $iniLines = Get-PhpIniLine -Path $iniPath
             ForEach ($line in $iniLines) {
                 $match = $line | Select-String -Pattern $rxSearch
                 if ($null -eq $match) {
@@ -102,7 +102,7 @@ function Enable-PhpExtension() {
             If (-Not($found)) {
                 $newIniLines += "$iniKey=$newIniValue"
             }
-            Set-PhpIniLines -Path $iniPath -Lines $newIniLines
+            Set-PhpIniLine -Path $iniPath -Lines $newIniLines
             $extensionToEnable.State = $Script:EXTENSIONSTATE_ENABLED
             Write-Output ('The extension ' + $extensionToEnable.Name + ' v' + $extensionToEnable.Version + ' has been enabled')
         }

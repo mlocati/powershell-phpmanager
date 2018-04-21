@@ -1,4 +1,4 @@
-Function Get-PhpActivatedExtensions
+Function Get-PhpActivatedExtension
 {
     <#
     .Synopsis
@@ -11,7 +11,7 @@ Function Get-PhpActivatedExtensions
     System.Array
     
     .Example
-    Get-PhpActivatedExtensions -PhpVersion $phpVersion
+    Get-PhpActivatedExtension -PhpVersion $phpVersion
     #>
     Param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want the extensions')]
@@ -22,7 +22,7 @@ Function Get-PhpActivatedExtensions
         $extensions = @()
     }
     Process {
-        $builtinExtensions = Get-PhpBuiltinExtensions -PhpVersion $PhpVersion
+        $builtinExtensions = Get-PhpBuiltinExtension -PhpVersion $PhpVersion
         $executableParameters = @('-m')
         $executableResult = & $PhpVersion.ExecutablePath $executableParameters
         $lines = $executableResult | Where-Object {$_ -notmatch '^\s*$'}

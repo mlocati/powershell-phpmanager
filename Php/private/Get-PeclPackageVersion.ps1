@@ -1,4 +1,4 @@
-Function Get-PeclPackageVersions
+Function Get-PeclPackageVersion
 {
     <#
     .Synopsis
