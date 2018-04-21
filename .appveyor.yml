@@ -71,7 +71,7 @@ deploy_script:
         $newVersion = $Env:APPVEYOR_REPO_TAG_NAME + '.' + $Env:APPVEYOR_BUILD_NUMBER
         Write-Host "Publishing new version: $newVersion"
         $psd = Get-Content -Path .\PhpManager\PhpManager.psd1
-        $psd = $psd -replace '^(\s*ModuleVersion\s*=\s*(["''])).*?(\2.*)$', ('$1' + $newVersion + '$3')
+        $psd = $psd -replace '^(\s*ModuleVersion\s*=\s*(["''])).*?(\2.*)$', ('${1}' + $newVersion + '${3}')
         Set-Content -Path .\PhpManager\PhpManager.psd1 -Value $psd
         Import-Module -Force .\PhpManager
         Publish-Module -Repository PSGallery -Name PhpManager -NuGetApiKey $Env:PsgKey -Force
