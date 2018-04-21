@@ -38,6 +38,7 @@ Function Get-PhpAvailableVersions
                 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
             }
             Catch {
+                Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
             }
             $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $urlList
             ForEach ($link In $webResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {

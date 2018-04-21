@@ -29,6 +29,7 @@ function Install-PhpExtensionPrerequisites() {
                     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
                 }
                 Catch {
+                    Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
                 }
                 $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $pageUrl
                 $zipUrl = $null
@@ -57,6 +58,7 @@ function Install-PhpExtensionPrerequisites() {
                             Remove-Item -Path $tempFolder -Recurse -Force
                         }
                         Catch {
+                            Write-Debug 'Failed to remove temporary folder'
                         }
                     }                                
                 }
@@ -65,6 +67,7 @@ function Install-PhpExtensionPrerequisites() {
                         Remove-Item -Path $zipFile
                     }
                     Catch {
+                        Write-Debug 'Failed to remove temporary zip file'
                     }
                 }
             }

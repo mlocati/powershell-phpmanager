@@ -36,6 +36,7 @@ function Get-ZipFromUrl() {
                 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
             }
             Catch {
+                Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
             }
             Write-Debug "Downloading from $Url"
             Invoke-WebRequest -UseBasicParsing $Url -OutFile $localFile
@@ -46,6 +47,7 @@ function Get-ZipFromUrl() {
                     Remove-Item -Path $localFile
                 }
                 Catch {
+                    Write-Debug 'Failed to remove temporary file'
                 }
             }
         }

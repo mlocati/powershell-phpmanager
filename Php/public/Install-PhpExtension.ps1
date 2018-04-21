@@ -117,6 +117,7 @@ function Install-PhpExtension() {
                         Remove-Item -Path $zip -Force
                     }
                     Catch {
+                        Write-Debug 'Failed to remove temporary zip file'
                     }
                 }
             }
@@ -147,6 +148,7 @@ function Install-PhpExtension() {
                     Remove-Item -Path $tempFolder -Recurse -Force
                 }
                 Catch {
+                    Write-Debug 'Failed to remove temporary folder'
                 }
             }
         }

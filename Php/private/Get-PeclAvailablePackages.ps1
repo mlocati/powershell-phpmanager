@@ -25,6 +25,7 @@ Function Get-PeclAvailablePackages
                 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
             }
             Catch {
+                Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
             }
             # https://pear.php.net/manual/en/core.rest.php
             $xmlDocument = Invoke-RestMethod -Method Get -Uri ($Script:URL_PECLREST_1_0 + 'p/packages.xml')

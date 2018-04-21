@@ -46,6 +46,7 @@ Function Get-PeclDlls
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
         }
         Catch {
+            Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
         }
         $rxMatch = '/php_' + [regex]::Escape($Handle)
         $rxMatch += '-' + [regex]::Escape($Version)
