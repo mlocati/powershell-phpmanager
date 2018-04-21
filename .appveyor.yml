@@ -1,5 +1,6 @@
 skip_commits:
   files:
+    - images/
     - src/
     - .gitignore
     - LICENSE
