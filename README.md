@@ -119,7 +119,7 @@ Get-PhpAvailableVersion Release | Where { $_.Architecture -eq 'x64' -and $_.Thre
 
 ## FAQ
 
-### What are [those executable](https://github.com/mlocati/powershell-phpmanager/tree/master/Php/private/bin) in the archive???
+### What are [those executable](https://github.com/mlocati/powershell-phpmanager/tree/master/PhpManager/private/bin) in the archive???
 
 In order to retrieve the name and the version of the locally available extensions, as well as to determine if the are PHP extensions (to be added in the `php.ini` file with `extension=...`) or Zend extensions (to be added in the `php.ini` file with `zend_extension=...`), we need to inspect the extension DLL files.  
 This is done with [this C# code](https://github.com/mlocati/powershell-phpmanager/blob/master/src/Inspect-PhpExtension.cs).  
