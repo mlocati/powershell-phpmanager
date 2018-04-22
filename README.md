@@ -4,6 +4,25 @@
 
 This repository contains a PowerShell module that implements functions to install or update PHP under Windows.
 
+# Installation
+
+To install this module for any user of your PC, open an elevated powershell session and run this command:
+
+```powershell
+Install-Module -Name PhpManager -Force
+```
+
+To install this module only for the current user:
+
+```powershell
+Install-Module -Name PhpManager -Force -Scope CurrentUser
+```
+
+If you won't be able to execute the module functions, you may need to tell PowerShell to execute the module functions.
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+```
 
 # Available Features
 
