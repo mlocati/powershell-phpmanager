@@ -1,4 +1,4 @@
-﻿@{
+@{
 	RootModule = 'PhpManager.psm1'
 	ModuleVersion = '1.0.0.0'
 	# CompatiblePSEditions = @()
