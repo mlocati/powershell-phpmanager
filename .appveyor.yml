@@ -71,9 +71,7 @@ deploy_script:
       If ($true -eq $Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
         $newVersion = $Env:APPVEYOR_REPO_TAG_NAME + '.' + $Env:APPVEYOR_BUILD_NUMBER
         Write-Host "Publishing new version: $newVersion"
-        $psd = Get-Content -Path .\PhpManager\PhpManager.psd1
-        $psd = $psd -replace '^(\s*ModuleVersion\s*=\s*(["''])).*?(\2.*)$', ('${1}' + $newVersion + '${3}')
-        Set-Content -Path .\PhpManager\PhpManager.psd1 -Value $psd
+        Update-ModuleManifest -Path .\PhpManager\PhpManager.psd1 -ModuleVersion $newVersion
         Import-Module -Force .\PhpManager
         Publish-Module -Repository PSGallery -Path .\PhpManager -NuGetApiKey $Env:PsgKey -Force
       }
