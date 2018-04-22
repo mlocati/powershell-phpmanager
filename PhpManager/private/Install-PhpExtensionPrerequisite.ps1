@@ -40,7 +40,7 @@ function Install-PhpExtensionPrerequisite() {
                         break
                     }
                 }
-                If ($null -eq  $zipUrl) {
+                If ($null -eq $zipUrl) {
                     Throw ('Unable to find the imagick package dependencies on {0} for {1}' -f $pageUrl, $PhpVersion.DisplayName)
                 }
                 $zipFile = Get-ZipFromUrl -Url $zipUrl
@@ -60,7 +60,7 @@ function Install-PhpExtensionPrerequisite() {
                         Catch {
                             Write-Debug 'Failed to remove temporary folder'
                         }
-                    }                                
+                    }
                 }
                 Finally {
                     Try {

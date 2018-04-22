@@ -31,8 +31,7 @@
 			Tags = @('php', 'extensions', 'windows', 'win32', 'dll')
 			LicenseUri = 'https://github.com/mlocati/powershell-phpmanager/blob/master/LICENSE'
 			ProjectUri = 'https://github.com/mlocati/powershell-phpmanager'
-			IconUri = 
-'https://raw.githubusercontent.com/mlocati/powershell-phpmanager/master/images/php.png'
+			IconUri = 'https://raw.githubusercontent.com/mlocati/powershell-phpmanager/master/images/php.png'
 			# ReleaseNotes = ''
 		}
 	}

@@ -3,7 +3,7 @@ Function Get-PhpVersionFromUrl
     <#
     .Synopsis
     Creates a new object representing a PHP version from an PHP download URL.
-    
+
     .Parameter Url
     The PHP download URL (eventually relative to PageUrl).
 

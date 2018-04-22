@@ -9,7 +9,7 @@ Function Get-PhpBuiltinExtension
 
     .Outputs
     System.Array
-    
+
     .Example
     Get-PhpBuiltinExtension -PhpVersion $phpVersion
     #>

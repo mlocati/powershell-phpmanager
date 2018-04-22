@@ -13,7 +13,7 @@ Function Get-PhpExtensionDetail
 
     .Outputs
     System.Array|PSObject
-    
+
     .Example
     Get-PhpExtensionDetail -PhpVersion $phpVersion -Path 'C:\Dev\PHP\ext\php_ext.dll'
     #>
@@ -39,7 +39,7 @@ Function Get-PhpExtensionDetail
         } Else {
             $result = @()
             $inspectingSingleFile = $false
-            If ($null -eq  $Path -or $Path -eq '') {
+            If ($null -eq $Path -or $Path -eq '') {
                 $folder = $PhpVersion.ExtensionsPath
             } Else {
                 $folder = $Path
@@ -48,7 +48,7 @@ Function Get-PhpExtensionDetail
                 }
             }
             If (Test-Path -Path $folder -PathType Container) {
-                $subFiles = Get-ChildItem -Path $folder -Filter '*.dll' | Select-Object -ExpandProperty 'FullName'    
+                $subFiles = Get-ChildItem -Path $folder -Filter '*.dll' | Select-Object -ExpandProperty 'FullName'
                 $somethingToInspect = $subFiles.Count -gt 0
                 If ($somethingToInspect) {
                     $inspectorParameters += $subFiles

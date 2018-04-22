@@ -3,7 +3,7 @@ Function Get-PhpExtensionHandle
     <#
     .Synopsis
     Gets the handle of a PHP extension given its name.
-    
+
     .Parameter Name
     The name of the PHP extension.
 

@@ -7,7 +7,7 @@ This repository contains a PowerShell module that implements functions to instal
 
 # Available Features
 
-Here's the list of available commands. Here you can find a short description of them: in order to get more details, type `Get-Help <CommandName>` (or `Get-Help -Detailed <CommandName>` or `Get-Help -Full <CommandName>`). 
+Here's the list of available commands. Here you can find a short description of them: in order to get more details, type `Get-Help <CommandName>` (or `Get-Help -Detailed <CommandName>` or `Get-Help -Full <CommandName>`).
 
 
 ### Installing PHP
@@ -90,9 +90,9 @@ Please remark that the `Enable-PhpExtension` requires that the extension is alre
 ```powershell
 Enable-PhpExtension opcache C:\PHP
 Disable-PhpExtension mbstring C:\PHP
-``` 
+```
 
-### Adding new extensions (from [PECL](https://pecl.php.net/)) 
+### Adding new extensions (from [PECL](https://pecl.php.net/))
 
 The `Enable-PhpExtension` command can only enables extensions that are already present in the PHP installation.
 In order to add new extensions (like `xdebug` or `imagick` - `imagemagick`) you can use the `Install-PhpExtension`.
@@ -121,13 +121,13 @@ Get-PhpAvailableVersion Release | Where { $_.Architecture -eq 'x64' -and $_.Thre
 
 ### What are [those executable](https://github.com/mlocati/powershell-phpmanager/tree/master/PhpManager/private/bin) in the archive???
 
-In order to retrieve the name and the version of the locally available extensions, as well as to determine if the are PHP extensions (to be added in the `php.ini` file with `extension=...`) or Zend extensions (to be added in the `php.ini` file with `zend_extension=...`), we need to inspect the extension DLL files.  
-This is done with [this C# code](https://github.com/mlocati/powershell-phpmanager/blob/master/src/Inspect-PhpExtension.cs).  
+In order to retrieve the name and the version of the locally available extensions, as well as to determine if the are PHP extensions (to be added in the `php.ini` file with `extension=...`) or Zend extensions (to be added in the `php.ini` file with `zend_extension=...`), we need to inspect the extension DLL files.
+This is done with [this C# code](https://github.com/mlocati/powershell-phpmanager/blob/master/src/Inspect-PhpExtension.cs).
 
-You could think that this C# code could be included in the PowerShell scripts with the [`Add-Type -Language CSharp`](http://go.microsoft.com/fwlink/?LinkId=821749) cmdlet.  
+You could think that this C# code could be included in the PowerShell scripts with the [`Add-Type -Language CSharp`](http://go.microsoft.com/fwlink/?LinkId=821749) cmdlet.
 Sadly, we have to inspect DLLs that are compiled both for 32 and for 64 bits architectures, and the code would be able to inspect DLL with the same architecture used by PowerShell.
 So, if PowerShell is running in 64-bit mode, we won't be able to inspect 32-bit DLLs.
 That's why we need these executables: the will be started in 32 bits (`Inspect-PhpExtension-x86.exe`) or in 64 bits (`Inspect-PhpExtension-x64.exe`).
 
-Those executables are compiled with this simple [batch file](https://github.com/mlocati/powershell-phpmanager/blob/master/src/compile.bat), but of course you don't have to trust them:  
+Those executables are compiled with this simple [batch file](https://github.com/mlocati/powershell-phpmanager/blob/master/src/compile.bat), but of course you don't have to trust them:
 you can download and decompile them with a tool like [ILSpy](https://github.com/icsharpcode/ILSpy) to check that their source code is [exactly this](https://github.com/mlocati/powershell-phpmanager/blob/master/src/Inspect-PhpExtension.cs).

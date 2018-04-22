@@ -26,7 +26,7 @@ function Enable-PhpExtension() {
     Begin {
     }
     Process {
-        If ($null -eq  $Path -or $Path -eq '') {
+        If ($null -eq $Path -or $Path -eq '') {
             $phpVersion = Get-OnePhpVersionFromEnvironment
         } Else {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
@@ -70,7 +70,7 @@ function Enable-PhpExtension() {
             $rxSearch = '^(\s*)([;#][\s;#]*)?(\s*(?:zend_)?extension\s*=\s*)('
             $rxSearch += '(?:(?:.*[/\\])?' + [regex]::Escape($filename) + ')';
             If ($canUseBaseName) {
-                $match = $filename | Select-String -Pattern  '^php_(.+)\.dll$'
+                $match = $filename | Select-String -Pattern '^php_(.+)\.dll$'
                 if ($match) {
                     $rxSearch += '|(?:' + [regex]::Escape($match.Matches[0].Groups[1].Value) + ')'
                 }
@@ -79,7 +79,7 @@ function Enable-PhpExtension() {
             If ($extensionToEnable.Filename -like ($extensionDir + '*')) {
                 $newIniValue = $extensionToEnable.Filename.SubString($extensionDir.Length)
                 If ($canUseBaseName) {
-                    $match = $newIniValue | Select-String -Pattern  '^php_(.+)\.dll$'
+                    $match = $newIniValue | Select-String -Pattern '^php_(.+)\.dll$'
                     If ($match) {
                         $newIniValue = $match.Matches[0].Groups[1].Value
                     }

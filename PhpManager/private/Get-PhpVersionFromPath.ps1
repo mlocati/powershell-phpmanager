@@ -3,7 +3,7 @@ Function Get-PhpVersionFromPath
     <#
     .Synopsis
     Creates a new object representing a PHP version from a PHP executable.
-    
+
     .Parameter Path
     The path to the PHP executable (or to the folder containing it).
 

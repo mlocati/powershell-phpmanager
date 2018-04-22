@@ -9,7 +9,7 @@ Function Get-PhpActivatedExtension
 
     .Outputs
     System.Array
-    
+
     .Example
     Get-PhpActivatedExtension -PhpVersion $phpVersion
     #>
@@ -37,7 +37,7 @@ Function Get-PhpActivatedExtension
                 If ($line -match '^\s*\[.*\]\s*$') {
                     throw "Unrecognized 'php -m' line: $line"
                 }
-                If ($null -eq  $type) {
+                If ($null -eq $type) {
                     throw "Unexpected 'php -m' line: $line"
                 }
                 $extensionName = $line -replace '^\s+', '' -replace '\s+$', ''

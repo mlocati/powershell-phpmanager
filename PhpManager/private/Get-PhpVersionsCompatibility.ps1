@@ -3,7 +3,7 @@ Function Get-PhpVersionsCompatibility
     <#
     .Synopsis
     Checks if two PhpVersion instances are compatible.
-    
+
     .Parameter A
     The first PhpVersion instance to check.
 

@@ -12,7 +12,7 @@ Function Get-PhpAvailableVersion
 
     .Outputs
     System.Array
-    
+
     .Example
     Get-PhpAvailableVersion -State Release
     #>

@@ -30,7 +30,7 @@ function Disable-PhpExtension() {
     Begin {
     }
     Process {
-        If ($null -eq  $Path -or $Path -eq '') {
+        If ($null -eq $Path -or $Path -eq '') {
             $phpVersion = Get-OnePhpVersionFromEnvironment
         } Else {
             $phpVersion = Get-PhpVersionFromPath -Path $Path
@@ -66,7 +66,7 @@ function Disable-PhpExtension() {
             $rxSearch = '^(\s*)([;#][\s;#]*)?(\s*(?:zend_)?extension\s*=\s*(?:'
             $rxSearch += '(?:(?:.*[/\\])?' + [regex]::Escape($filename) + ')';
             If ($canUseBaseName) {
-                $match = $filename | Select-String -Pattern  '^php_(.+)\.dll$'
+                $match = $filename | Select-String -Pattern '^php_(.+)\.dll$'
                 if ($match) {
                     $rxSearch += '|(?:' + [regex]::Escape($match.Matches[0].Groups[1].Value) + ')'
                 }
@@ -77,7 +77,7 @@ function Disable-PhpExtension() {
             $iniLines = @(Get-PhpIniLine -Path $iniPath)
             ForEach ($line in $iniLines) {
                 $match = $line | Select-String -Pattern $rxSearch
-                if ($null -eq  $match) {
+                if ($null -eq $match) {
                     $newIniLines += $line
                 } Else {
                     If ($match.Matches[0].Groups[2].Value -eq '') {

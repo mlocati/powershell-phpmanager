@@ -118,7 +118,6 @@ function Install-Php() {
             Throw 'No PHP version matches the specified criterias'
         }
         # Install the found PHP version
-        
         Write-Output $('Installing PHP ' + $versionToInstall.DisplayName)
         Install-PhpFromUrl -Url $versionToInstall.DownloadUrl -Path $Path
         # Initialize the php.ini

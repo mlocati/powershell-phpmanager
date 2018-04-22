@@ -12,7 +12,7 @@ Function Get-PeclPackageVersion
 
     .Parameter MinimumStability
     The minimum stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
-    
+
     .Outputs
     System.Array
     #>
@@ -41,7 +41,7 @@ Function Get-PeclPackageVersion
             $Script:PEARSTATE_STABLE { $minimumStabilityInt = 4 }
             default { Throw "Unrecognized value of MinimumStability: $MinimumStability" }
         }
-        If ($null -eq  $Version -or $Version -eq '') {
+        If ($null -eq $Version -or $Version -eq '') {
             $rxVersion = $null
         } Else {
             $rxVersion = '^' + [regex]::Escape($Version) + '($|\.|[a-z])'
@@ -60,11 +60,10 @@ Function Get-PeclPackageVersion
                 default { Throw ('Unrecognized value of stability read in XML' + $xmlVersion.s) }
             }
             If ($stabilityInt -ge $minimumStabilityInt) {
-                If ($null -eq  $rxVersion -or $xmlVersion.v -match $rxVersion) {
+                If ($null -eq $rxVersion -or $xmlVersion.v -match $rxVersion) {
                     $result += $xmlVersion.v
                 }
             }
-    
         }
     }
     End {

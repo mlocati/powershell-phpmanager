@@ -22,7 +22,7 @@ function Install-PhpFromUrl() {
     Begin {
     }
     Process {
-        $temporaryFile = Get-ZipFromUrl -Url $Url 
+        $temporaryFile = Get-ZipFromUrl -Url $Url
         Try {
             Write-Debug "Extracting $temporaryFile"
             Expand-Archive -LiteralPath $temporaryFile -DestinationPath $Path -Force

@@ -12,7 +12,7 @@ Function New-PhpVersion
 
     .Outputs
     PSCustomObject
-    
+
     .Example
     New-PhpVersion @{
         'BaseVersion' = '7.1.2';

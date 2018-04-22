@@ -9,7 +9,7 @@ Function New-PhpExtension
 
     .Outputs
     PSCustomObject
-    
+
     .Example
     New-PhpExtensionState @{
         'Type' = $Script:EXTENSIONSTATE_BUILTIN
