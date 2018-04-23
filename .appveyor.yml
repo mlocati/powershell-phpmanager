@@ -1,3 +1,7 @@
+branches:
+  only:
+    - master
+
 skip_commits:
   files:
     - images/
@@ -75,7 +79,7 @@ deploy_script:
         Write-Host "Publishing new version: $newVersion"
         $releaseNotes = ''
         $tags = @(& git tag --list --sort=-version:refname)
-        If ($tags.Count < 2) {
+        If ($tags.Count -lt 2) {
           Write-Host 'Less than 2 tags found: empty release notes'
         } Else {
           $thisTagIndex = [array]::IndexOf($tags, $Env:APPVEYOR_REPO_TAG_NAME)
@@ -93,7 +97,7 @@ deploy_script:
             Write-Host 'Unable to find the previously published tag: empty release notes'
           } Else {
             $commitMessages = @(& git log --format='- %s' --no-merges --reverse ("$previousTag..." + $Env:APPVEYOR_REPO_TAG_NAME) -- .\PhpManager)
-            If ($commitMessages.Count < 1) {
+            If ($commitMessages.Count -lt 1) {
               Write-Host 'No relevant commit messages found: empty release notes'
             } Else {
               $releaseNotes = [string]::Join("`n", $commitMessages)
@@ -101,7 +105,6 @@ deploy_script:
             }
           }
         }
-        $thisTagIndex = [array]::IndexOf($tags,
         Update-ModuleManifest -Path .\PhpManager\PhpManager.psd1 -ModuleVersion $newVersion -ReleaseNotes $releaseNotes
         Import-Module -Force .\PhpManager
         Publish-Module -Repository PSGallery -Path .\PhpManager -NuGetApiKey $Env:PsgKey -Force
