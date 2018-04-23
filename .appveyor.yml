@@ -71,7 +71,36 @@ deploy_script:
       If ($true -eq $Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
         $newVersion = $Env:APPVEYOR_REPO_TAG_NAME + '.' + $Env:APPVEYOR_BUILD_NUMBER
         Write-Host "Publishing new version: $newVersion"
-        Update-ModuleManifest -Path .\PhpManager\PhpManager.psd1 -ModuleVersion $newVersion
+        $releaseNotes = ''
+        $tags = @(& git tag --list --sort=-version:refname)
+        If ($tags.Count < 2) {
+          Write-Host 'Less than 2 tags found: empty release notes'
+        } Else {
+          $thisTagIndex = [array]::IndexOf($tags, $Env:APPVEYOR_REPO_TAG_NAME)
+          If ($thisTagIndex -lt 0) {
+            Write-Host 'Unable to find the index of the current tag: empty release notes'
+          }
+          $previousTag = ''
+          For ($tagIndex = $thisTagIndex + 1; $tagIndex -lt $tags.Count; $tagIndex++) {
+            If ($tags[$tagIndex] -match '^\d+\.\d+\.\d+$') {
+              $previousTag = $tags[$tagIndex]
+              break
+            }
+          }
+          If ($previousTag -eq '') {
+            Write-Host 'Unable to find the previously published tag: empty release notes'
+          } Else {
+            $commitMessages = @(& git log --format='- %s' --no-merges --reverse ("$previousTag..." + $Env:APPVEYOR_REPO_TAG_NAME) -- .\PhpManager)
+            If ($commitMessages.Count < 1) {
+              Write-Host 'No relevant commit messages found: empty release notes'
+            } Else {
+              $releaseNotes = [string]::Join("`n", $commitMessages)
+              Write-Host "Release notes:`n$releaseNotes"
+            }
+          }
+        }
+        $thisTagIndex = [array]::IndexOf($tags,
+        Update-ModuleManifest -Path .\PhpManager\PhpManager.psd1 -ModuleVersion $newVersion -ReleaseNotes $releaseNotes
         Import-Module -Force .\PhpManager
         Publish-Module -Repository PSGallery -Path .\PhpManager -NuGetApiKey $Env:PsgKey -Force
       }
