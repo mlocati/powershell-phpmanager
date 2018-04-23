@@ -99,7 +99,7 @@ function Update-PhpCAInfo() {
        }
        $caFolder = [System.IO.Path]::GetDirectoryName($CAPath)
        If (-Not(Test-Path -Path $caFolder -PathType Container)) {
-           New-Item -Path $caFolder -ItemType Directory
+           New-Item -Path $caFolder -ItemType Directory | Out-Null
         }
         Set-Content -Path $CAPath -Value $cacertBytes -Encoding Byte
         $iniPath = $phpVersion.IniPath
