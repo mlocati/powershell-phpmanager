@@ -5,7 +5,7 @@
 	GUID = 'f444cf15-ed25-40c2-96bb-ebfd51d08564'
 	Author = 'Michele Locati'
 	CompanyName = 'Unknown'
-	Copyright = '(c) 2018 Michele Locati. Tutti i diritti riservati.'
+	Copyright = '(c) 2018 Michele Locati. All rights reserved.'
 	Description = 'A PowerShell module to install/update PHP and PHP extensions'
 	PowerShellVersion = '5.0'
 	# PowerShellHostName = ''
