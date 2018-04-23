@@ -38,3 +38,7 @@ New-Variable -Option Constant -Scope Script -Name 'PEARSTATE_ALPHA' -Value 'alph
 New-Variable -Option Constant -Scope Script -Name 'PEARSTATE_DEVEL' -Value 'devel'
 # A frozen picture of development at a particular moment.
 New-Variable -Option Constant -Scope Script -Name 'PEARSTATE_SNAPSHOT' -Value 'snapshot'
+
+New-Variable -Option Constant -Scope Script -Name 'CACERT_PEM_URL' -Value 'https://curl.haxx.se/ca/cacert.pem'
+New-Variable -Option Constant -Scope Script -Name 'CACERT_CHECKSUM_URL' -Value 'https://curl.haxx.se/ca/cacert.pem.sha256'
+New-Variable -Option Constant -Scope Script -Name 'CACERT_CHECKSUM_ALGORITHM' -Value 'SHA256'

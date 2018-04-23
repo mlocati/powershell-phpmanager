@@ -19,7 +19,7 @@
 	# TypesToProcess = @()
 	# FormatsToProcess = @()
 	# NestedModules = @()
-	FunctionsToExport = 'Get-PhpAvailableVersion', 'Install-Php', 'Update-Php', 'Uninstall-Php', 'Get-Php', 'Set-PhpIniKey', 'Get-PhpIniKey', 'Get-PhpExtension', 'Enable-PhpExtension', 'Disable-PhpExtension', 'Install-PhpExtension'
+	FunctionsToExport = 'Get-PhpAvailableVersion', 'Install-Php', 'Update-Php', 'Uninstall-Php', 'Get-Php', 'Set-PhpIniKey', 'Get-PhpIniKey', 'Get-PhpExtension', 'Enable-PhpExtension', 'Disable-PhpExtension', 'Install-PhpExtension', 'Update-PhpCAInfo'
 	CmdletsToExport = ''
 	VariablesToExport = ''
 	AliasesToExport = ''

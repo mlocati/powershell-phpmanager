@@ -37,6 +37,8 @@ test_script:
       Write-Output 'Version updated:'
       $installedPhp
       If ($latest72.FullVersion -ne $installedPhp.FullVersion) { Throw 'Wrong new PHP version!' }
+      # Check that Update-PhpCAInfo works
+      Update-PhpCAInfo -Path $installPath
       # Check that Get-PhpExtension works
       $allExtensions = Get-PhpExtension $installPath
       $builtinExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Builtin' })
