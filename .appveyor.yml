@@ -2,7 +2,7 @@ branches:
   only:
     - master
 
-version: "{build}"
+version: "Build {build}"
 
 skip_commits:
   files:
