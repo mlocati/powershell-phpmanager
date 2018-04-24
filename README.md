@@ -6,6 +6,13 @@ This repository contains a PowerShell module that implements functions to instal
 
 # Installation
 
+You'll need at least PowerShell version 5: in order to determine which version you have, open PowerShell and type:
+```powershell
+$PSVersionTable.PSVersion.ToString()
+```
+
+If you have an older version, you can upgrade it [following these instructions](https://docs.microsoft.com/en-us/powershell/wmf/5.1/install-configure).
+
 To install this module for any user of your PC, open an elevated powershell session and run this command:
 
 ```powershell
