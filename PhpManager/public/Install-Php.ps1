@@ -59,6 +59,9 @@ function Install-Php() {
     Begin {
     }
     Process {
+        if ($Architecture -eq 'x64' -and -Not([Environment]::Is64BitOperatingSystem)) {
+            Throw 'The current operating system is not 64 bits: you can only install with the x86 architecture'
+        }
         $Path = [System.IO.Path]::GetFullPath($Path)
         # Check existency
         If (Test-Path -Path $Path -PathType Leaf) {
