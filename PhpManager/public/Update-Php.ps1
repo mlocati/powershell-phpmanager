@@ -84,7 +84,7 @@ function Update-Php() {
                 $updated = $false
             } else {
                 Write-Output $('Installing new version: ' + $bestNewVersion.DisplayName)
-                Install-PhpFromUrl -Url $bestNewVersion.DownloadUrl -Path ([System.IO.Path]::GetDirectoryName($installedVersion.ExecutablePath))
+                Install-PhpFromUrl -Url $bestNewVersion.DownloadUrl -Path ([System.IO.Path]::GetDirectoryName($installedVersion.ExecutablePath)) -PhpVersion $bestNewVersion -InstallVCRedist $false
                 $updated = $true
             }
         }

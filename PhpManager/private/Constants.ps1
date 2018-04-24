@@ -42,3 +42,5 @@ New-Variable -Option Constant -Scope Script -Name 'PEARSTATE_SNAPSHOT' -Value 's
 New-Variable -Option Constant -Scope Script -Name 'CACERT_PEM_URL' -Value 'https://curl.haxx.se/ca/cacert.pem'
 New-Variable -Option Constant -Scope Script -Name 'CACERT_CHECKSUM_URL' -Value 'https://curl.haxx.se/ca/cacert.pem.sha256'
 New-Variable -Option Constant -Scope Script -Name 'CACERT_CHECKSUM_ALGORITHM' -Value 'SHA256'
+
+New-Variable -Option Constant -Scope Script -Name 'STATUS_DLL_NOT_FOUND' -Value 0xC0000135

@@ -34,6 +34,9 @@ function Install-Php() {
     Specify if you want to add the PHP installation folder to the user ('User') or system ('System') PATH environment variable.
     Please remark that using 'System' usually requires administrative rights.
 
+    .Parameter InstallVC
+    Specify this switch to try to install automatically the required Visual C++ Redistributables (requires the VcRedist PowerShell package, and to run the process as an elevated user).
+
     .Parameter Force
     Use this switch to enable installing PHP even if the destination directory already exists and it's not empty.
     #>
@@ -54,6 +57,7 @@ function Install-Php() {
         [Parameter(Mandatory = $false, Position = 5, HelpMessage = 'Specify if you want to add the PHP installation folder to the user (''User'') or system (''System'') PATH environment variable')]
         [ValidateSet('User', 'System')]
         [string] $AddToPath,
+        [switch] $InstallVC,
         [switch] $Force
     )
     Begin {
@@ -122,7 +126,7 @@ function Install-Php() {
         }
         # Install the found PHP version
         Write-Output $('Installing PHP ' + $versionToInstall.DisplayName)
-        Install-PhpFromUrl -Url $versionToInstall.DownloadUrl -Path $Path
+        Install-PhpFromUrl -Url $versionToInstall.DownloadUrl -Path $Path -PhpVersion $versionToInstall -InstallVCRedist $InstallVC
         # Initialize the php.ini
         $IniPath = [System.IO.Path]::Combine($Path, 'php.ini');
         If (-Not(Test-Path -Path $IniPath -PathType Leaf)) {
