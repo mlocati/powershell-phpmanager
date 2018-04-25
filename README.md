@@ -143,6 +143,15 @@ For instance, to list all the 64-bit thread-safe releases you can use this comma
 Get-PhpAvailableVersion Release | Where { $_.Architecture -eq 'x64' -and $_.ThreadSafe -eq $true }
 ```
 
+### Managing HTTPS/TLS/SSL Certification Authority certificates
+
+When connecting (with cURL, openssl, ...) to a remote resource via a secure protocol (for instance `https:`), PHP checks if the certificate has been issued by a valid Certification Authorty (CA).
+On Linux and Mac systems, the list of valid CAs is managed by the system.
+On Windows there isn't a similar feature: we have to manually retrieve the list of reliable CAs and tell PHP where they are.
+The `Update-PhpCAInfo` does all that for you: a simple call to this command will fetch the valid CA list and configure PHP.
+Since the list of valid CA certificates changes over time, you execute `Update-PhpCAInfo` on a regular basis.
+In addition, `Update-PhpCAInfo` can optionally add your custom CA certificates to the list of official CA certificates.
+
 ## FAQ
 
 ### What are [those executable](https://github.com/mlocati/powershell-phpmanager/tree/master/PhpManager/private/bin) in the archive???
