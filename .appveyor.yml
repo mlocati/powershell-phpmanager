@@ -106,7 +106,7 @@ deploy_script:
             $rawCommitMessages = @(& git log --format='- %s' --no-merges --reverse ("$previousTag..." + $Env:APPVEYOR_REPO_TAG_NAME) -- .\PhpManager)
             $commitMessages = @()
             ForEach ($rawCommitMessage in $rawCommitMessages) {
-              If (-Not($rawCommitMessage -imatch '^\[minor\]')) {
+              If (-Not($rawCommitMessage -imatch '^- \[minor\]')) {
                 $commitMessages += $rawCommitMessage
               }
             }
