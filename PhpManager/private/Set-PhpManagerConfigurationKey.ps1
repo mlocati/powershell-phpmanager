@@ -38,7 +38,6 @@ Function Set-PhpManagerConfigurationKey
         }
         $path = Join-Path -Path $folder -ChildPath 'phpmanager.json'
         $json = $null
-        $isEmpty =
         If (Test-Path -PathType Leaf -LiteralPath $path) {
             $json = Get-Content -LiteralPath $path | ConvertFrom-Json
         }
