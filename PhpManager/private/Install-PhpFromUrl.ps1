@@ -63,7 +63,7 @@ function Install-PhpFromUrl() {
                     If (-Not($InstallVCRedist)) {
                         Throw "The Visual C++ $redistName Redistributable seems to be missing: you have to install it manually"
                     }
-                    If (-Not(Get-Module -Name VcRedist)) {
+                    If (-Not(Get-Module -Name VcRedist) -and -Not(Get-Module -ListAvailable | Where-Object { $_.Name -eq 'VcRedist' })) {
                         Throw "The Visual C++ $redistName Redistributable seems to be missing: you have to manually install it (if you install the VcRedist PowerShell module we could try to install it automatically)"
                     }
                     $vcListKind = 'Supported'
