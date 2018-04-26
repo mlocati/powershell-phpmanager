@@ -96,7 +96,7 @@ function Install-PhpExtension() {
                     Throw "No compatible Windows DLL found for PECL package $peclPackageHandle with a $MinimumStability minimum stability"
                 }
                 Write-Output ("Downloading PECL package {0} {1} from {2}" -f $peclPackageHandle, $foundDll.Version, $foundDll.Url)
-                $zip = Get-ZipFromUrl -Url $foundDll.Url
+                $zip, $keepZip = Get-FileFromUrlOrCache -Url $foundDll.Url
                 Try {
                     $tempFolder = New-TempDirectory
                     Expand-Archive -LiteralPath $zip -DestinationPath $tempFolder
@@ -112,12 +112,18 @@ function Install-PhpExtension() {
                     }
                     $dllPath = $phpDlls[0].FullName
                 }
+                Catch {
+                    $keepZip = $false
+                    Throw
+                }
                 Finally {
-                    Try {
-                        Remove-Item -Path $zip -Force
-                    }
-                    Catch {
-                        Write-Debug 'Failed to remove temporary zip file'
+                    If (-Not($keepZip)) {
+                        Try {
+                            Remove-Item -Path $zip -Force
+                        }
+                        Catch {
+                            Write-Debug 'Failed to remove temporary zip file'
+                        }
                     }
                 }
             }

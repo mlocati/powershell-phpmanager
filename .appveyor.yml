@@ -16,6 +16,10 @@ environment:
   PsgKey:
     secure: tlhLuUS6x8FcP159+X/EIBDlj9m+u5KCTTuqwzsiNHlPX6K4AolpaZcfAP4ClOdB
 
+cache:
+  - C:\downloads -> .appveyor.yml
+  - '%ProgramFiles%\WindowsPowerShell\Modules\VcRedist -> .appveyor.yml'
+
 install:
   - ps: Import-Module -Force .\PhpManager
 
@@ -27,6 +31,7 @@ test_script:
       Set-StrictMode -Version 2.0
       $ProgressPreference = 'SilentlyContinue'
       $ErrorActionPreference = 'Stop'
+      Set-PhpDownloadCache -Path C:\downloads
       # Check that Get-PhpAvailableVersion works
       $latest72 = Get-PhpAvailableVersion -State Release | Where-Object { $_.BaseVersion -match '^7.2\.' -and $_.Architecture -eq 'x86' -and $_.ThreadSafe -eq $true }
       If (-Not($latest72)) { Throw 'PHP release 7.2 not not found!' }
@@ -98,7 +103,13 @@ deploy_script:
           If ($previousTag -eq '') {
             Write-Host 'Unable to find the previously published tag: empty release notes'
           } Else {
-            $commitMessages = @(& git log --format='- %s' --no-merges --reverse ("$previousTag..." + $Env:APPVEYOR_REPO_TAG_NAME) -- .\PhpManager)
+            $rawCommitMessages = @(& git log --format='- %s' --no-merges --reverse ("$previousTag..." + $Env:APPVEYOR_REPO_TAG_NAME) -- .\PhpManager)
+            $commitMessages = @()
+            ForEach ($rawCommitMessage in $rawCommitMessages) {
+              If (-Not($rawCommitMessage -imatch '^\[minor\]')) {
+                $commitMessages += $rawCommitMessage
+              }
+            }
             If ($commitMessages.Count -lt 1) {
               Write-Host 'No relevant commit messages found: empty release notes'
             } Else {

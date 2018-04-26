@@ -33,12 +33,18 @@ function Install-PhpFromUrl() {
     Begin {
     }
     Process {
-        $temporaryFile = Get-ZipFromUrl -Url $Url
+        $temporaryFile, $keepTemporaryFile = Get-FileFromUrlOrCache -Url $Url
         Try {
             $temporaryDirectory = New-TempDirectory
             Try {
                 Write-Debug "Extracting $temporaryFile to temporary directory"
-                Expand-Archive -LiteralPath $temporaryFile -DestinationPath $temporaryDirectory -Force
+                Try {
+                    Expand-Archive -LiteralPath $temporaryFile -DestinationPath $temporaryDirectory -Force
+                }
+                Catch {
+                    $keepTemporaryFile = $false
+                    Throw
+                }
                 $exePath = Join-Path -Path $temporaryDirectory -ChildPath 'php.exe'
                 If (-Not(Test-Path -Path $exePath -PathType Leaf)) {
                     Throw "Unable to find php.exe in the downloaded archive"
@@ -108,10 +114,12 @@ function Install-PhpFromUrl() {
             Write-Debug "Extracting $temporaryFile to destination directory"
             Expand-Archive -LiteralPath $temporaryFile -DestinationPath $Path -Force
         } Finally {
-            Try {
-                Remove-Item -Path $temporaryFile
-            } Catch {
-                Write-Debug 'Failed to remove temporary file'
+            If (-Not($keepTemporaryFile)) {
+                Try {
+                    Remove-Item -Path $temporaryFile
+                } Catch {
+                    Write-Debug 'Failed to remove temporary file'
+                }
             }
         }
     }

@@ -7,5 +7,10 @@
     "files.trimTrailingWhitespace": true,
     "[bat]": {
         "files.encoding": "iso88591"
+    },
+    "[markdown]": {
+        "editor.wordWrap": "on",
+        "editor.quickSuggestions": false,
+        "files.trimTrailingWhitespace": false
     }
 }

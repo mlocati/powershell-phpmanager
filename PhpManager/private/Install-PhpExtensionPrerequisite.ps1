@@ -44,11 +44,17 @@ function Install-PhpExtensionPrerequisite() {
                     Throw ('Unable to find the imagick package dependencies on {0} for {1}' -f $pageUrl, $PhpVersion.DisplayName)
                 }
                 Write-Output "Downloading and extracting $zipUrl"
-                $zipFile = Get-ZipFromUrl -Url $zipUrl
+                $zipFile, $keepZipFile = Get-FileFromUrlOrCache -Url $zipUrl
                 Try {
                     $tempFolder = New-TempDirectory
                     Try {
-                        Expand-Archive -LiteralPath $zipFile -DestinationPath $tempFolder
+                        Try {
+                            Expand-Archive -LiteralPath $zipFile -DestinationPath $tempFolder
+                        }
+                        Catch {
+                            $keepZipFile = $false
+                            Throw
+                        }
                         $phpFolder = [System.IO.Path]::GetDirectoryName($PhpVersion.ExecutablePath)
                         Get-ChildItem -LiteralPath $tempFolder -Recurse -File -Filter *.dll `
                             | Where-Object {$_.Name -like 'CORE_RL_*.dll' -or $_.Name -like 'IM_MOD_RL_*.dll' } `
@@ -64,11 +70,13 @@ function Install-PhpExtensionPrerequisite() {
                     }
                 }
                 Finally {
-                    Try {
-                        Remove-Item -Path $zipFile
-                    }
-                    Catch {
-                        Write-Debug 'Failed to remove temporary zip file'
+                    If (-Not($keepZipFile)) {
+                        Try {
+                            Remove-Item -Path $zipFile
+                        }
+                        Catch {
+                            Write-Debug 'Failed to remove temporary zip file'
+                        }
                     }
                 }
             }
