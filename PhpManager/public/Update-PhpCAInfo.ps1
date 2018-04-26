@@ -61,7 +61,7 @@ function Update-PhpCAInfo() {
             Finally {
                 $streamWriter.Dispose()
             }
-    }
+        }
         Finally {
             $stream.Dispose()
         }
