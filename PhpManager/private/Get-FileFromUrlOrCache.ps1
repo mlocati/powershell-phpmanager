@@ -98,7 +98,7 @@ Function Get-FileFromUrlOrCache
                     $localFile = $fullCachePath
                     $fromCache = $true
                 } Else {
-                    $localFile = $fullCachePath
+                    $localFile = $temporaryFile
                     $fromCache = $false
                 }
             } Catch {
