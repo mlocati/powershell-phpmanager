@@ -156,7 +156,7 @@ In addition, `Update-PhpCAInfo` can optionally add your custom CA certificates t
 
 This module downloads PHP and PHP extensions from internet.  
 In order to avoid downloading the same files multiple times you can use `Set-PhpDownloadCache` to specify the path of a local folder where the downloads will be cached (to get the configured value you can use `Set-PhpDownloadCache`).  
-Please remark that this settings is not persisted across different sessions: you have to call `Set-PhpDownloadCache` in every session.
+By default `Set-PhpDownloadCache` does not persist the configured value: you can use the `-Persist` option to store if for the current user, of for all users.
 
 ## FAQ
 

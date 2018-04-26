@@ -15,6 +15,13 @@ Function Get-PhpDownloadCache
     Begin {
     }
     Process {
+        If ($null -eq $Script:DOWNLOADCACHE_PATH) {
+            $path = Get-PhpManagerConfigurationKey -Key 'DOWNLOADCACHE_PATH'
+            If ($null -eq $path) {
+                $path = ''
+            }
+            Set-Variable -Scope Script -Name 'DOWNLOADCACHE_PATH' -Value $path -Force
+        }
     }
     End {
         $Script:DOWNLOADCACHE_PATH

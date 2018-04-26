@@ -71,13 +71,14 @@ Function Get-FileFromUrlOrCache
                 }
             }
         }
-        If ($Script:DOWNLOADCACHE_PATH -eq '') {
+        $downloadCachePath = Get-PhpDownloadCache
+        If ($downloadCachePath -eq '') {
             $fullCachePath = ''
         } Else {
-            If (-Not(Test-Path -LiteralPath $Script:DOWNLOADCACHE_PATH -PathType Container)) {
-                New-Item -Path $Script:DOWNLOADCACHE_PATH -ItemType Directory | Out-Null
+            If (-Not(Test-Path -LiteralPath $downloadCachePath -PathType Container)) {
+                New-Item -Path $downloadCachePath -ItemType Directory | Out-Null
             }
-            $fullCachePath = Join-Path -Path $Script:DOWNLOADCACHE_PATH -ChildPath $CachedFileName
+            $fullCachePath = Join-Path -Path $downloadCachePath -ChildPath $CachedFileName
         }
         If ($fullCachePath -ne '' -and (Test-Path -LiteralPath $fullCachePath -PathType Leaf)) {
             $localFile = $fullCachePath
