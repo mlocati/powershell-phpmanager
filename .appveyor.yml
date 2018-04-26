@@ -32,7 +32,7 @@ test_script:
       If (-Not($latest72)) { Throw 'PHP release 7.2 not not found!' }
       # Check that Install-Php works
       $installPath = 'C:\Test\PHP'
-      Install-Php -Version 7.2.0 -Architecture x86 -ThreadSafe $true -Path $installPath -AddToPath User
+      Install-Php -Version 7.2.0 -Architecture x86 -ThreadSafe $true -Path $installPath -AddToPath User -InitialPhpIni Development
       # Check that Get-Php works
       Write-Output 'Version installed:'
       Get-Php -Path $installPath

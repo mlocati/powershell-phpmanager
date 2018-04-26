@@ -34,6 +34,10 @@ function Install-Php() {
     Specify if you want to add the PHP installation folder to the user ('User') or system ('System') PATH environment variable.
     Please remark that using 'System' usually requires administrative rights.
 
+    .Parameter InitialPhpIni
+    Specify to initialize the initial php.ini with the bundled php.ini-production ('Production') or with the bundled php.ini-development ('Development').
+    If you don't specify this value, an almost empty php.ini will be created.
+
     .Parameter InstallVC
     Specify this switch to try to install automatically the required Visual C++ Redistributables (requires the VcRedist PowerShell package, and to run the process as an elevated user).
 
@@ -57,6 +61,9 @@ function Install-Php() {
         [Parameter(Mandatory = $false, Position = 5, HelpMessage = 'Specify if you want to add the PHP installation folder to the user (''User'') or system (''System'') PATH environment variable')]
         [ValidateSet('User', 'System')]
         [string] $AddToPath,
+        [Parameter(Mandatory = $false, Position = 6, HelpMessage = 'Specify to initialize the initial php.ini with the bundled php.ini-production (''Production'') or with the bundled php.ini-development (''Development''); if you don''t specify this value, an almost empty php.ini will be created')]
+        [ValidateSet('Production', 'Development')]
+        [string] $InitialPhpIni,
         [switch] $InstallVC,
         [switch] $Force
     )
@@ -128,14 +135,21 @@ function Install-Php() {
         Write-Output $('Installing PHP ' + $versionToInstall.DisplayName)
         Install-PhpFromUrl -Url $versionToInstall.DownloadUrl -Path $Path -PhpVersion $versionToInstall -InstallVCRedist $InstallVC
         # Initialize the php.ini
-        $IniPath = [System.IO.Path]::Combine($Path, 'php.ini');
-        If (-Not(Test-Path -Path $IniPath -PathType Leaf)) {
+        $iniPath = [System.IO.Path]::Combine($Path, 'php.ini');
+        If ($null -ne $InitialPhpIni -and $InitialPhpIni -ne '') {
+            $sourceIniPath = [System.IO.Path]::Combine($Path, 'php.ini-' + $InitialPhpIni.ToLowerInvariant());
+            Copy-Item -Path $sourceIniPath -Destination $iniPath -Force
+            $initializePhpIni = $true
+        } Else {
+            $initializePhpIni = -Not(Test-Path -Path $iniPath -PathType Leaf)
+        }
+        If ($initializePhpIni) {
             if ($null -eq $TimeZone -or $TimeZone -eq '') {
                 $TimeZone = 'UTC'
             }
-            Set-PhpIniKey -Key 'date.timezone' -Value $TimeZone -Path $IniPath
-            Set-PhpIniKey -Key 'default_charset' -Value 'UTF-8' -Path $IniPath
-            Set-PhpIniKey -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext')) -Path $IniPath
+            Set-PhpIniKey -Key 'date.timezone' -Value $TimeZone -Path $iniPath
+            Set-PhpIniKey -Key 'default_charset' -Value 'UTF-8' -Path $iniPath
+            Set-PhpIniKey -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext')) -Path $iniPath
         }
         If ($null -ne $AddToPath -and $AddToPath -ne '') {
             If ([System.Environment]::GetEnvironmentVariable[0].OverloadDefinitions.Count -lt 2) {
