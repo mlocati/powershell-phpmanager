@@ -41,7 +41,7 @@ Function Get-PhpVersionFromPath
             throw "Unable to find the file/folder $Path"
         }
         $data['ExecutablePath'] = $executablePath
-        $executableParameters = @('-r', 'echo PHP_VERSION, ''@'', PHP_INT_SIZE * 8;')
+        $executableParameters = @('-n', '-r', 'echo PHP_VERSION, ''@'', PHP_INT_SIZE * 8;')
         $executableResult = & $executablePath $executableParameters
         $match = $executableResult | Select-String -Pattern '^(\d+\.\d+\.\d+)(?:RC(\d+))?@(\d+)$'
         $data['BaseVersion'] = $match.Matches.Groups[1].Value
@@ -52,7 +52,16 @@ Function Get-PhpVersionFromPath
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Thread Safety\s*=>\s*(\w+)'
         $data['ThreadSafe'] = $match.Matches.Groups[1].Value -eq 'enabled'
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Compiler\s*=>\s*MSVC([\d]{1,2})'
-        $data['VCVersion'] = $match.Matches.Groups[1].Value
+        If ($null -eq $match) {
+            $v = [System.Version]$data['BaseVersion']
+            If ($v -le [System.Version]'5.2.9999') {
+                $data['VCVersion'] = 6
+            } Else {
+                Throw 'Failed to recognize VCVersion'
+            }
+        } Else {
+            $data['VCVersion'] = $match.Matches.Groups[1].Value
+        }
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Loaded Configuration File\s*=>\s*([\S].*[\S])\s*$'
         $iniPath = ''
         If ($match) {
