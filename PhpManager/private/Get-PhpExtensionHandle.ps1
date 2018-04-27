@@ -29,6 +29,8 @@ Function Get-PhpExtensionHandle
         }
         Switch ($handle) {
             'zend opcache' { $handle = 'opcache' }
+            'advanced php debugger (apd)' { $handle = 'apd' }
+            'nt user api' { $handle = 'ntuser' }
             default {
                 If (-Not($handle -match '^[a-z0-9][a-z0-9_\-]+$')) {
                     Throw "Unrecognized PHP extension name: $Name"
