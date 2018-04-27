@@ -91,7 +91,7 @@ function Enable-PhpExtension() {
                         $rxSearch += '|(?:' + [regex]::Escape($match.Matches[0].Groups[1].Value) + ')'
                     }
                 }
-                $rxSearch += ')\s*$'
+                $rxSearch += ')"?\s*$'
                 If ($extensionToEnable.Filename -like ($extensionDir + '*')) {
                     $newIniValue = $extensionToEnable.Filename.SubString($extensionDir.Length)
                     If ($canUseBaseName) {
@@ -99,6 +99,8 @@ function Enable-PhpExtension() {
                         If ($match) {
                             $newIniValue = $match.Matches[0].Groups[1].Value
                         }
+                    } ElseIf ([System.Version]$phpVersion.BaseVersion -le [System.Version]'5.4.99999') {
+                        $newIniValue = $extensionToEnable.Filename
                     }
                 } Else {
                     $newIniValue = $extensionToEnable.Filename

@@ -93,7 +93,7 @@ function Disable-PhpExtension() {
                         $rxSearch += '|(?:' + [regex]::Escape($match.Matches[0].Groups[1].Value) + ')'
                     }
                 }
-                $rxSearch += '))\s*$'
+                $rxSearch += '))"?\s*$'
                 $disabled = $false
                 $newIniLines = @()
                 ForEach ($line in $iniLines) {
