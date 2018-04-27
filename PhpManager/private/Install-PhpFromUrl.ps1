@@ -113,6 +113,26 @@ function Install-PhpFromUrl() {
             }
             Write-Debug "Extracting $temporaryFile to destination directory"
             Expand-Archive -LiteralPath $temporaryFile -DestinationPath $Path -Force
+            Try {
+                $apacheFile = [System.IO.Path]::Combine($Path, 'Apache.conf')
+                If (-Not(Test-Path -LiteralPath $apacheFile)) {
+                    $apacheDlls = @(Get-ChildItem -LiteralPath $Path -Filter 'php*apache*.dll')
+                    If ($apacheDlls.Count -gt 1) {
+                        $apacheDlls = $apacheDlls | Where-Object { $_.BaseName -match '^php(\d+(_\d+)*)apache(\d+(_\d+)*)$' }
+                    }
+                    If ($apacheDlls.Count -eq 1) {
+                        $match = $apacheDlls[0].BaseName | Select-String -Pattern '^php(\d+(?:_\d+)*)apache(?:\d+(?:_\d+)*)$'
+                        If ($match) {
+                            $moduleName = 'php' + $match.Matches[0].Groups[1].Value + '_module'
+                            $fullName = $apacheDlls[0].FullName
+                            Set-Content -LiteralPath $apacheFile -Value "LoadModule $moduleName ""$fullName"""
+                        }
+                    }
+                }
+            }
+            Catch {
+                Write-Debug 'Failed to configure the Apache.conf file'
+            }
         } Finally {
             If (-Not($keepTemporaryFile)) {
                 Try {

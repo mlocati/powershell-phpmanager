@@ -11,13 +11,22 @@ Function Get-PhpManagerConfigurationKey
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
-        [string]$Key
+        [string]$Key,
+        [Parameter(Mandatory = $False, Position = 1)]
+        [ValidateSet('Any', 'CurrentUser', 'AllUsers')]
+        [string]$Scope = 'Any'
     )
     Begin {
         $result = $null
     }
     Process {
-        $folders = @($Env:LOCALAPPDATA, $Env:ProgramData)
+        If ($Scope -eq 'CurrentUser') {
+            $folders = @($Env:LOCALAPPDATA)
+        } ElseIf ($Scope -eq 'AllUsers') {
+            $folders = @($Env:ProgramData)
+        } Else {
+            $folders = @($Env:LOCALAPPDATA, $Env:ProgramData)
+        }
         ForEach ($folder in $folders) {
             If ($folder) {
                 $path = Join-Path -Path $folder -ChildPath 'phpmanager.json'

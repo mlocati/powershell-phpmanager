@@ -47,7 +47,7 @@ Function Set-PhpManagerConfigurationKey
     }
     Process {
         If ($null -eq $Value) {
-            $json.PSObject.Properties.Remove($key)
+            $json.PSObject.Properties.Remove($Key)
         } Else {
             $json | Add-Member -MemberType NoteProperty -Name $Key -Value $Value -Force
         }
