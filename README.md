@@ -72,7 +72,7 @@ Uninstall-Php C:\PHP
 ### Working with multiple PHP installations
 
 It's often handy to be able to use different PHP versions for different projects.  
-For instance, sometimes you may want that `php.exe` is PHP 5.6, sometimes you may want that `php.exe` is PHP 7.0.  
+For instance, sometimes you may want that `php.exe` is PHP 5.6, sometimes you may want that `php.exe` is PHP 7.2.  
 This module let's you easily switch the *current* PHP version (that is, the one accessible without specifying the `php.exe` path) with the concept of **PHP Switcher**.  
 You first install the PHP versions you need:
 ```powershell
