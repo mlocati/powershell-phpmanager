@@ -35,10 +35,18 @@ Function Add-PhpFolderToPath
             $targets += $Script:ENVTARGET_PROCESS
         }
         If ($null -ne $Persist) {
-            If ($Persist -eq 'User') {
-                $targets += $Script:ENVTARGET_USER
-            } ElseIf ($Persist -eq 'System') {
-                $targets += $Script:ENVTARGET_MACHINE
+            If ([System.Environment]::GetEnvironmentVariable[0].OverloadDefinitions.Count -lt 2) {
+                If ($CurrentProcess) {
+                    Write-Warning "The current PowerShell version does not support persisting environment variables: we'll set the Path only for the current process"
+                } Else {
+                    Write-Warning "The current PowerShell version does not support persisting environment variables"
+                }
+            } Else {
+                If ($Persist -eq 'User') {
+                    $targets += $Script:ENVTARGET_USER
+                } ElseIf ($Persist -eq 'System') {
+                    $targets += $Script:ENVTARGET_MACHINE
+                }
             }
         }
         ForEach ($target in $targets) {
