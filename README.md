@@ -212,15 +212,14 @@ By default `Set-PhpDownloadCache` does not persist the configured value: you can
 
 ## FAQ
 
-### What are [those executable](https://github.com/mlocati/powershell-phpmanager/tree/master/PhpManager/private/bin) in the archive???
+### What are [those executable](https://github.com/mlocati/powershell-phpmanager/tree/master/PhpManager/private/bin) in the archive?
 
 In order to retrieve the name and the version of the locally available extensions, as well as to determine if the are PHP extensions (to be added in the `php.ini` file with `extension=...`) or Zend extensions (to be added in the `php.ini` file with `zend_extension=...`), we need to inspect the extension DLL files.
-This is done with [this C# code](https://github.com/mlocati/powershell-phpmanager/blob/master/src/Inspect-PhpExtension.cs).
+This is done with [this C code](https://github.com/mlocati/powershell-phpmanager/blob/master/src/Inspect-PhpExtension.c).
 
-You could think that this C# code could be included in the PowerShell scripts with the [`Add-Type -Language CSharp`](http://go.microsoft.com/fwlink/?LinkId=821749) cmdlet.
+You could think that this code could be written in C# and included in the PowerShell scripts with the [`Add-Type -Language CSharp`](http://go.microsoft.com/fwlink/?LinkId=821749) cmdlet.
 Sadly, we have to inspect DLLs that are compiled both for 32 and for 64 bits architectures, and the code would be able to inspect DLL with the same architecture used by PowerShell.
 So, if PowerShell is running in 64-bit mode, we won't be able to inspect 32-bit DLLs.
 That's why we need these executables: the will be started in 32 bits (`Inspect-PhpExtension-x86.exe`) or in 64 bits (`Inspect-PhpExtension-x64.exe`).
 
-Those executables are compiled with this simple [batch file](https://github.com/mlocati/powershell-phpmanager/blob/master/src/compile.bat), but of course you don't have to trust them:
-you can download and decompile them with a tool like [ILSpy](https://github.com/icsharpcode/ILSpy) to check that their source code is [exactly this](https://github.com/mlocati/powershell-phpmanager/blob/master/src/Inspect-PhpExtension.cs).
+Of course you don't have to trust them: you can compile them on your own (it will require [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10)) by calling the [`compile.bat`](https://github.com/mlocati/powershell-phpmanager/blob/master/src/compile.bat) script.
