@@ -31,7 +31,7 @@ Function Get-PhpManagerConfigurationKey
             If ($folder) {
                 $path = Join-Path -Path $folder -ChildPath 'phpmanager.json'
                 If (Test-Path -PathType Leaf -LiteralPath $path) {
-                    $content = @(Get-Content -LiteralPath $path) -join ''
+                    $content = @(Get-Content -LiteralPath $path) -join "`n"
                     $json = ConvertFrom-Json -InputObject $content
                     If ($json.PSobject.Properties.name -eq $Key) {
                         $result = $json.$Key

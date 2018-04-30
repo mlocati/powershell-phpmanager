@@ -39,7 +39,8 @@ Function Set-PhpManagerConfigurationKey
         $path = Join-Path -Path $folder -ChildPath 'phpmanager.json'
         $json = $null
         If (Test-Path -PathType Leaf -LiteralPath $path) {
-            $json = Get-Content -LiteralPath $path | ConvertFrom-Json
+            $content = @(Get-Content -LiteralPath $path) -join "`n"
+            $json = ConvertFrom-Json -InputObject $content
         }
         If (-Not($json)) {
             $json = New-Object -TypeName PSCustomObject
