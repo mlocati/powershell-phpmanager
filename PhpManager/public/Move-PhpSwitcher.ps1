@@ -49,7 +49,7 @@ Function Move-PhpSwitcher
                             }
                         }
                     }
-                    Remove-PhpFolderFromPath -Path $oldAlias
+                    Edit-PhpFolderInPath -Operation Remove -Path $oldAlias
                     Remove-Item -LiteralPath $oldAlias -Recurse -Force
                 }
             }
@@ -59,7 +59,7 @@ Function Move-PhpSwitcher
                     Remove-Item -LiteralPath $NewAlias -Recurse -Force
                 }
                 New-Item -ItemType Junction -Path $NewAlias -Value $recreateAs | Out-Null
-                Add-PhpFolderToPath -Path $NewAlias -Persist $(If ($switcher.Scope -eq 'AllUsers') { 'System' } Else { 'User' } ) -CurrentProcess
+                Edit-PhpFolderInPath -Operation Add -Path $NewAlias -Persist $(If ($switcher.Scope -eq 'AllUsers') { 'System' } Else { 'User' } ) -CurrentProcess
             }
             Set-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Value $switcher -Scope $switcher.Scope
         }

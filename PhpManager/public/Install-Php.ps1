@@ -152,7 +152,7 @@ function Install-Php() {
             Set-PhpIniKey -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext')) -Path $iniPath
         }
         If ($null -ne $AddToPath -and $AddToPath -ne '') {
-            Add-PhpFolderToPath -Path $Path -Persist $AddToPath -CurrentProcess
+            Edit-PhpFolderInPath -Operation Add -Path $Path -Persist $AddToPath -CurrentProcess
         }
     }
     End {

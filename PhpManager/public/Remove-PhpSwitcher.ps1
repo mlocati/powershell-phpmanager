@@ -5,7 +5,7 @@ Function Remove-PhpSwitcher
     Process {
         $switcher = Get-PhpSwitcher
         If ($switcher -ne $null) {
-            Remove-PhpFolderFromPath -Path $switcher.Alias
+            Edit-PhpFolderInPath -Operation Remove -Path $switcher.Alias
             If (Test-Path -LiteralPath $switcher.Alias -PathType Container) {
                 $aliasItem = Get-Item -LiteralPath $switcher.Alias
                 If ($aliasItem.LinkType -eq 'Junction') {
