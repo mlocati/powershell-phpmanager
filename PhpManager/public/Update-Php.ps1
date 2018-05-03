@@ -19,7 +19,8 @@ function Update-Php() {
     .Outputs
     bool
     #>
-    Param(
+    [OutputType([bool])]
+    param (
         [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path of the PHP installation; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -27,69 +28,68 @@ function Update-Php() {
         [switch] $ConfirmAuto,
         [switch] $Force
     )
-    Begin {
+    begin {
         $updated = $null
     }
-    Process {
-        If ($null -eq $Path -or $Path -eq '') {
-            $installedVersion = Get-OnePhpVersionFromEnvironment
+    process {
+        if ($null -eq $Path -or $Path -eq '') {
+            $installedVersion = [PhpVersionInstalled]::FromEnvironmentOne()
             $confirmAutomaticallyFoundPhp = $true
-        } Else {
-            $installedVersion = Get-PhpVersionFromPath -Path $Path
+        } else {
+            $installedVersion = [PhpVersionInstalled]::FromPath($Path)
             $confirmAutomaticallyFoundPhp = $false
         }
-        $folder = [System.IO.Path]::GetDirectoryName($installedVersion.ExecutablePath)
-        If ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
-            Write-Output "The PHP installation has been found at $folder"
+        if ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
+            Write-Verbose "The PHP installation has been found at $($installedVersion.ActualFolder))"
             $confirmed = $false
-            While (-Not($confirmed)) {
-                $answer = Read-Host -Prompt "Do you confirm updating this installation [use -ConfirmAuto to confirm autumatically]? [y/n]"
-                If ($answer -match '^\s*y') {
+            while (-Not($confirmed)) {
+                $answer = Read-Host -Prompt "Do you confirm updating PHP at $($installedVersion.ActualFolder) [use -ConfirmAuto to confirm autumatically]? [y/n]"
+                if ($answer -match '^\s*y') {
                     $confirmed = $true
-                } ElseIf ($answer -match '^\s*n') {
+                } elseif ($answer -match '^\s*n') {
                     throw 'Operation aborted.'
-                } Else {
-                    Write-Output 'Please answer with Y or N'
+                } else {
+                    Write-Error 'Please answer with Y or N' -ErrorAction Continue
                 }
             }
         }
-        if ($installedVersion.RC -eq '') {
+        if ($null -eq $installedVersion.RC) {
             $possibleReleaseStates = @($Script:RELEASESTATE_RELEASE, $Script:RELEASESTATE_ARCHIVE)
         } else {
             $possibleReleaseStates = @($Script:RELEASESTATE_QA)
         }
         $compatibleVersions = $null
         foreach ($possibleReleaseState in $possibleReleaseStates) {
-            $compatibleVersions = Get-PhpAvailableVersion -State $possibleReleaseState | Where-Object {Get-PhpVersionsCompatibility -A $installedVersion -B $_}
+            $compatibleVersions = Get-PhpAvailableVersion -State $possibleReleaseState | Where-Object { Get-PhpVersionsCompatibility -A $installedVersion -B $_ }
             if ($null -ne $compatibleVersions) {
                 break
             }
         }
         $bestNewVersion = $null
         if ($null -ne $compatibleVersions) {
-            ForEach ($compatibleVersion in $compatibleVersions) {
-                If ($null -eq $bestNewVersion) {
+            foreach ($compatibleVersion in $compatibleVersions) {
+                if ($null -eq $bestNewVersion) {
                     $bestNewVersion = $compatibleVersion
-                } ElseIf ($(Compare-PhpVersion -A $compatibleVersion -B $bestNewVersion) -gt 0) {
+                } elseif ($compatibleVersion.CompareTo($bestNewVersion) -gt 0) {
                     $bestNewVersion = $compatibleVersion
                 }
             }
         }
         if ($null -eq $bestNewVersion) {
-            Write-Output 'No PHP compatible version found'
+            Write-Verbose 'No PHP compatible version found'
             $updated = $false
         } else {
-            if (-Not($Force) -and $(Compare-PhpVersion -A $bestNewVersion -B $installedVersion) -le 0) {
-                Write-Output $('No new version available (latest version is ' + $bestNewVersion.FullVersion + ')')
+            if (-Not($Force) -and $bestNewVersion.CompareTo($installedVersion) -le 0) {
+                Write-Verbose "No new version available (latest version is $($bestNewVersion.FullVersion))"
                 $updated = $false
             } else {
-                Write-Output $('Installing new version: ' + $bestNewVersion.DisplayName)
-                Install-PhpFromUrl -Url $bestNewVersion.DownloadUrl -Path ([System.IO.Path]::GetDirectoryName($installedVersion.ExecutablePath)) -PhpVersion $bestNewVersion -InstallVCRedist $false
+                Write-Verbose "Installing new version $($bestNewVersion.DisplayName) over $($installedVersion.DisplayName)"
+                Install-PhpFromUrl -Url $bestNewVersion.DownloadUrl -Path $installedVersion.ActualFolder -PhpVersion $bestNewVersion -InstallVCRedist $false
                 $updated = $true
             }
         }
     }
-    End {
+    end {
         $updated
     }
 }

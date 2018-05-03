@@ -1,4 +1,4 @@
-Function Move-PhpSwitcher
+function Move-PhpSwitcher
 {
     <#
     .Synopsis
@@ -10,41 +10,42 @@ Function Move-PhpSwitcher
     .Example
     Move-PhpSwitcher C:\PHP
     #>
-    Param (
+    [OutputType()]
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The new path where PHP will be visible when switching to a PHP version')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$NewAlias
     )
-    Begin {
+    begin {
     }
-    Process {
+    process {
         $switcher = Get-PhpSwitcher
         if ($null -eq $switcher) {
-            Throw 'PHP Switcher is not initialized: you can initialize it with the Initialize-PhpSwitcher command'
+            throw 'PHP Switcher is not initialized: you can initialize it with the Initialize-PhpSwitcher command'
         }
         $NewAlias = [System.IO.Path]::GetFullPath($NewAlias)
         $newAliasJunction = $null
-        If (Test-Path -LiteralPath $NewAlias -PathType Container) {
+        if (Test-Path -LiteralPath $NewAlias -PathType Container) {
             $newAliasJunction = Get-Item -LiteralPath $NewAlias
-            If ($newAliasJunction.LinkType -ne 'Junction') {
-                Throw "$NewAlias already exist and it's not a junction."
+            if ($newAliasJunction.LinkType -ne 'Junction') {
+                throw "$NewAlias already exist and it's not a junction."
             }
-        } ElseIf (Test-Path -LiteralPath $NewAlias) {
-            Throw "$NewAlias already exist and it's not a junction."
+        } elseif (Test-Path -LiteralPath $NewAlias) {
+            throw "$NewAlias already exist and it's not a junction."
         }
         $oldAlias = $switcher.Alias
         $dsc = [System.IO.Path]::DirectorySeparatorChar
-        If ($oldAlias.TrimEnd($dsc) -ne $NewAlias.TrimEnd($dsc)) {
+        if ($oldAlias.TrimEnd($dsc) -ne $NewAlias.TrimEnd($dsc)) {
             $recreateAs = $null
-            If (Test-Path -LiteralPath $oldAlias -PathType Container) {
+            if (Test-Path -LiteralPath $oldAlias -PathType Container) {
                 $oldAliasItem = Get-Item -LiteralPath $oldAlias
-                If ($oldAliasItem.LinkType -eq 'Junction') {
-                    If ($oldAliasItem | Get-Member -Name 'Target') {
+                if ($oldAliasItem.LinkType -eq 'Junction') {
+                    if ($oldAliasItem | Get-Member -Name 'Target') {
                         $s = [string]$oldAliasItem.Target
-                        If (Test-Path -LiteralPath $s -PathType Container) {
+                        if (Test-Path -LiteralPath $s -PathType Container) {
                             $sItem = Get-Item -LiteralPath $s
-                            If (-Not($sItem.LinkType)) {
+                            if (-Not($sItem.LinkType)) {
                                 $recreateAs = $s
                             }
                         }
@@ -54,16 +55,16 @@ Function Move-PhpSwitcher
                 }
             }
             $switcher.Alias = $NewAlias
-            If ($recreateAs -ne $null) {
-                If ($newAliasJunction -ne $null) {
+            if ($null -ne $recreateAs) {
+                if ($null -ne $newAliasJunction) {
                     Remove-Item -LiteralPath $NewAlias -Recurse -Force
                 }
                 New-Item -ItemType Junction -Path $NewAlias -Value $recreateAs | Out-Null
-                Edit-PhpFolderInPath -Operation Add -Path $NewAlias -Persist $(If ($switcher.Scope -eq 'AllUsers') { 'System' } Else { 'User' } ) -CurrentProcess
+                Edit-PhpFolderInPath -Operation Add -Path $NewAlias -Persist $(if ($switcher.Scope -eq 'AllUsers') { 'System' } else { 'User' } ) -CurrentProcess
             }
             Set-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Value $switcher -Scope $switcher.Scope
         }
     }
-    End {
+    end {
     }
 }

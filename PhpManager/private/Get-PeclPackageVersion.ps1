@@ -1,4 +1,4 @@
-Function Get-PeclPackageVersion
+function Get-PeclPackageVersion
 {
     <#
     .Synopsis
@@ -16,7 +16,8 @@ Function Get-PeclPackageVersion
     .Outputs
     System.Array
     #>
-    Param (
+    [OutputType([string[]])]
+    param (
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [ValidatePattern('^[A-Za-z][A-Za-z0-9_\-]*$')]
@@ -29,44 +30,44 @@ Function Get-PeclPackageVersion
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
         [string] $MinimumStability = 'stable'
     )
-    Begin {
+    begin {
         $result = @()
     }
-    Process {
-        Switch ($MinimumStability) {
+    process {
+        switch ($MinimumStability) {
             $Script:PEARSTATE_SNAPSHOT { $minimumStabilityInt = 0 }
             $Script:PEARSTATE_DEVEL { $minimumStabilityInt = 1 }
             $Script:PEARSTATE_ALPHA { $minimumStabilityInt = 2 }
             $Script:PEARSTATE_BETA { $minimumStabilityInt = 3 }
             $Script:PEARSTATE_STABLE { $minimumStabilityInt = 4 }
-            default { Throw "Unrecognized value of MinimumStability: $MinimumStability" }
+            default { throw "Unrecognized value of MinimumStability: $MinimumStability" }
         }
-        If ($null -eq $Version -or $Version -eq '') {
+        if ($null -eq $Version -or $Version -eq '') {
             $rxVersion = $null
-        } Else {
+        } else {
             $rxVersion = '^' + [regex]::Escape($Version) + '($|\.|[a-z])'
         }
         # https://pear.php.net/manual/en/core.rest.php
         $handleLC = $Handle.ToLowerInvariant()
         $xmlDocument = Invoke-RestMethod -Method Get -Uri ($Script:URL_PECLREST_1_0 + "r/$handleLC/allreleases.xml")
         $xmlVersions = @($xmlDocument | Select-Xml -XPath '/ns:a/ns:r' -Namespace @{'ns' = $xmlDocument.DocumentElement.NamespaceURI} | Select-Object -ExpandProperty Node)
-        ForEach ($xmlVersion In $xmlVersions) {
-            Switch ($xmlVersion.s) {
+        foreach ($xmlVersion in $xmlVersions) {
+            switch ($xmlVersion.s) {
                 $Script:PEARSTATE_SNAPSHOT { $stabilityInt = 0 }
                 $Script:PEARSTATE_DEVEL { $stabilityInt = 1 }
                 $Script:PEARSTATE_ALPHA { $stabilityInt = 2 }
                 $Script:PEARSTATE_BETA { $stabilityInt = 3 }
                 $Script:PEARSTATE_STABLE { $stabilityInt = 4 }
-                default { Throw ('Unrecognized value of stability read in XML' + $xmlVersion.s) }
+                default { throw ('Unrecognized value of stability read in XML' + $xmlVersion.s) }
             }
-            If ($stabilityInt -ge $minimumStabilityInt) {
-                If ($null -eq $rxVersion -or $xmlVersion.v -match $rxVersion) {
+            if ($stabilityInt -ge $minimumStabilityInt) {
+                if ($null -eq $rxVersion -or $xmlVersion.v -match $rxVersion) {
                     $result += $xmlVersion.v
                 }
             }
         }
     }
-    End {
+    end {
         $result
     }
 }

@@ -9,72 +9,66 @@ function Install-PhpExtensionPrerequisite() {
     .Parameter Extension
     The PhpExtension instance representing the extension.
     #>
-    Param(
+    [OutputType()]
+    param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]
-        [psobject] $PhpVersion,
+        [PhpVersionInstalled] $PhpVersion,
         [Parameter(Mandatory = $True, Position = 1)]
         [ValidateNotNull()]
-        [psobject] $Extension
+        [PhpExtension] $Extension
     )
-    Begin {
+    begin {
     }
-    Process {
-        Write-Output ('Checking prerequisites for {0}' -f $Extension.Name)
+    process {
+        Write-Verbose ('Checking prerequisites for {0}' -f $Extension.Name)
         switch ($Extension.Handle) {
             imagick {
                 $rxSearch = '/ImageMagick-[\d\.\-]+-vc' + $PhpVersion.VCVersion + '-' + $PhpVersion.Architecture + '\.zip$'
                 $pageUrl = 'https://windows.php.net/downloads/pecl/deps/'
-                Try {
+                try {
                     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
-                }
-                Catch {
+                } catch {
                     Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
                 }
                 $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $pageUrl
                 $zipUrl = $null
-                ForEach ($link In $webResponse.Links) {
+                foreach ($link in $webResponse.Links) {
                     $fullUrl = [Uri]::new([Uri]$pageUrl, $link.Href).AbsoluteUri
-                    If ($fullUrl -match $rxSearch) {
+                    if ($fullUrl -match $rxSearch) {
                         $zipUrl = $fullUrl
                         break
                     }
                 }
-                If ($null -eq $zipUrl) {
-                    Throw ('Unable to find the imagick package dependencies on {0} for {1}' -f $pageUrl, $PhpVersion.DisplayName)
+                if ($null -eq $zipUrl) {
+                    throw ('Unable to find the imagick package dependencies on {0} for {1}' -f $pageUrl, $PhpVersion.DisplayName)
                 }
-                Write-Output "Downloading and extracting $zipUrl"
+                Write-Verbose "Downloading and extracting $zipUrl"
                 $zipFile, $keepZipFile = Get-FileFromUrlOrCache -Url $zipUrl
-                Try {
+                try {
                     $tempFolder = New-TempDirectory
-                    Try {
-                        Try {
-                            Expand-Archive -LiteralPath $zipFile -DestinationPath $tempFolder
-                        }
-                        Catch {
+                    try {
+                        try {
+                            Expand-ArchiveWith7Zip -ArchivePath $zipFile -DestinationPath $tempFolder
+                        } catch {
                             $keepZipFile = $false
-                            Throw
+                            throw
                         }
-                        $phpFolder = [System.IO.Path]::GetDirectoryName($PhpVersion.ExecutablePath)
                         Get-ChildItem -LiteralPath $tempFolder -Recurse -File -Filter *.dll `
-                            | Where-Object {$_.Name -like 'CORE_RL_*.dll' -or $_.Name -like 'IM_MOD_RL_*.dll' } `
-                            | Move-Item -Force -Destination $phpFolder
-                    }
-                    Finally {
-                        Try {
+                            | Where-Object { $_.Name -like 'CORE_RL_*.dll' -or $_.Name -like 'IM_MOD_RL_*.dll' } `
+                            | Move-Item -Force -Destination $PhpVersion.ActualFolder
+                    } finally {
+                        try {
                             Remove-Item -Path $tempFolder -Recurse -Force
-                        }
-                        Catch {
+                        } catch {
                             Write-Debug 'Failed to remove temporary folder'
                         }
                     }
-                }
-                Finally {
-                    If (-Not($keepZipFile)) {
-                        Try {
+                } finally {
+                    if (-Not($keepZipFile)) {
+                        try {
                             Remove-Item -Path $zipFile
-                        }
-                        Catch {
+                        } catch {
                             Write-Debug 'Failed to remove temporary zip file'
                         }
                     }
@@ -82,6 +76,6 @@ function Install-PhpExtensionPrerequisite() {
             }
         }
     }
-    End {
+    end {
     }
 }

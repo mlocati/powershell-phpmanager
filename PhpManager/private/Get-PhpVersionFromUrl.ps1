@@ -1,55 +1,57 @@
-Function Get-PhpVersionFromUrl
+function Get-PhpVersionFromUrl
 {
     <#
     .Synopsis
-    Creates a new object representing a PHP version from an PHP download URL.
+    Gets an instance of PhpVersion by parsing its download URL.
 
     .Parameter Url
     The PHP download URL (eventually relative to PageUrl).
 
-    .Parameter PageUrl
-    The URL of the page where the download link has been retrieved from.
-
     .Parameter ReleaseState
     One of the $Script:RELEASESTATE_... constants.
 
-    .Outputs
-    PSCustomObject
+    .Parameter PageUrl
+    The URL of the page where the download link has been retrieved from.
 
-    .Example
-    Get-PhpVersionFromUrl '/downloads/releases/php-7.2.4-Win32-VC15-x86.zip' 'https://windows.php.net/downloads/releases/' $Script:RELEASESTATE_RELEASE
+    .Outputs
+    PhpVersionDownloadable
     #>
-    Param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The PHP download URL (eventually relative to PageUrl)')]
+    [OutputType([psobject])]
+    param (
+        [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Url,
-        [Parameter(Mandatory = $False, Position = 1, HelpMessage = 'The URL of the page where the download link has been retrieved from')]
+        [Parameter(Mandatory = $True, Position = 1)]
         [ValidateNotNull()]
-        [ValidateLength(1, [int]::MaxValue)]
-        [string]$PageUrl,
-        [Parameter(Mandatory = $False, Position = 2, HelpMessage = 'One of the $Script:RELEASESTATE_... constants')]
         [ValidateSet('QA', 'Release', 'Archive')]
-        [string]$ReleaseState
+        [string] $ReleaseState,
+        [Parameter(Mandatory = $False, Position = 2)]
+        [string]$PageUrl
     )
-    Begin {
-        $data = @{}
+    begin {
+        $result = $null
     }
-    Process {
+    process {
         $match = $Url | Select-String -CaseSensitive -Pattern ('/' + $Script:RX_ZIPARCHIVE + '$')
-        $data['BaseVersion'] = $match.Matches.Groups[1].Value;
-        $data['RC'] = $match.Matches.Groups[2].Value;
-        $data['Architecture'] = $match.Matches.Groups[5].Value;
-        $data['ThreadSafe'] = $match.Matches.Groups[3].Value -ne '-nts';
-        $data['VCVersion'] = $match.Matches.Groups[4].Value;
-        $data['ReleaseState'] = $ReleaseState;
-        If ($null -ne $PageUrl -and $PageUrl -ne '') {
-            $data['DownloadUrl'] = [Uri]::new([Uri]$PageUrl, $Url).AbsoluteUri
-        } else {
-            $data['DownloadUrl'] = $Url
+        if ($null -eq $match) {
+            throw "Unrecognized PHP ZIP archive url: $Url"
         }
+        $data = @{}
+        $data.Version = $match.Matches.Groups[1].Value;
+        $data.RC = $match.Matches.Groups[2].Value;
+        $data.Architecture = $match.Matches.Groups[5].Value;
+        $data.ThreadSafe = $match.Matches.Groups[3].Value -ne '-nts';
+        $data.VCVersion = $match.Matches.Groups[4].Value;
+        $data.ReleaseState = $ReleaseState;
+        if ($null -ne $PageUrl -and $PageUrl -ne '') {
+            $data.DownloadUrl = [Uri]::new([Uri]$PageUrl, $Url).AbsoluteUri
+        } else {
+            $data.DownloadUrl = $Url
+        }
+        $result = [PhpVersionDownloadable]::new($data)
     }
-    End {
-        New-PhpVersion $data
+    end {
+        $result
     }
 }

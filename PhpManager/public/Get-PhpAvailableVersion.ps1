@@ -1,4 +1,4 @@
-Function Get-PhpAvailableVersion
+function Get-PhpAvailableVersion
 {
     <#
     .Synopsis
@@ -16,38 +16,38 @@ Function Get-PhpAvailableVersion
     .Example
     Get-PhpAvailableVersion -State Release
     #>
-    Param (
+    [OutputType([psobject[]])]
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The release state (can be ''Release'' or ''Archive'' or ''QA'')')]
         [ValidateSet('QA', 'Release', 'Archive')]
         [string]$State,
         [Parameter(Mandatory = $False,HelpMessage = 'Force the reload of the list')]
         [switch]$Reload
     )
-    Begin {
+    begin {
         $result = $null
     }
-    Process {
-        $listVariableName = 'AVAILABLEVERSIONS_' + $State
-        If (-Not $Reload) {
+    process {
+        $listVariableName = "AVAILABLEVERSIONS_$State"
+        if (-Not $Reload) {
             $result = Get-Variable -Name $listVariableName -ValueOnly -Scope Script
         }
-        If ($null -eq $result) {
+        if ($null -eq $result) {
             $result = @()
-            $urlList = Get-Variable -Name $('URL_LIST_' + $State) -ValueOnly -Scope Script
-            Try {
+            $urlList = Get-Variable -Name "URL_LIST_$State" -ValueOnly -Scope Script
+            try {
                 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
-            }
-            Catch {
+            } catch {
                 Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
             }
             $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $urlList
-            ForEach ($link In $webResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {
-                $result += Get-PhpVersionFromUrl -Url $link.Href -PageUrl $urlList -ReleaseState $State
+            foreach ($link in $webResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {
+                $result += Get-PhpVersionFromUrl -Url $link.Href -ReleaseState $State -PageUrl $urlList
             }
             Set-Variable -Scope Script -Name $listVariableName -Value $result -Force
         }
     }
-    End {
+    end {
         $result
     }
 }

@@ -44,7 +44,8 @@ function Install-Php() {
     .Parameter Force
     Use this switch to enable installing PHP even if the destination directory already exists and it's not empty.
     #>
-    Param(
+    [OutputType()]
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The PHP version to be installed')]
         [ValidatePattern('^\d+(\.\d+)?(\.\d+)?(RC\d*)?$')]
         [string] $Version,
@@ -67,47 +68,47 @@ function Install-Php() {
         [switch] $InstallVC,
         [switch] $Force
     )
-    Begin {
+    begin {
     }
-    Process {
+    process {
         if ($Architecture -eq 'x64' -and [System.IntPtr]::Size -lt 8) {
-            Throw 'The current operating system is not 64 bits: you can only install with the x86 architecture'
+            throw 'The current operating system is not 64 bits: you can only install with the x86 architecture'
         }
         $Path = [System.IO.Path]::GetFullPath($Path)
         # Check existency
-        If (Test-Path -Path $Path -PathType Leaf) {
-            Throw "The specified installation path ($Path) points to an existing file"
+        if (Test-Path -Path $Path -PathType Leaf) {
+            throw "The specified installation path ($Path) points to an existing file"
         }
         if (-Not($Force)) {
             if (Test-Path -Path $([System.IO.Path]::Combine($Path, '*'))) {
-                Throw "The specified installation path ($Path) exists and it's not empty (use the -Force flag to force the installation)"
+                throw "The specified installation path ($Path) exists and it's not empty (use the -Force flag to force the installation)"
             }
         }
         # Check $Version format
         $match = $Version | Select-String -Pattern '^([1-9]\d*)(?:\.(\d+))?(?:\.(\d+))?(RC(\d*))?$'
-        If ($null -eq $match) {
-            Throw "The specified PHP version ($Version) is malformed"
+        if ($null -eq $match) {
+            throw "The specified PHP version ($Version) is malformed"
         }
         # Build the regular expression to match the version, and determine the list of release states
         $rxSearchVersion = '^'
         $rxSearchVersion += $match.Matches.Groups[1].Value + '\.'
-        If ($match.Matches.Groups[2].Value -eq '') {
+        if ($match.Matches.Groups[2].Value -eq '') {
             $rxSearchVersion += '\d+\.\d+'
-        } Else {
+        } else {
             $rxSearchVersion += [string][int]$match.Matches.Groups[2].Value + '\.'
-            If ($match.Matches.Groups[3].Value -eq '') {
+            if ($match.Matches.Groups[3].Value -eq '') {
                 $rxSearchVersion += '\d+'
-            } Else {
+            } else {
                 $rxSearchVersion += [string][int]$match.Matches.Groups[3].Value
             }
         }
-        If ($match.Matches.Groups[4].Value -eq '') {
+        if ($match.Matches.Groups[4].Value -eq '') {
             $searchReleaseStates = @($Script:RELEASESTATE_RELEASE, $Script:RELEASESTATE_ARCHIVE)
-        } Else {
+        } else {
             $rxSearchVersion += 'RC'
-            If ($match.Matches.Groups[5].Value -eq '') {
+            if ($match.Matches.Groups[5].Value -eq '') {
                 $rxSearchVersion += '\d+'
-            } Else {
+            } else {
                 $rxSearchVersion += [string][int]$match.Matches.Groups[5].Value
             }
             $searchReleaseStates = @($Script:RELEASESTATE_QA)
@@ -115,35 +116,35 @@ function Install-Php() {
         $rxSearchVersion += '$'
         # Filter the list of available PHP versions, and get the latest one
         $versionToInstall = $null
-        ForEach ($searchReleaseState in $searchReleaseStates) {
-            $compatibleVersions = Get-PhpAvailableVersion -State $searchReleaseState | Where-Object {$_.FullVersion -match $rxSearchVersion} | Where-Object {$_.Architecture -eq $Architecture} | Where-Object {$_.ThreadSafe -eq $ThreadSafe}
-            ForEach ($compatibleVersion in $compatibleVersions) {
-                If ($null -eq $versionToInstall) {
+        foreach ($searchReleaseState in $searchReleaseStates) {
+            $compatibleVersions = Get-PhpAvailableVersion -State $searchReleaseState | Where-Object { $_.FullVersion -match $rxSearchVersion -and $_.Architecture -eq $Architecture -and $_.ThreadSafe -eq $ThreadSafe }
+            foreach ($compatibleVersion in $compatibleVersions) {
+                if ($null -eq $versionToInstall) {
                     $versionToInstall = $compatibleVersion
-                } ElseIf ($(Compare-PhpVersion -A $compatibleVersion -B $versionToInstall) -gt 0) {
+                } elseif ($compatibleVersions -gt $versionToInstall) {
                     $versionToInstall = $compatibleVersion
                 }
             }
-            If ($null -ne $versionToInstall) {
+            if ($null -ne $versionToInstall) {
                 break
             }
         }
         if ($null -eq $versionToInstall) {
-            Throw 'No PHP version matches the specified criterias'
+            throw 'No PHP version matches the specified criterias'
         }
         # Install the found PHP version
-        Write-Output $('Installing PHP ' + $versionToInstall.DisplayName)
+        Write-Verbose $('Installing PHP ' + $versionToInstall.DisplayName)
         Install-PhpFromUrl -Url $versionToInstall.DownloadUrl -Path $Path -PhpVersion $versionToInstall -InstallVCRedist $InstallVC
         # Initialize the php.ini
         $iniPath = [System.IO.Path]::Combine($Path, 'php.ini');
-        If ($null -ne $InitialPhpIni -and $InitialPhpIni -ne '') {
+        if ($null -ne $InitialPhpIni -and $InitialPhpIni -ne '') {
             $sourceIniPath = [System.IO.Path]::Combine($Path, 'php.ini-' + $InitialPhpIni.ToLowerInvariant());
             Copy-Item -Path $sourceIniPath -Destination $iniPath -Force
             $initializePhpIni = $true
-        } Else {
+        } else {
             $initializePhpIni = -Not(Test-Path -Path $iniPath -PathType Leaf)
         }
-        If ($initializePhpIni) {
+        if ($initializePhpIni) {
             if ($null -eq $TimeZone -or $TimeZone -eq '') {
                 $TimeZone = 'UTC'
             }
@@ -151,10 +152,10 @@ function Install-Php() {
             Set-PhpIniKey -Key 'default_charset' -Value 'UTF-8' -Path $iniPath
             Set-PhpIniKey -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext')) -Path $iniPath
         }
-        If ($null -ne $AddToPath -and $AddToPath -ne '') {
+        if ($null -ne $AddToPath -and $AddToPath -ne '') {
             Edit-PhpFolderInPath -Operation Add -Path $Path -Persist $AddToPath -CurrentProcess
         }
     }
-    End {
+    end {
     }
 }

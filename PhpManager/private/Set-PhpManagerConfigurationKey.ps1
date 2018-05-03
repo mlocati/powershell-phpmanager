@@ -1,4 +1,4 @@
-Function Set-PhpManagerConfigurationKey
+function Set-PhpManagerConfigurationKey
 {
     <#
     .Synopsis
@@ -13,7 +13,8 @@ Function Set-PhpManagerConfigurationKey
     .Parameter Scope
     Persist the value for 'CurrentUser' or for 'AllUsers'
     #>
-    Param (
+    [OutputType()]
+    param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -24,45 +25,45 @@ Function Set-PhpManagerConfigurationKey
         [ValidateSet('CurrentUser', 'AllUsers')]
         $Scope
     )
-    Begin {
-        If ($Scope -eq 'AllUsers') {
+    begin {
+        if ($Scope -eq 'AllUsers') {
             $folder = $Env:ProgramData
-            If (-Not(Test-Path -PathType Container -LiteralPath $folder)) {
-                Throw "Unable to find the ProgramData folder ($folder)"
+            if (-Not(Test-Path -PathType Container -LiteralPath $folder)) {
+                throw "Unable to find the ProgramData folder ($folder)"
             }
-        } Else {
+        } else {
             $folder = $Env:LOCALAPPDATA
-            If (-Not(Test-Path -PathType Container -LiteralPath $folder)) {
-                Throw "Unable to find the LocalAppData folder ($folder)"
+            if (-Not(Test-Path -PathType Container -LiteralPath $folder)) {
+                throw "Unable to find the LocalAppData folder ($folder)"
             }
         }
         $path = Join-Path -Path $folder -ChildPath 'phpmanager.json'
         $json = $null
-        If (Test-Path -PathType Leaf -LiteralPath $path) {
+        if (Test-Path -PathType Leaf -LiteralPath $path) {
             $content = @(Get-Content -LiteralPath $path) -join "`n"
             $json = ConvertFrom-Json -InputObject $content
         }
-        If (-Not($json)) {
+        if (-Not($json)) {
             $json = New-Object -TypeName PSCustomObject
         }
     }
-    Process {
-        If ($null -eq $Value) {
+    process {
+        if ($null -eq $Value) {
             $json.PSObject.Properties.Remove($Key)
-        } Else {
+        } else {
             $json | Add-Member -MemberType NoteProperty -Name $Key -Value $Value -Force
         }
     }
-    End {
+    end {
         $props = @($json | Get-Member -MemberType Property,NoteProperty)
-        If ($props.Count -eq 0) {
-            If (Test-Path -PathType Leaf -LiteralPath $path) {
+        if ($props.Count -eq 0) {
+            if (Test-Path -PathType Leaf -LiteralPath $path) {
                 Remove-Item -LiteralPath $path
             }
-        } Else {
+        } else {
             ConvertTo-Json -InputObject $json | Set-Content -LiteralPath $path
         }
-        If ($Scope -eq 'AllUsers') {
+        if ($Scope -eq 'AllUsers') {
             Set-PhpManagerConfigurationKey -Key $Key -Value $null -Scope CurrentUser
         }
     }

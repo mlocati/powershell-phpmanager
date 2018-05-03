@@ -1,4 +1,4 @@
-Function Get-PhpManagerConfigurationKey
+function Get-PhpManagerConfigurationKey
 {
     <#
     .Synopsis
@@ -7,7 +7,8 @@ Function Get-PhpManagerConfigurationKey
     .Parameter Key
     The key of the configuration to be fetched.
     #>
-    Param (
+    [OutputType([object])]
+    param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -16,34 +17,34 @@ Function Get-PhpManagerConfigurationKey
         [ValidateSet('Any', 'CurrentUser', 'AllUsers')]
         [string]$Scope = 'Any'
     )
-    Begin {
+    begin {
         $result = $null
     }
-    Process {
-        If ($Scope -eq 'CurrentUser') {
+    process {
+        if ($Scope -eq 'CurrentUser') {
             $folders = @($Env:LOCALAPPDATA)
-        } ElseIf ($Scope -eq 'AllUsers') {
+        } elseif ($Scope -eq 'AllUsers') {
             $folders = @($Env:ProgramData)
-        } Else {
+        } else {
             $folders = @($Env:LOCALAPPDATA, $Env:ProgramData)
         }
-        ForEach ($folder in $folders) {
-            If ($folder) {
+        foreach ($folder in $folders) {
+            if ($folder) {
                 $path = Join-Path -Path $folder -ChildPath 'phpmanager.json'
-                If (Test-Path -PathType Leaf -LiteralPath $path) {
+                if (Test-Path -PathType Leaf -LiteralPath $path) {
                     $content = @(Get-Content -LiteralPath $path) -join "`n"
                     $json = ConvertFrom-Json -InputObject $content
-                    If ($json.PSobject.Properties.name -eq $Key) {
+                    if ($json.PSobject.Properties.name -eq $Key) {
                         $result = $json.$Key
-                        If ($null -ne $result) {
-                            Break
+                        if ($null -ne $result) {
+                            break
                         }
                     }
                 }
             }
         }
     }
-    End {
+    end {
         $result
     }
 }

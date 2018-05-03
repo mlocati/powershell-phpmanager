@@ -1,4 +1,4 @@
-Function Get-PeclAvailablePackage
+function Get-PeclAvailablePackage
 {
     <#
     .Synopsis
@@ -10,21 +10,21 @@ Function Get-PeclAvailablePackage
     .Outputs
     System.Array
     #>
-    Param (
+    [OutputType([string[]])]
+    param (
         [switch]$Reload
     )
-    Begin {
+    begin {
         $result = $null
     }
-    Process {
-        If (-Not $Reload) {
+    process {
+        if (-Not $Reload) {
             $result = $Script:PECL_PACKAGES
         }
-        If ($null -eq $result) {
-            Try {
+        if ($null -eq $result) {
+            try {
                 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
-            }
-            Catch {
+            } catch {
                 Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
             }
             # https://pear.php.net/manual/en/core.rest.php
@@ -33,7 +33,7 @@ Function Get-PeclAvailablePackage
             Set-Variable -Scope Script -Name 'PECL_PACKAGES' -Value $result -Force
         }
     }
-    End {
+    end {
         $result
     }
 }

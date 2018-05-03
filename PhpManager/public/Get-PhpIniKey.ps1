@@ -1,4 +1,4 @@
-Function Get-PhpIniKey
+function Get-PhpIniKey
 {
     <#
     .Synopsis
@@ -23,7 +23,8 @@ Function Get-PhpIniKey
     .Example
     Get-PhpIniKey 'default_charset' 'C:\Dev\PHP\php.exe'
     #>
-    Param (
+    [OutputType([string])]
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The key of the php.ini to get')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -33,36 +34,33 @@ Function Get-PhpIniKey
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path
     )
-    Begin {
+    begin {
         $result = $null
     }
-    Process {
+    process {
         $phpVersion = $null
-        If ($null -eq $Path -or $Path -eq '') {
-            $phpVersion = Get-OnePhpVersionFromEnvironment
-        } ElseIf ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
-            $phpVersion = Get-PhpVersionFromPath -Path $Path
+        if ($null -eq $Path -or $Path -eq '') {
+            $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
+        } elseif ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
+            $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
-        If ($null -ne $phpVersion) {
+        if ($null -ne $phpVersion) {
             $iniPath = $phpVersion.IniPath
-            If (-Not($iniPath)) {
-                Throw "The PHP at $Path does not have a configured php.ini"
-            }
-        } Else {
+        } else {
             $iniPath = $Path
         }
-        If ($Key -match '^\s*(zend_)?extension\s*$') {
-            Throw 'You can''t use this command to get the extensions'
+        if ($Key -match '^\s*(zend_)?extension\s*$') {
+            throw 'You can''t use this command to get the extensions'
         }
         $rxSearch = '^\s*' + [Regex]::Escape($Key) + '\s*=\s*(.*?)\s*$'
-        ForEach ($line in $(Get-PhpIniLine -Path $iniPath)) {
+        foreach ($line in $(Get-PhpIniLine -Path $iniPath)) {
             $match = $line | Select-String -Pattern $rxSearch
             if ($match) {
                 $result = $match.Matches[0].Groups[1].Value
             }
         }
     }
-    End {
+    end {
         $result
     }
 }

@@ -1,4 +1,4 @@
-Function Remove-PhpFromSwitcher
+function Remove-PhpFromSwitcher
 {
     <#
     .Synopsis
@@ -17,29 +17,30 @@ Function Remove-PhpFromSwitcher
     Add-PhpToSwitcher 7.2 C:\PHP7.2
     Remove-PhpFromSwitcher 5.6
     #>
-    Param (
+    [OutputType()]
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The symbolic name of the PHP installation to be removed from the PHP Switcher')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Name,
         [switch]$Force
     )
-    Begin {
+    begin {
     }
-    Process {
+    process {
         $switcher = Get-PhpSwitcher
         if ($null -eq $switcher) {
-            Throw 'PHP Switcher is not initialized: you can initialize it with the Initialize-PhpSwitcher command'
+            throw 'PHP Switcher is not initialized: you can initialize it with the Initialize-PhpSwitcher command'
         }
-        If ($switcher.Targets.ContainsKey($Name)) {
-            If (-Not($Force)) {
-                If (Test-Path -LiteralPath $switcher.Alias -PathType Container) {
+        if ($switcher.Targets.ContainsKey($Name)) {
+            if (-Not($Force)) {
+                if (Test-Path -LiteralPath $switcher.Alias -PathType Container) {
                     $aliasItem = Get-Item -LiteralPath $switcher.Alias
-                    If ($aliasItem.LinkType -eq 'Junction') {
+                    if ($aliasItem.LinkType -eq 'Junction') {
                         $aliasTarget = [string]$aliasItem.Target
                         $dsc = [System.IO.Path]::DirectorySeparatorChar
                         if ($aliasTarget.TrimEnd($dsc) -eq $switcher.Targets[$Name].TrimEnd($dsc)) {
-                            Throw "$Name is the currently active version for the PHP Switcher. Use -Force to remove it anyway."
+                            throw "$Name is the currently active version for the PHP Switcher. Use -Force to remove it anyway."
                         }
                     }
                 }
@@ -48,6 +49,6 @@ Function Remove-PhpFromSwitcher
             Set-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Value $switcher -Scope $switcher.Scope
         }
     }
-    End {
+    end {
     }
 }

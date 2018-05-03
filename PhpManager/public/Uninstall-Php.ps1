@@ -13,42 +13,45 @@ function Uninstall-Php() {
     .Parameter ConfirmAuto
     If -Path is omitted, specify this flag to assume that the PHP installation found in PATH is the correct one.
     #>
-    Param(
+    [OutputType()]
+    param (
         [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path of the PHP installation; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Path,
         [switch] $ConfirmAuto
     )
-    Begin {
+    begin {
     }
-    Process {
-        If ($null -eq $Path -or $Path -eq '') {
-            $phpVersion = Get-OnePhpVersionFromEnvironment
+    process {
+        if ($null -eq $Path -or $Path -eq '') {
+            $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
             $confirmAutomaticallyFoundPhp = $true
-        } Else {
-            $phpVersion = Get-PhpVersionFromPath -Path $Path
+        } else {
+            $phpVersion = [PhpVersionInstalled]::FromPath($Path)
             $confirmAutomaticallyFoundPhp = $false
         }
-        $folder = [System.IO.Path]::GetDirectoryName($phpVersion.ExecutablePath)
-        If ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
-            Write-Output "The PHP installation has been found at $folder"
+        if ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
+            Write-Verbose "The PHP installation has been found at $($phpVersion.ActualFolder)"
             $confirmed = $false
-            While (-Not($confirmed)) {
-                $answer = Read-Host -Prompt "Do you confirm removing this installation [use -ConfirmAuto to confirm autumatically]? [y/n]"
-                If ($answer -match '^\s*y') {
+            while (-Not($confirmed)) {
+                $answer = Read-Host -Prompt "Do you confirm removing PHP from $($phpVersion.ActualFolder) [use -ConfirmAuto to confirm autumatically]? [y/n]"
+                if ($answer -match '^\s*y') {
                     $confirmed = $true
-                } ElseIf ($answer -match '^\s*n') {
+                } elseif ($answer -match '^\s*n') {
                     throw 'Operation aborted.'
-                } Else {
-                    Write-Output 'Please answer with Y or N'
+                } else {
+                    Write-Error 'Please answer with Y or N' -ErrorAction Continue
                 }
             }
         }
-        Remove-Item -Path $folder -Recurse -Force
-        Edit-PhpFolderInPath -Operation Remove -Path $folder
-        Write-Output ($phpVersion.DisplayName + ' has been uninstalled from ' + $folder)
+        Remove-Item -LiteralPath $phpVersion.ActualFolder -Recurse -Force
+        Edit-PhpFolderInPath -Operation Remove -Path $phpVersion.ActualFolder
+        if ($phpVersion.Folder -ne $phpVersion.ActualFolder) {
+            Edit-PhpFolderInPath -Operation Remove -Path $phpVersion.Folder
+        }
+        Write-Verbose ($phpVersion.DisplayName + ' has been uninstalled from ' + $phpVersion.ActualFolder)
     }
-    End {
+    end {
     }
 }

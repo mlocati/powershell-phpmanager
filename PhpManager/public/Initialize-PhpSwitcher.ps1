@@ -1,4 +1,4 @@
-Function Initialize-PhpSwitcher
+function Initialize-PhpSwitcher
 {
     <#
     .Synopsis
@@ -19,7 +19,8 @@ Function Initialize-PhpSwitcher
     Add-PhpToSwitcher 7.2 C:\PHP7.2
     Switch-Php 5.6
     #>
-    Param (
+    [OutputType()]
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path where PHP will be visible when switching to a PHP version')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -29,41 +30,40 @@ Function Initialize-PhpSwitcher
         [string]$Scope = 'CurrentUser',
         [switch]$Force
     )
-    Begin {
-
+    begin {
     }
-    Process {
+    process {
         $existingSwitcher = Get-PhpSwitcher
         if ($null -ne $existingSwitcher) {
             if ($Scope -eq 'AllUsers' -and $existingSwitcher.Scope -eq 'CurrentUser') {
-                Throw 'It''s not possible to create a PHP Switcher for all users while there''s a PHP Switcher for the current user.'
+                throw 'It''s not possible to create a PHP Switcher for all users while there''s a PHP Switcher for the current user.'
             }
             if ($Scope -eq $existingSwitcher.Scope) {
-                If (-Not($Force)) {
-                    Throw 'Another PHP Switcher already exists. You should delete it first (with the Remove-PhpSwitcher command), or use the -Force flag.'
+                if (-Not($Force)) {
+                    throw 'Another PHP Switcher already exists. You should delete it first (with the Remove-PhpSwitcher command), or use the -Force flag.'
                 }
-            } Else {
+            } else {
                 $existingSwitcher = $null
             }
         }
         $newSwitcher = @{}
         $Alias = [System.IO.Path]::GetFullPath($Alias)
-        If (Test-Path -LiteralPath $Alias -PathType Container) {
+        if (Test-Path -LiteralPath $Alias -PathType Container) {
             $aliasItem = Get-Item -LiteralPath $Alias
-            If ($aliasItem.LinkType -ne 'Junction') {
-                Throw "$Alias already exist and it's not a junction."
+            if ($aliasItem.LinkType -ne 'Junction') {
+                throw "$Alias already exist and it's not a junction."
             }
-        } ElseIf (Test-Path -LiteralPath $Alias) {
-            Throw "$Alias already exist and it's not a junction."
+        } elseif (Test-Path -LiteralPath $Alias) {
+            throw "$Alias already exist and it's not a junction."
         }
         $newSwitcher.Alias = $Alias
         $newSwitcher.Targets = @{}
-        If ($existingSwitcher) {
+        if ($existingSwitcher) {
             Remove-PhpSwitcher
         }
         Set-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Value $newSwitcher -Scope $Scope
         Write-Verbose 'The new PHP Switcher has been created.'
     }
-    End {
+    end {
     }
 }

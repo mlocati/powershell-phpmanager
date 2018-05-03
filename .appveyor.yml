@@ -1,3 +1,5 @@
+image: Visual Studio 2017
+
 branches:
   only:
     - master
@@ -15,115 +17,82 @@ skip_commits:
 environment:
   PsgKey:
     secure: tlhLuUS6x8FcP159+X/EIBDlj9m+u5KCTTuqwzsiNHlPX6K4AolpaZcfAP4ClOdB
+  matrix:
+    - TEST_NANOSERVER: no
+    - TEST_NANOSERVER: yes
 
 cache:
-  - C:\downloads -> .appveyor.yml
+  - test\download-cache -> .appveyor.yml
   - '%ProgramFiles%\WindowsPowerShell\Modules\VcRedist -> .appveyor.yml'
   - '%ProgramFiles%\WindowsPowerShell\Modules\PSScriptAnalyzer -> .appveyor.yml'
-
-install:
-  - ps: Import-Module -Force .\PhpManager
+  - '%ProgramFiles%\WindowsPowerShell\Modules\Pester -> .appveyor.yml'
 
 build: off
 
+install:
+  - ps: |
+      if ($Env:TEST_NANOSERVER -ne 'yes') {
+        .\test\setup.ps1
+      } else {
+        if (-Not(Test-Path -LiteralPath .\test\docker-build)) {
+          New-Item -ItemType Directory -Path .\test\docker-build | Out-Null
+        }
+        Copy-Item -LiteralPath "$($Env:SystemRoot)\System32\vcruntime140.dll" -Destination .\test\docker-build\
+        Copy-Item -LiteralPath .\test\setup.ps1 -Destination .\test\docker-build\
+        Copy-Item -LiteralPath .\test\Nanoserver.Dockerfile -Destination .\test\docker-build\Dockerfile
+        docker build --rm --force-rm --tag nanoserver/phpmanager .\test\docker-build\
+        Remove-Item -LiteralPath .\test\docker-build -Recurse
+      }
+
 test_script:
   - ps: |
-      # Setup
-      Set-StrictMode -Version 2.0
-      $ProgressPreference = 'SilentlyContinue'
-      $ErrorActionPreference = 'Stop'
-      Set-PhpDownloadCache -Path C:\downloads
-      If (-Not(Get-Module -Name VcRedist) -and -Not(Get-Module -ListAvailable | Where-Object { $_.Name -eq 'VcRedist' })) {
-        Write-Output -InputObject 'Installing VcRedist PowerShell module'
-        Install-Module -Name VcRedist -Repository PSGallery -Scope AllUsers -Force
+      if ($Env:TEST_NANOSERVER -ne 'yes') {
+        $pesterResult = .\test\pester.ps1
+        $failCount = $pesterResult.FailedCount
+      } else {
+        $volume="$($Env:APPVEYOR_BUILD_FOLDER):C:\App"
+        docker run --rm --volume $volume --workdir C:\App nanoserver/phpmanager powershell.exe '$pesterResult=.\test\pester.ps1; exit $pesterResult.FailedCount'
+        $failCount = $LASTEXITCODE
       }
-      If (-Not(Get-Module -Name PSScriptAnalyzer) -and -Not(Get-Module -ListAvailable | Where-Object { $_.Name -eq 'PSScriptAnalyzer' })) {
-        Write-Output -InputObject 'Installing PSScriptAnalyzer PowerShell module'
-        Install-Module -Name PSScriptAnalyzer -Repository PSGallery -Scope AllUsers -Force
+      (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path -LiteralPath .\TestsResults.xml))
+      if ($failCount -ne 0) {
+        throw "$failCount tests failed!"
       }
-      # Analyze the scripts
-      Invoke-ScriptAnalyzer -Path .\PhpManager -Recurse -Severity Warning -Settings PSGallery -ExcludeRule PSUseShouldProcessForStateChangingFunctions -ErrorAction Stop
-      # Check that Get-PhpAvailableVersion works
-      $latest72 = Get-PhpAvailableVersion -State Release | Where-Object { $_.BaseVersion -match '^7.2\.' -and $_.Architecture -eq 'x86' -and $_.ThreadSafe -eq $true }
-      If (-Not($latest72)) { Throw 'PHP release 7.2 not not found!' }
-      # Check that Install-Php works
-      $installPath = 'C:\Test\PHP'
-      Install-Php -Version 7.2.0 -Architecture x86 -ThreadSafe $true -Path $installPath -AddToPath User -InitialPhpIni Development -InstallVC
-      # Check that Get-Php works
-      Write-Output 'Version installed:'
-      Get-Php -Path $installPath
-      If (-Not($Env:Path -like "*$installPath*")) { Throw 'Installation directory not added to PATH' }
-      # Check that Update-Php works
-      If (-Not(Update-Php -Path $installPath)) { Throw 'PHP not updated!' }
-      $installedPhp = Get-Php -Path $installPath
-      Write-Output 'Version updated:'
-      $installedPhp
-      If ($latest72.FullVersion -ne $installedPhp.FullVersion) { Throw 'Wrong new PHP version!' }
-      # Check that Update-PhpCAInfo works
-      Update-PhpCAInfo -Path $installPath
-      # Check that Get-PhpExtension works
-      $allExtensions = Get-PhpExtension $installPath
-      $builtinExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Builtin' })
-      If ($builtinExtensions.Count -eq 0) { Throw 'No PHP builtin extensions found!' }
-      Write-Output ('Builtin extensions found: ' + $builtinExtensions.Count)
-      $phpExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Php' })
-      If ($phpExtensions.Count -eq 0) { Throw 'No PHP extensions found!' }
-      Write-Output ('PHP extensions found: ' + $phpExtensions.Count)
-      $zendExtensions = @($allExtensions | Where-Object { $_.Type -eq 'Zend' })
-      Write-Output ('Zend extensions found: ' + $zendExtensions.Count)
-      $enabledExtensions = @($allExtensions | Where-Object { $_.State -eq 'Enabled' })
-      If ($enabledExtensions.Count -ne 0) { Throw 'Some PHP extensions (in addition to the builtin ones) are already enabled!' }
-      # Check that Enable-PhpExtension works
-      Enable-PhpExtension -Extension curl -Path $installPath
-      $enabledExtensions = @(Get-PhpExtension $installPath | Where-Object { $_.Type -eq 'Php' -and $_.State -eq 'Enabled' })
-      If ($enabledExtensions.Count -ne 1) { Throw 'Expected 1 PHP enabled installation' }
-      # Check that Disable-PhpExtension works
-      Disable-PhpExtension -Extension curl -Path $installPath
-      $enabledExtensions = @(Get-PhpExtension $installPath | Where-Object { $_.Type -eq 'Php' -and $_.State -eq 'Enabled' })
-      If ($enabledExtensions.Count -ne 0) { Throw 'Expected 0 PHP enabled installation' }
-      # Check that Install-PhpExtension works
-      Install-PhpExtension -Extension imagick -MinimumStability snapshot -Path $installPath
-      $imagickEnabled = @(Get-PhpExtension $installPath | Where-Object { $_.Handle -eq 'imagick' -and $_.State -eq 'Enabled' })
-      $enabledExtensions = @(Get-PhpExtension $installPath | Where-Object { $_.Type -eq 'Php' -and $_.State -eq 'Enabled' })
-      If ($enabledExtensions.Count -ne 1) { Throw 'The ImageMagick extension has not been installed and enabled' }
-      # Check that Uninstall-Php works
-      Uninstall-Php $installPath
-      If ($Env:Path -like "*$installPath*") { Throw 'Installation directory not removed from PATH' }
 
 deploy_script:
   - ps: |
-      If ($true -eq $Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
+      if ($Env:TEST_NANOSERVER -ne 'yes' -and $true -eq $Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
         $newVersion = $Env:APPVEYOR_REPO_TAG_NAME + '.' + $Env:APPVEYOR_BUILD_NUMBER
         Write-Host "Publishing new version: $newVersion"
         $releaseNotes = ''
         $tags = @(& git tag --list --sort=-version:refname)
-        If ($tags.Count -lt 2) {
+        if ($tags.Count -lt 2) {
           Write-Host 'Less than 2 tags found: empty release notes'
-        } Else {
+        } else {
           $thisTagIndex = [array]::IndexOf($tags, $Env:APPVEYOR_REPO_TAG_NAME)
-          If ($thisTagIndex -lt 0) {
+          if ($thisTagIndex -lt 0) {
             Write-Host 'Unable to find the index of the current tag: empty release notes'
           }
           $previousTag = ''
-          For ($tagIndex = $thisTagIndex + 1; $tagIndex -lt $tags.Count; $tagIndex++) {
-            If ($tags[$tagIndex] -match '^\d+\.\d+\.\d+$') {
+          for ($tagIndex = $thisTagIndex + 1; $tagIndex -lt $tags.Count; $tagIndex++) {
+            if ($tags[$tagIndex] -match '^\d+\.\d+\.\d+$') {
               $previousTag = $tags[$tagIndex]
               break
             }
           }
-          If ($previousTag -eq '') {
+          if ($previousTag -eq '') {
             Write-Host 'Unable to find the previously published tag: empty release notes'
-          } Else {
+          } else {
             $rawCommitMessages = @(& git log --format='- %s' --no-merges --reverse ("$previousTag..." + $Env:APPVEYOR_REPO_TAG_NAME) -- .\PhpManager)
             $commitMessages = @()
-            ForEach ($rawCommitMessage in $rawCommitMessages) {
-              If (-Not($rawCommitMessage -imatch '^- \[minor\]')) {
+            foreach ($rawCommitMessage in $rawCommitMessages) {
+              if (-Not($rawCommitMessage -imatch '^- \[minor\]')) {
                 $commitMessages += $rawCommitMessage
               }
             }
-            If ($commitMessages.Count -lt 1) {
+            if ($commitMessages.Count -lt 1) {
               Write-Host 'No relevant commit messages found: empty release notes'
-            } Else {
+            } else {
               $releaseNotes = [string]::Join("`n", $commitMessages)
               Write-Host "Release notes:`n$releaseNotes"
             }

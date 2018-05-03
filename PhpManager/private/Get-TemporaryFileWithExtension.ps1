@@ -15,49 +15,50 @@ function Get-TemporaryFileWithExtension() {
     .Outputs
     string
     #>
-    Param(
+    [OutputType([string])]
+    param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Extension
     )
-    Begin {
+    begin {
         $temporaryFilePath = $null
     }
-    Process {
-        If ($null -eq $Extension -or $Extension -eq '') {
+    process {
+        if ($null -eq $Extension -or $Extension -eq '') {
             $Extension = ''
-        } ElseIf ($Extension[0] -ne '.') {
+        } elseif ($Extension[0] -ne '.') {
             $Extension = '.' + $Extension
         }
         $originalTemporaryFilePath = [System.IO.Path]::GetTempFileName()
-        Try {
-            $temporaryDirectoryPath = [System.IO.Path]::GetDirectoryName($originalTemporaryFilePath)
+        try {
+            $temporaryDirectoryPath = Split-Path -LiteralPath $originalTemporaryFilePath
             $temporaryFileName = [System.IO.Path]::GetFileNameWithoutExtension($originalTemporaryFilePath)
-            For ($i = 0;; $i++) {
-                If ($i -eq 0) {
+            for ($i = 0;; $i++) {
+                if ($i -eq 0) {
                     $suffix = ''
-                } Else {
+                } else {
                     $suffix = '-' + [string]$i
                 }
                 $temporaryFilePath = [System.IO.Path]::Combine($temporaryDirectoryPath, $temporaryFileName + $suffix + $Extension)
-                If ($temporaryFilePath -eq $originalTemporaryFilePath) {
-                    Break
+                if ($temporaryFilePath -eq $originalTemporaryFilePath) {
+                    break
                 }
-                If (-Not(Test-Path -LiteralPath $temporaryFilePath)) {
+                if (-Not(Test-Path -LiteralPath $temporaryFilePath)) {
                     Rename-Item -LiteralPath $originalTemporaryFilePath -NewName $temporaryFilePath
-                    Break
+                    break
                 }
             }
-        } Catch {
-            Try {
+        } catch {
+            try {
                 Remove-Item -LiteralPath $originalTemporaryFilePath
-            } Catch {
+            } catch {
                 Write-Debug 'Failed to remove a temporary file'
             }
         }
     }
-    End {
+    end {
         $temporaryFilePath
     }
 }

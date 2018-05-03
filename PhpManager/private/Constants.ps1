@@ -44,3 +44,4 @@ New-Variable -Option Constant -Scope Script -Name 'CACERT_CHECKSUM_URL' -Value '
 New-Variable -Option Constant -Scope Script -Name 'CACERT_CHECKSUM_ALGORITHM' -Value 'SHA256'
 
 New-Variable -Option Constant -Scope Script -Name 'STATUS_DLL_NOT_FOUND' -Value 0xC0000135
+New-Variable -Option Constant -Scope Script -Name 'ENTRYPOINT_NOT_FOUND' -Value 0xC0000139
