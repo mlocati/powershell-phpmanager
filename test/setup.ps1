@@ -23,16 +23,16 @@ If (-Not($psScriptAnalyzer)) {
 }
 Write-Host " - PSScriptAnalyzer version: $($psScriptAnalyzer.Version.ToString())"
 
-$pester = Get-Module -Name Pester
+$pester = Get-Module -Name Pester | Where-Object { $_.Version -ge '4.3' }
 If (-Not($pester)) {
-    $pester = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'Pester' }
+    $pester = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'Pester' -and $_.Version -ge '4.3' }
     If ($pester -is [array]) {
         $pester = $pester[0]
     }
     If (-Not($pester)) {
         Write-Host ' - installing Pester'
-        Install-Module -Name Pester -Force
-        $pester = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'Pester' }
+        Install-Module -Name Pester -Force -SkipPublisherCheck
+        $pester = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'Pester' -and $_.Version -ge '4.3' }
     }
 }
 Write-Host " - Pester version: $($pester.Version.ToString())"
