@@ -44,9 +44,9 @@ function Disable-PhpExtension() {
     }
     Process {
         If ($null -eq $Path -or $Path -eq '') {
-            $phpVersion = Get-OnePhpVersionFromEnvironment
+            $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
         } Else {
-            $phpVersion = Get-PhpVersionFromPath -Path $Path
+            $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
         $allExtensions = Get-PhpExtension -Path $phpVersion.ExecutablePath
         $extensionsToDisable = @()
@@ -75,16 +75,13 @@ function Disable-PhpExtension() {
         }
         If ($extensionsToDisable) {
             $iniPath = $phpVersion.IniPath
-            If (-Not($iniPath)) {
-                Throw 'There''s no php.ini for the specified PHP installation (?)'
-            }
             If (-Not(Test-Path -Path $iniPath -PathType Leaf)) {
                 Throw "There file $iniPath does not exist (?)"
             }
             $iniLines = @(Get-PhpIniLine -Path $iniPath)
             ForEach ($extensionToDisable in $extensionsToDisable) {
                 $filename = [System.IO.Path]::GetFileName($extensionToDisable.Filename)
-                $canUseBaseName = [System.Version]$phpVersion.BaseVersion -ge [System.Version]'7.2'
+                $canUseBaseName = [System.Version]$phpVersion.Version -ge [System.Version]'7.2'
                 $rxSearch = '^(\s*)([;#][\s;#]*)?(\s*(?:zend_)?extension\s*=\s*(?:'
                 $rxSearch += '(?:(?:.*[/\\])?' + [regex]::Escape($filename) + ')';
                 If ($canUseBaseName) {

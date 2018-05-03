@@ -120,7 +120,7 @@ function Install-Php() {
             ForEach ($compatibleVersion in $compatibleVersions) {
                 If ($null -eq $versionToInstall) {
                     $versionToInstall = $compatibleVersion
-                } ElseIf ($(Compare-PhpVersion -A $compatibleVersion -B $versionToInstall) -gt 0) {
+                } ElseIf ($compatibleVersions -gt $versionToInstall) {
                     $versionToInstall = $compatibleVersion
                 }
             }

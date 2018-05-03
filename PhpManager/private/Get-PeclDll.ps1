@@ -30,7 +30,7 @@ Function Get-PeclDll
         [string] $Version,
         [Parameter(Mandatory = $true, Position = 2)]
         [ValidateNotNull()]
-        [psobject] $PhpVersion,
+        [PhpVersionInstalled] $PhpVersion,
         [Parameter(Mandatory = $false, Position = 3)]
         [ValidateNotNull()]
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]

@@ -4,7 +4,7 @@ Function Remove-PhpSwitcher
     }
     Process {
         $switcher = Get-PhpSwitcher
-        If ($switcher -ne $null) {
+        If ($null -ne $switcher) {
             Edit-PhpFolderInPath -Operation Remove -Path $switcher.Alias
             If (Test-Path -LiteralPath $switcher.Alias -PathType Container) {
                 $aliasItem = Get-Item -LiteralPath $switcher.Alias

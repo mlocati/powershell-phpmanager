@@ -35,9 +35,9 @@ function Update-PhpCAInfo() {
     }
     Process {
         If ($null -eq $Path -or $Path -eq '') {
-            $phpVersion = Get-OnePhpVersionFromEnvironment
+            $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
         } Else {
-            $phpVersion = Get-PhpVersionFromPath -Path $Path
+            $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
         If ($null -eq $CustomCAPath -or $CustomCAPath -eq '') {
             $CustomCAPath = ''
@@ -93,19 +93,16 @@ function Update-PhpCAInfo() {
         }
         Write-Output "Saving CA file"
         If ($null -eq $CAPath -or $CAPath -eq '') {
-            $CAPath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($phpVersion.ExecutablePath), 'ssl', 'cacert.pem')
+            $CAPath = Join-Path -Path $installedVersion.ActualFolder -ChildPath ssl | Join-Path -ChildPath cacert.pem
         } Else {
             $CAPath = [System.IO.Path]::GetFullPath($CAPath)
        }
-       $caFolder = [System.IO.Path]::GetDirectoryName($CAPath)
+       $caFolder = Split-Path -LiteralPath $CAPath
        If (-Not(Test-Path -Path $caFolder -PathType Container)) {
            New-Item -Path $caFolder -ItemType Directory | Out-Null
         }
         Set-Content -Path $CAPath -Value $cacertBytes -Encoding Byte
         $iniPath = $phpVersion.IniPath
-        If (-Not($iniPath)) {
-            $iniPath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($phpVersion.ExecutablePath), 'php.ini')
-        }
         $iniValue = Get-PhpIniKey -Key 'curl.cainfo' -Path $iniPath
         If ($iniValue -eq $CAPath) {
             Write-Output "curl.cainfo did not require to be updated"

@@ -103,7 +103,7 @@ Function Edit-PhpFolderInPath
                         } Else {
                             $exeCommand = "[System.Environment]::SetEnvironmentVariable('Path', '$newPathEscaped', '$Script:ENVTARGET_MACHINE') | Out-Null"
                         }
-                        Start-Process -FilePath 'powershell.exe' -ArgumentList "-Command ""$exeCommand""" -Verb RunAs
+                        Start-Process -FilePath 'powershell.exe' -ArgumentList "-Command ""$exeCommand""" -WindowStyle Hidden -Verb RunAs
                     } else {
                         If ($needDirectRegistryAccess) {
                             New-ItemProperty -Path $targets[$target] -Name 'Path' -Value $newPath -PropertyType ExpandString -Force | Out-Null

@@ -32,7 +32,7 @@ function Get-TemporaryFileWithExtension() {
         }
         $originalTemporaryFilePath = [System.IO.Path]::GetTempFileName()
         Try {
-            $temporaryDirectoryPath = [System.IO.Path]::GetDirectoryName($originalTemporaryFilePath)
+            $temporaryDirectoryPath = Split-Path -LiteralPath $originalTemporaryFilePath
             $temporaryFileName = [System.IO.Path]::GetFileNameWithoutExtension($originalTemporaryFilePath)
             For ($i = 0;; $i++) {
                 If ($i -eq 0) {

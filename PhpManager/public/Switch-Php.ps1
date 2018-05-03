@@ -57,8 +57,8 @@ Function Switch-Php
         $dsc = [System.IO.Path]::DirectorySeparatorChar
         If (-Not($Force)) {
             $extraPhpInPaths = @()
-            ForEach ($phpVersion in @(Get-Php)) {
-                $folder = [System.IO.Path]::GetDirectoryName($phpVersion.ExecutablePath).TrimEnd($dsc)
+            ForEach ($phpVersion in @([PhpVersionInstalled]::FromEnvironment())) {
+                $folder = $phpVersion.Folder
                 If ($folder -ne $switcher.Alias.TrimEnd($dsc)) {
                     $extraPhpInPaths += $folder
                 }

@@ -24,9 +24,9 @@ function Get-PhpExtension() {
     }
     Process {
         If ($null -eq $Path -or $Path -eq '') {
-            $phpVersion = Get-OnePhpVersionFromEnvironment
+            $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
         } Else {
-            $phpVersion = Get-PhpVersionFromPath -Path $Path
+            $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
         $result += Get-PhpBuiltinExtension -PhpVersion $phpVersion
         $dllExtensions = @(Get-PhpExtensionDetail -PhpVersion $phpVersion)

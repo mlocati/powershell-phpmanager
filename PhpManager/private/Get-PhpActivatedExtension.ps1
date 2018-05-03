@@ -16,7 +16,7 @@ Function Get-PhpActivatedExtension
     Param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want the extensions')]
         [ValidateNotNull()]
-        [PSObject]$PhpVersion
+        [PhpVersionInstalled]$PhpVersion
     )
     Begin {
         $extensions = @()

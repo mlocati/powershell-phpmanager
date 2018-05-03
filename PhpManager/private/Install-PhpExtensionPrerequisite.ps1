@@ -12,10 +12,10 @@ function Install-PhpExtensionPrerequisite() {
     Param(
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]
-        [psobject] $PhpVersion,
+        [PhpVersionInstalled] $PhpVersion,
         [Parameter(Mandatory = $True, Position = 1)]
         [ValidateNotNull()]
-        [psobject] $Extension
+        [PhpVersionInstalled] $Extension
     )
     Begin {
     }
@@ -55,10 +55,9 @@ function Install-PhpExtensionPrerequisite() {
                             $keepZipFile = $false
                             Throw
                         }
-                        $phpFolder = [System.IO.Path]::GetDirectoryName($PhpVersion.ExecutablePath)
                         Get-ChildItem -LiteralPath $tempFolder -Recurse -File -Filter *.dll `
                             | Where-Object {$_.Name -like 'CORE_RL_*.dll' -or $_.Name -like 'IM_MOD_RL_*.dll' } `
-                            | Move-Item -Force -Destination $phpFolder
+                            | Move-Item -Force -Destination $PhpVersion.ActualFolder
                     }
                     Finally {
                         Try {

@@ -32,15 +32,14 @@ function Update-Php() {
     }
     Process {
         If ($null -eq $Path -or $Path -eq '') {
-            $installedVersion = Get-OnePhpVersionFromEnvironment
+            $installedVersion = [PhpVersionInstalled]::FromEnvironmentOne()
             $confirmAutomaticallyFoundPhp = $true
         } Else {
-            $installedVersion = Get-PhpVersionFromPath -Path $Path
+            $installedVersion = [PhpVersionInstalled]::FromPath($Path)
             $confirmAutomaticallyFoundPhp = $false
         }
-        $folder = [System.IO.Path]::GetDirectoryName($installedVersion.ExecutablePath)
         If ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
-            Write-Output "The PHP installation has been found at $folder"
+            Write-Output "The PHP installation has been found at $($installedVersion.ActualFolder))"
             $confirmed = $false
             While (-Not($confirmed)) {
                 $answer = Read-Host -Prompt "Do you confirm updating this installation [use -ConfirmAuto to confirm autumatically]? [y/n]"
@@ -70,7 +69,7 @@ function Update-Php() {
             ForEach ($compatibleVersion in $compatibleVersions) {
                 If ($null -eq $bestNewVersion) {
                     $bestNewVersion = $compatibleVersion
-                } ElseIf ($(Compare-PhpVersion -A $compatibleVersion -B $bestNewVersion) -gt 0) {
+                } ElseIf ($compatibleVersion -gt $bestNewVersion) {
                     $bestNewVersion = $compatibleVersion
                 }
             }
@@ -79,12 +78,12 @@ function Update-Php() {
             Write-Output 'No PHP compatible version found'
             $updated = $false
         } else {
-            if (-Not($Force) -and $(Compare-PhpVersion -A $bestNewVersion -B $installedVersion) -le 0) {
+            if (-Not($Force) -and $bestNewVersion -le $installedVersion) {
                 Write-Output $('No new version available (latest version is ' + $bestNewVersion.FullVersion + ')')
                 $updated = $false
             } else {
                 Write-Output $('Installing new version: ' + $bestNewVersion.DisplayName)
-                Install-PhpFromUrl -Url $bestNewVersion.DownloadUrl -Path ([System.IO.Path]::GetDirectoryName($installedVersion.ExecutablePath)) -PhpVersion $bestNewVersion -InstallVCRedist $false
+                Install-PhpFromUrl -Url $bestNewVersion.DownloadUrl -Path $installedVersion.ActualFolder -PhpVersion $bestNewVersion -InstallVCRedist $false
                 $updated = $true
             }
         }

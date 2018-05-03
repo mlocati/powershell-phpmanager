@@ -65,15 +65,12 @@ Function Set-PhpIniKey
     Process {
         $phpVersion = $null
         If ($null -eq $Path -or $Path -eq '') {
-            $phpVersion = Get-OnePhpVersionFromEnvironment
+            $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
         } ElseIf ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
-            $phpVersion = Get-PhpVersionFromPath -Path $Path
+            $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
         If ($null -ne $phpVersion) {
             $iniPath = $phpVersion.IniPath
-            If (-Not($iniPath)) {
-                Throw "The PHP at $Path does not have a configured php.ini"
-            }
         } Else {
             $iniPath = $Path
         }

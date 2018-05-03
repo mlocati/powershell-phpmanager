@@ -37,9 +37,9 @@ function Enable-PhpExtension() {
     }
     Process {
         If ($null -eq $Path -or $Path -eq '') {
-            $phpVersion = Get-OnePhpVersionFromEnvironment
+            $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
         } Else {
-            $phpVersion = Get-PhpVersionFromPath -Path $Path
+            $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
         $extensionsToEnable = @()
         $allExtensions = Get-PhpExtension -Path $phpVersion.ExecutablePath
@@ -57,15 +57,12 @@ function Enable-PhpExtension() {
             $extensionsToEnable += $foundExtensions[0]
         }
         $iniPath = $phpVersion.IniPath
-        If (-Not($iniPath)) {
-            $iniPath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($phpVersion.ExecutablePath), 'php.ini')
-        }
         $extensionDir = $null
         $iniLines = @(Get-PhpIniLine -Path $iniPath)
         ForEach ($extensionToEnable in $extensionsToEnable) {
             $extensionDir = $phpVersion.ExtensionsPath
             If (-Not($extensionDir)) {
-                $extensionDir = [System.IO.Path]::GetDirectoryName($extensionToEnable.Filename)
+                $extensionDir = Split-Path -LiteralPath $extensionToEnable.Filename
                 Set-PhpIniKey -Key 'extension_dir' -Value $extensionDir -Path $iniPath
             }
             $extensionDir = $extensionDir.TrimEnd('/', '\') + [System.IO.Path]::DirectorySeparatorChar
@@ -82,7 +79,7 @@ function Enable-PhpExtension() {
                     default { Throw ('Unrecognized extension type: ' + $extensionToEnable.Type) }
                 }
                 $filename = [System.IO.Path]::GetFileName($extensionToEnable.Filename)
-                $canUseBaseName = [System.Version]$phpVersion.BaseVersion -ge [System.Version]'7.2'
+                $canUseBaseName = [System.Version]$phpVersion.Version -ge [System.Version]'7.2'
                 $rxSearch = '^(\s*)([;#][\s;#]*)?(\s*(?:zend_)?extension\s*=\s*)('
                 $rxSearch += '(?:(?:.*[/\\])?' + [regex]::Escape($filename) + ')';
                 If ($canUseBaseName) {
@@ -99,7 +96,7 @@ function Enable-PhpExtension() {
                         If ($match) {
                             $newIniValue = $match.Matches[0].Groups[1].Value
                         }
-                    } ElseIf ([System.Version]$phpVersion.BaseVersion -le [System.Version]'5.4.99999') {
+                    } ElseIf ([System.Version]$phpVersion.Version -le [System.Version]'5.4.99999') {
                         $newIniValue = $extensionToEnable.Filename
                     }
                 } Else {

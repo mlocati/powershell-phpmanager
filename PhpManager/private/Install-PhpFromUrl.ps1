@@ -26,7 +26,7 @@ function Install-PhpFromUrl() {
         [string] $Path,
         [Parameter(Mandatory = $true, Position = 2, HelpMessage = 'The instance of PphVersion we are going to install')]
         [ValidateNotNull()]
-        [psobject] $PhpVersion,
+        [PhpVersionDownloadable] $PhpVersion,
         [Parameter(Mandatory = $true, Position = 3, HelpMessage = 'Install the Visual C++ Redistributables if they are missing?')]
         [bool] $InstallVCRedist
     )

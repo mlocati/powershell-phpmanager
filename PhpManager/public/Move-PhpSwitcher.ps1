@@ -54,8 +54,8 @@ Function Move-PhpSwitcher
                 }
             }
             $switcher.Alias = $NewAlias
-            If ($recreateAs -ne $null) {
-                If ($newAliasJunction -ne $null) {
+            If ($null -ne $recreateAs) {
+                If ($null -ne $newAliasJunction) {
                     Remove-Item -LiteralPath $NewAlias -Recurse -Force
                 }
                 New-Item -ItemType Junction -Path $NewAlias -Value $recreateAs | Out-Null

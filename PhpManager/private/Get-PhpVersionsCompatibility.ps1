@@ -16,10 +16,10 @@ Function Get-PhpVersionsCompatibility
     Param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The first PhpVersion instance to compare')]
         [ValidateNotNull()]
-        [PSObject]$A,
+        [PhpVersion]$A,
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The second PhpVersion instance to compare')]
         [ValidateNotNull()]
-        [PSObject]$B
+        [PhpVersion]$B
     )
     Begin {
         $areCompatible = $null

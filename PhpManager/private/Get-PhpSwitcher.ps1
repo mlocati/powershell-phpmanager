@@ -13,11 +13,11 @@ Function Get-PhpSwitcher
     Process {
         $scope = 'CurrentUser'
         $data = Get-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Scope $scope
-        If ($data -eq $null) {
+        If ($null -eq $data) {
             $scope = 'AllUsers'
             $data = Get-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Scope $scope
         }
-        If ($data -ne $null) {
+        If ($null -ne $data) {
             $result = New-Object PSObject
             $result | Add-Member -MemberType NoteProperty -Name 'Scope' -Value $scope
             $alias = ''

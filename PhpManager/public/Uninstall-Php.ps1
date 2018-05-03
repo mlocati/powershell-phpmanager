@@ -24,15 +24,14 @@ function Uninstall-Php() {
     }
     Process {
         If ($null -eq $Path -or $Path -eq '') {
-            $phpVersion = Get-OnePhpVersionFromEnvironment
+            $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
             $confirmAutomaticallyFoundPhp = $true
         } Else {
-            $phpVersion = Get-PhpVersionFromPath -Path $Path
+            $phpVersion = [PhpVersionInstalled]::FromPath($Path)
             $confirmAutomaticallyFoundPhp = $false
         }
-        $folder = [System.IO.Path]::GetDirectoryName($phpVersion.ExecutablePath)
         If ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
-            Write-Output "The PHP installation has been found at $folder"
+            Write-Output "The PHP installation has been found at $($phpVersion.ActualFolder)"
             $confirmed = $false
             While (-Not($confirmed)) {
                 $answer = Read-Host -Prompt "Do you confirm removing this installation [use -ConfirmAuto to confirm autumatically]? [y/n]"
@@ -45,9 +44,12 @@ function Uninstall-Php() {
                 }
             }
         }
-        Remove-Item -Path $folder -Recurse -Force
-        Edit-PhpFolderInPath -Operation Remove -Path $folder
-        Write-Output ($phpVersion.DisplayName + ' has been uninstalled from ' + $folder)
+        Remove-Item -LiteralPath $phpVersion.ActualFolder -Recurse -Force
+        Edit-PhpFolderInPath -Operation Remove -Path $phpVersion.ActualFolder
+        If ($phpVersion.Folder -ne $phpVersion.ActualFolder) {
+            Edit-PhpFolderInPath -Operation Remove -Path $phpVersion.Folder
+        }
+        Write-Output ($phpVersion.DisplayName + ' has been uninstalled from ' + $phpVersion.ActualFolder)
     }
     End {
     }

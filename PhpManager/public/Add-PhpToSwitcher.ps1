@@ -38,7 +38,7 @@ Function Add-PhpToSwitcher
             Throw 'PHP Switcher is not initialized: you can initialize it with the Initialize-PhpSwitcher command'
         }
         If ($switcher.Targets.ContainsKey($Name) -and -Not($Force)) {
-            Throw "Another PHP installation (" + $switcher.Targets[$Name] + ") is already assigned to the PHP Switcher with the name $Name. Use the -Force flag to force the operation anyway."
+            Throw "Another PHP installation ($($switcher.Targets[$Name])) is already assigned to the PHP Switcher with the name $Name. Use the -Force flag to force the operation anyway."
         }
         $Path = [System.IO.Path]::GetFullPath($Path)
         If (-Not(Test-Path -LiteralPath $Path -PathType Container)) {
@@ -48,7 +48,7 @@ Function Add-PhpToSwitcher
         If ($pathInfo.LinkType -eq 'Junction') {
             Throw "$Path must be a regular directory (it is a junction)."
         }
-        Get-PhpVersionFromPath -Path $Path | Out-Null
+        [PhpVersionInstalled]::FromPath($Path) | Out-Null
         $switcher.Targets[$Name] = $Path
         Set-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Value $switcher -Scope $switcher.Scope
     }

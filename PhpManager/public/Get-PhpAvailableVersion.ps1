@@ -42,7 +42,7 @@ Function Get-PhpAvailableVersion
             }
             $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $urlList
             ForEach ($link In $webResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {
-                $result += Get-PhpVersionFromUrl -Url $link.Href -PageUrl $urlList -ReleaseState $State
+                $result += [PhpVersionDownloadable]::FromUrl($link.Href, $urlList, $State)
             }
             Set-Variable -Scope Script -Name $listVariableName -Value $result -Force
         }
