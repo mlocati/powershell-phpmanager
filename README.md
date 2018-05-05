@@ -1,10 +1,11 @@
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mlocati/powershell-phpmanager?branch=master&svg=true)](https://ci.appveyor.com/project/mlocati/powershell-phpmanager)
 
-# Introduction
+## Introduction
 
 This repository contains a PowerShell module that implements functions to install, update and configure PHP on Windows.
 
-# Installation
+
+## Installation
 
 You'll need at least PowerShell version 5: in order to determine which version you have, open PowerShell and type:
 ```powershell
@@ -31,7 +32,7 @@ If you won't be able to execute the module functions, you may need to tell Power
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 ```
 
-# Available Features
+## Available Features
 
 Here's the list of available commands. Here you can find a short description of them: in order to get more details, type `Get-Help <CommandName>` (or `Get-Help -Detailed <CommandName>` or `Get-Help -Full <CommandName>`).
 
@@ -121,6 +122,7 @@ Include "C:\Dev\PHP\Apache.conf"
 ```
 That's all: to switch the PHP version used by Apache simply call `Switch-Php` and restart Apache.
 
+
 ### Getting details about installed PHPs
 
 Use the command `Get-Php` to list the PHP installations found in the current PATH environment variable.
@@ -184,6 +186,7 @@ Install-PhpExtension imagick -MinimumStability snapshot
 
 PS: `Install-PhpExtension` can also be used to upgrade (or downgrade) a PHP extension to the most recent one available online.
 
+
 ### Getting the list of PHP versions available online
 
 Use the command `Get-PhpAvailableVersion` to list the PHP versions available online.
@@ -204,13 +207,32 @@ The `Update-PhpCAInfo` does all that for you: a simple call to this command will
 Since the list of valid CA certificates changes over time, you execute `Update-PhpCAInfo` on a regular basis.  
 In addition, `Update-PhpCAInfo` can optionally add your custom CA certificates to the list of official CA certificates.
 
+
 ### Caching downloads
 
 This module downloads PHP and PHP extensions from internet.  
 In order to avoid downloading the same files multiple times you can use `Set-PhpDownloadCache` to specify the path of a local folder where the downloads will be cached (to get the configured value you can use `Set-PhpDownloadCache`).  
 By default `Set-PhpDownloadCache` does not persist the configured value: you can use the `-Persist` option to store if for the current user, of for all users.
 
+
+## Test
+
+Tests require some module (PSScriptAnalyzer, Pester, ...).  
+You can run the `test\setup.ps1` PowerShell script to install them.  
+The `test\pester.ps1` script executes all the tests, which are located in the `test\tests` directory.
+YOu can test a specific case by specifying its name:
+```powershell
+.\test\pester.ps1 Edit-PhpFolderInPath
+```
+Some tests may require to run commands with elevated privileges. These tests are disabled by default: you can enable them by setting the `PHPMANAGER_TEST_RUNAS` environment variable to a non empty value:
+```powershell
+$Env:PHPMANAGER_TEST_RUNAS=1
+.\test\pester.ps1 Edit-PhpFolderInPath
+```
+
+
 ## FAQ
+
 
 ### What are [those executable](https://github.com/mlocati/powershell-phpmanager/tree/master/PhpManager/private/bin) in the archive?
 
