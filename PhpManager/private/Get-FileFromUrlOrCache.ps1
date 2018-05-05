@@ -19,6 +19,7 @@ Function Get-FileFromUrlOrCache
     .Outputs
     [System.Array]
     #>
+    [OutputType([string], [bool])]
     Param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]

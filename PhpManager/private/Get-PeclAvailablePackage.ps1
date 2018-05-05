@@ -10,6 +10,7 @@ Function Get-PeclAvailablePackage
     .Outputs
     System.Array
     #>
+    [OutputType([string[]])]
     Param (
         [switch]$Reload
     )
