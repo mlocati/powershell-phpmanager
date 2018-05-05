@@ -5,7 +5,7 @@ Write-Host " - PowerShell version: $($PSVersionTable.PSVersion.ToString())"
 $nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
 If (-Not($nuget)) {
     Write-Host ' - installing NuGet'
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
     $nuget = Get-PackageProvider -Name NuGet
 }
 Write-Host " - NuGet version: $($nuget.Version.ToString())"
