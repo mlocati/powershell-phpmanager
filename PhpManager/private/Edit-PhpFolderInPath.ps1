@@ -100,6 +100,7 @@ Function Edit-PhpFolderInPath
                         $newPathEscaped = $newPath -replace "'", "''"
                         If ($needDirectRegistryAccess) {
                             $exeCommand = "New-ItemProperty -Path '$($targets[$target])' -Name 'Path' -Value '$newPathEscaped' -PropertyType ExpandString -Force | Out-Null"
+                            $haveToBroadcast = $True
                         } Else {
                             $exeCommand = "[System.Environment]::SetEnvironmentVariable('Path', '$newPathEscaped', '$Script:ENVTARGET_MACHINE') | Out-Null"
                         }
@@ -107,11 +108,11 @@ Function Edit-PhpFolderInPath
                     } else {
                         If ($needDirectRegistryAccess) {
                             New-ItemProperty -Path $targets[$target] -Name 'Path' -Value $newPath -PropertyType ExpandString -Force | Out-Null
+                            $haveToBroadcast = $True
                         } Else {
                             [System.Environment]::SetEnvironmentVariable('Path', $newPath, $target) | Out-Null
                         }
                     }
-                    $haveToBroadcast = $True
                 }
             }
         }
