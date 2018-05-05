@@ -16,6 +16,7 @@ Function Get-PeclPackageVersion
     .Outputs
     System.Array
     #>
+    [OutputType([string[]])]
     Param (
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
