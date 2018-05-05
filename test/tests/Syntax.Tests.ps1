@@ -4,11 +4,11 @@ Describe 'Syntax' {
 
     It -Name '<file> should be a valid PowerShell script' -TestCases $testCases {
         param($file)
-        $file.FullName | Should Exist
+        $file.FullName | Should -Exist
         $contents = Get-Content -Path $file.FullName -ErrorAction Stop
         $errors = $null
         [System.Management.Automation.PSParser]::Tokenize($contents, [ref]$errors) | Out-Null
-        $errors.Count | Should Be 0
+        $errors.Count | Should -Be 0
     }
 
     If ($PSVersionTable.PSEdition -ne 'Core') {
@@ -18,7 +18,7 @@ Describe 'Syntax' {
             If ($problems) {
                 $problems | Format-Table | Out-String | Write-Host
             }
-            @($problems).Count | Should Be 0
+            @($problems).Count | Should -Be 0
         }
     }
 }
