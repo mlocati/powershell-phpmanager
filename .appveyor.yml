@@ -1,3 +1,5 @@
+image: Visual Studio 2017
+
 branches:
   only:
     - master
@@ -15,6 +17,9 @@ skip_commits:
 environment:
   PsgKey:
     secure: tlhLuUS6x8FcP159+X/EIBDlj9m+u5KCTTuqwzsiNHlPX6K4AolpaZcfAP4ClOdB
+  matrix:
+    - TEST_NANOSERVER: no
+    - TEST_NANOSERVER: yes
 
 cache:
   - C:\downloads -> .appveyor.yml
@@ -25,19 +30,31 @@ cache:
 build: off
 
 install:
-  - ps: .\test\setup.ps1
+  - ps: |
+      If ($Env:TEST_NANOSERVER -ne 'yes') {
+        .\test\setup.ps1
+      } Else {
+        docker build --rm --force-rm --file test\Nanoserver.Dockerfile --tag nanoserver/phpmanager .
+      }
 
 test_script:
   - ps: |
-      $pesterResult = .\test\pester.ps1
+      If ($Env:TEST_NANOSERVER -ne 'yes') {
+        $pesterResult = .\test\pester.ps1
+        $failCount = $pesterResult.FailedCount
+      } Else {
+        $volume="$($Env:APPVEYOR_BUILD_FOLDER):C:\App"
+        docker run --rm --volume $volume --workdir C:\App nanoserver/phpmanager powershell.exe '$pesterResult=.\test\pester.ps1; exit $pesterResult.FailedCount'
+        $failCount = $LASTEXITCODE
+      }
       (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path -LiteralPath .\TestsResults.xml))
-      If ($pesterResult.FailedCount -gt 0) {
-        Throw "$($pesterResult.FailedCount) tests failed!"
+      If ($failCount -ne 0) {
+        Throw "$failCount tests failed!"
       }
 
 deploy_script:
   - ps: |
-      If ($true -eq $Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
+      If ($Env:TEST_NANOSERVER -ne 'yes' -and $true -eq $Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
         $newVersion = $Env:APPVEYOR_REPO_TAG_NAME + '.' + $Env:APPVEYOR_BUILD_NUMBER
         Write-Host "Publishing new version: $newVersion"
         $releaseNotes = ''

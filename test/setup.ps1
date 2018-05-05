@@ -1,5 +1,6 @@
 Write-Host "Setting up test dependencies"
 
+Write-Host " - PowerShell edition: $($PSVersionTable.PSEdition)"
 Write-Host " - PowerShell version: $($PSVersionTable.PSVersion.ToString())"
 $nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
 If (-Not($nuget)) {
