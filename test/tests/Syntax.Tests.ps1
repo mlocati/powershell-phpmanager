@@ -11,12 +11,14 @@ Describe 'Syntax' {
         $errors.Count | Should Be 0
     }
 
-    It -Name '<file> should pass PSScriptAnalyzer' -TestCases $testCases {
-        param($file)
-        $problems = @(Invoke-ScriptAnalyzer -Path $file.FullName -ExcludeRule PSUseShouldProcessForStateChangingFunctions -Severity Warning, Error)
-        If ($problems) {
-            $problems | Format-Table | Out-String | Write-Host
+    If ($PSVersionTable.PSEdition -ne 'Core') {
+        It -Name '<file> should pass PSScriptAnalyzer' -TestCases $testCases {
+            param($file)
+            $problems = @(Invoke-ScriptAnalyzer -Path $file.FullName -ExcludeRule PSUseShouldProcessForStateChangingFunctions -Severity Warning, Error)
+            If ($problems) {
+                $problems | Format-Table | Out-String | Write-Host
+            }
+            @($problems).Count | Should Be 0
         }
-        @($problems).Count | Should Be 0
     }
 }

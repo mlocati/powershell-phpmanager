@@ -9,19 +9,21 @@ If (-Not($nuget)) {
 }
 Write-Host " - NuGet version: $($nuget.Version.ToString())"
 
-$psScriptAnalyzer = Get-Module -Name PSScriptAnalyzer
-If (-Not($psScriptAnalyzer)) {
-    $psScriptAnalyzer = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'PSScriptAnalyzer' }
-    If ($psScriptAnalyzer -is [array]) {
-        $psScriptAnalyzer = $psScriptAnalyzer[0]
-    }
-    If (-Not($psScriptAnalyzer)) {
-        Write-Host ' - installing PSScriptAnalyzer'
-        Install-Module -Name PSScriptAnalyzer -Force
-        $psScriptAnalyzer = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'PSScriptAnalyzer' }
-    }
+If ($PSVersionTable.PSEdition -ne 'Core') {
+	$psScriptAnalyzer = Get-Module -Name PSScriptAnalyzer
+	If (-Not($psScriptAnalyzer)) {
+		$psScriptAnalyzer = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'PSScriptAnalyzer' }
+		If ($psScriptAnalyzer -is [array]) {
+			$psScriptAnalyzer = $psScriptAnalyzer[0]
+		}
+		If (-Not($psScriptAnalyzer)) {
+			Write-Host ' - installing PSScriptAnalyzer'
+			Install-Module -Name PSScriptAnalyzer -Force
+			$psScriptAnalyzer = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'PSScriptAnalyzer' }
+		}
+	}
+	Write-Host " - PSScriptAnalyzer version: $($psScriptAnalyzer.Version.ToString())"
 }
-Write-Host " - PSScriptAnalyzer version: $($psScriptAnalyzer.Version.ToString())"
 
 $pester = Get-Module -Name Pester | Where-Object { $_.Version -ge '4.3' }
 If (-Not($pester)) {
