@@ -19,7 +19,7 @@ function Get-PeclArchiveUrl
     .Outputs
     System.Array
     #>
-    [OutputType([string[]])]
+    [OutputType([string])]
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
@@ -39,7 +39,7 @@ function Get-PeclArchiveUrl
         [string] $MinimumStability = 'stable'
     )
     begin {
-        $result = @()
+        $result = ''
     }
     process {
         # https://github.com/php/web-pecl/blob/467593b248d4603a3dee2ecc3e61abfb7434d24d/include/pear-win-package.php
@@ -72,10 +72,11 @@ function Get-PeclArchiveUrl
                 $linkUrl = [Uri]::new([Uri]$url, $link.Href).AbsoluteUri
                 $match = $linkUrl | Select-String -Pattern $rxMatch
                 if ($match) {
-                    $result += $linkUrl
+                    $result = $linkUrl
+                    break
                 }
             }
-            if ($result.Count -gt 0) {
+            if ($result -ne '') {
                 break
             }
         }

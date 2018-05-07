@@ -84,8 +84,8 @@ function Install-PhpExtension() {
                 }
                 $availablePackageVersion = $null
                 foreach ($peclPackageVersion in $peclPackageVersions) {
-                    $archiveUrl = @(Get-PeclArchiveUrl -PackageHandle $peclPackageHandle -PackageVersion $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability)
-                    if ($archiveUrl.Count -eq 0) {
+                    $archiveUrl = Get-PeclArchiveUrl -PackageHandle $peclPackageHandle -PackageVersion $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability
+                    if ($archiveUrl -eq '') {
                         Write-Verbose ("No Windows DLLs found for PECL package {0} {1} compatible with {2}" -f $peclPackageHandle, $peclPackageVersion, $phpVersion.DisplayName)
                     } else {
                         $availablePackageVersion = @{PackageVersion = $peclPackageVersion; PackageArchiveUrl = $archiveUrl}
