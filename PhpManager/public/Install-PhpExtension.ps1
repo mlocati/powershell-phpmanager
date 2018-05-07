@@ -82,21 +82,21 @@ function Install-PhpExtension() {
                     }
                     Throw "The PECL package $peclPackageHandle does not have any $Version version with a $MinimumStability minimum stability"
                 }
-                $foundDll = $null
+                $availablePackageVersion = $null
                 ForEach ($peclPackageVersion in $peclPackageVersions) {
-                    $dlls = @(Get-PeclDll -Handle $peclPackageHandle -Version $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability)
-                    If ($dlls.Count -eq 0) {
+                    $archiveUrl = @(Get-PeclArchiveUrl -PackageHandle $peclPackageHandle -PackageVersion $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability)
+                    If ($archiveUrl.Count -eq 0) {
                         Write-Verbose ("No Windows DLLs found for PECL package {0} {1} compatible with {2}" -f $peclPackageHandle, $peclPackageVersion, $phpVersion.DisplayName)
                     } Else {
-                        $foundDll = $dlls[0]
+                        $availablePackageVersion = @{PackageVersion = $peclPackageVersion; PackageArchiveUrl = $archiveUrl}
                         break
                     }
                 }
-                If ($null -eq $foundDll) {
+                If ($null -eq $availablePackageVersion) {
                     Throw "No compatible Windows DLL found for PECL package $peclPackageHandle with a $MinimumStability minimum stability"
                 }
-                Write-Output ("Downloading PECL package {0} {1} from {2}" -f $peclPackageHandle, $foundDll.Version, $foundDll.Url)
-                $zip, $keepZip = Get-FileFromUrlOrCache -Url $foundDll.Url
+                Write-Output ("Downloading PECL package {0} {1} from {2}" -f $peclPackageHandle, $availablePackageVersion.PackageVersion, $availablePackageVersion.PackageArchiveUrl)
+                $zip, $keepZip = Get-FileFromUrlOrCache -Url $availablePackageVersion.PackageArchiveUrl
                 Try {
                     $tempFolder = New-TempDirectory
                     Expand-Archive -LiteralPath $zip -DestinationPath $tempFolder
@@ -105,10 +105,10 @@ function Install-PhpExtension() {
                         $phpDlls = @(Get-ChildItem -Path $tempFolder\php_*.dll -File -Depth 1)
                     }
                     If ($phpDlls.Count -eq 0) {
-                        Throw ("No PHP DLL found in archive downloaded from {0}" -f $foundDll.Url)
+                        Throw ("No PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
                     }
                     If ($phpDlls.Count -ne 1) {
-                        Throw ("Multiple PHP DLL found in archive downloaded from {0}" -f $foundDll.Url)
+                        Throw ("Multiple PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
                     }
                     $dllPath = $phpDlls[0].FullName
                 }
