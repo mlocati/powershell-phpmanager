@@ -1,4 +1,4 @@
-Function New-PhpExtension
+function New-PhpExtension
 {
     <#
     .Synopsis
@@ -20,23 +20,23 @@ Function New-PhpExtension
         'Filename' = 'php_xdebug-2.6.0-7.2-vc15.dll'
     }
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The dictionary with the property values')]
         [ValidateNotNull()]
         [Hashtable]$Dictionary
     )
-    Begin {
+    begin {
         $result = New-Object PSObject
     }
-    Process {
+    process {
         $result | Add-Member -MemberType NoteProperty -Name 'Type' -Value ([string]$Dictionary['Type'])
         $result | Add-Member -MemberType NoteProperty -Name 'State' -Value ([string]$Dictionary['State'])
         $result | Add-Member -MemberType NoteProperty -Name 'Name' -Value ([string]$Dictionary['Name'])
         $result | Add-Member -MemberType NoteProperty -Name 'Handle' -Value ([string]$Dictionary['Handle'])
-        $result | Add-Member -MemberType NoteProperty -Name 'Version' -Value $( If ($Dictionary.ContainsKey('Version')) { [string]$Dictionary['Version'] } Else { '' } )
-        $result | Add-Member -MemberType NoteProperty -Name 'Filename' -Value $( If ($Dictionary.ContainsKey('Filename')) { [string]$Dictionary['Filename'] } Else { '' } )
+        $result | Add-Member -MemberType NoteProperty -Name 'Version' -Value $( if ($Dictionary.ContainsKey('Version')) { [string]$Dictionary['Version'] } else { '' } )
+        $result | Add-Member -MemberType NoteProperty -Name 'Filename' -Value $( if ($Dictionary.ContainsKey('Filename')) { [string]$Dictionary['Filename'] } else { '' } )
     }
-    End {
+    end {
         $result
     }
 }

@@ -1,4 +1,4 @@
-Function Get-PhpVersionsCompatibility
+function Get-PhpVersionsCompatibility
 {
     <#
     .Synopsis
@@ -13,7 +13,7 @@ Function Get-PhpVersionsCompatibility
     .Outputs
     bool
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The first PhpVersion instance to compare')]
         [ValidateNotNull()]
         [PhpVersion]$A,
@@ -21,10 +21,10 @@ Function Get-PhpVersionsCompatibility
         [ValidateNotNull()]
         [PhpVersion]$B
     )
-    Begin {
+    begin {
         $areCompatible = $null
     }
-    Process {
+    process {
         if ($a.Architecture -ne $b.Architecture -or $a.ThreadSafe -ne $b.ThreadSafe) {
             $areCompatible = $False
         } elseif ($a.ComparableVersion.Major -ne $b.ComparableVersion.Major -or $a.ComparableVersion.Minor -ne $b.ComparableVersion.Minor) {
@@ -33,7 +33,7 @@ Function Get-PhpVersionsCompatibility
             $areCompatible = $True
         }
     }
-    End {
+    end {
         $areCompatible
     }
 }

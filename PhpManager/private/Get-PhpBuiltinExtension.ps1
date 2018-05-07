@@ -1,4 +1,4 @@
-Function Get-PhpBuiltinExtension
+function Get-PhpBuiltinExtension
 {
     <#
     .Synopsis
@@ -13,28 +13,28 @@ Function Get-PhpBuiltinExtension
     .Example
     Get-PhpBuiltinExtension -PhpVersion $phpVersion
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want the extensions')]
         [ValidateNotNull()]
         [PhpVersionInstalled]$PhpVersion
     )
-    Begin {
+    begin {
         $extensions = @()
     }
-    Process {
+    process {
         $executableParameters = @('-n', '-m')
         $executableResult = & $PhpVersion.ExecutablePath $executableParameters
-        $extensionNames = $executableResult | Where-Object {$_ -notmatch '^\s*\[.*\]\s*$'} | Where-Object {$_ -notmatch '^\s*$'}
+        $extensionNames = $executableResult | Where-Object { $_ -notmatch '^\s*\[.*\]\s*$' } | Where-Object { $_ -notmatch '^\s*$' }
         $alreadyExtensions = @{}
-        ForEach ($extensionName in $extensionNames) {
+        foreach ($extensionName in $extensionNames) {
             $extensionHandle = Get-PhpExtensionHandle -Name $extensionName
-            If (-Not($alreadyExtensions.ContainsKey($extensionHandle))) {
+            if (-Not($alreadyExtensions.ContainsKey($extensionHandle))) {
                 $alreadyExtensions[$extensionHandle] = $true
                 $extensions += New-PhpExtension -Dictionary @{'Name' = $extensionName; 'Handle' = $extensionHandle; 'Type' = $Script:EXTENSIONTYPE_BUILTIN; 'State' = $Script:EXTENSIONSTATE_BUILTIN}
             }
         }
     }
-    End {
+    end {
         $extensions
     }
 }

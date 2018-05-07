@@ -1,4 +1,4 @@
-Function Set-PhpIniLine
+function Set-PhpIniLine
 {
     <#
     .Synopsis
@@ -10,7 +10,7 @@ Function Set-PhpIniLine
     .Parameter Lines
     The new lines to be added to the php.ini.
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to the php.ini (or to the folder containing it)')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -19,14 +19,14 @@ Function Set-PhpIniLine
         [ValidateNotNull()]
         [System.Array]$Lines
     )
-    Begin {
+    begin {
     }
-    Process {
-        If (Test-Path -Path $Path -PathType Container) {
+    process {
+        if (Test-Path -Path $Path -PathType Container) {
             $Path = [System.IO.Path]::Combine($Path, 'php.ini')
         }
         Set-Content -Path $Path -Value $Lines
     }
-    End {
+    end {
     }
 }

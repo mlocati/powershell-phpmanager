@@ -19,17 +19,17 @@ Describe 'Get-PeclPackageVersion' {
 </a>
 '@ } -ParameterFilter { $Method -eq 'Get' -and $Uri -clike '*/samplepackage/allreleases.xml' }
 
-        $minimumStabilities = @('_DEFAULT_', 'stable', 'beta', 'alpha', 'devel', 'snapshot') | ForEach-Object {@{minimumStability = $_}}
+        $minimumStabilities = @('_DEFAULT_', 'stable', 'beta', 'alpha', 'devel', 'snapshot') | ForEach-Object { @{minimumStability = $_} }
         It 'should detect the correct version considering the <minimumStability> minimum stability' -TestCases $minimumStabilities {
-            param($minimumStability)
-            If ($minimumStability -eq '_DEFAULT_') {
+            param ($minimumStability)
+            if ($minimumStability -eq '_DEFAULT_') {
                 $versions = Get-PeclPackageVersion -Handle 'SamplePackage' -Version '2'
-            } Else {
+            } else {
                 $versions = Get-PeclPackageVersion -Handle 'SamplePackage' -Version '2' -MinimumStability $minimumStability
             }
             Assert-MockCalled -ModuleName PhpManager Invoke-RestMethod -Scope It -Times 1 -Exactly
             $versionsJoined = $versions -join '___'
-            Switch -regex ($minimumStability) {
+            switch -regex ($minimumStability) {
                 '_DEFAULT_|stable' {
                     $versions -join ' ' | Should -BeExactly '2.6.0 2.5.5 2.0.0'
                 }

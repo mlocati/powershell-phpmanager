@@ -1,4 +1,4 @@
-Function Get-PhpExtensionHandle
+function Get-PhpExtensionHandle
 {
     <#
     .Synopsis
@@ -13,32 +13,32 @@ Function Get-PhpExtensionHandle
     .Example
     Get-PhpExtensionHandle -Name 'Zend OPcache'
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The name of the PHP extension')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Name
     )
-    Begin {
+    begin {
         $handle = $null
     }
-    Process {
+    process {
         $handle = $Name.Trim().ToLowerInvariant()
-        If ($handle -eq '') {
-            Throw 'Empty PHP extension name specified'
+        if ($handle -eq '') {
+            throw 'Empty PHP extension name specified'
         }
-        Switch ($handle) {
+        switch ($handle) {
             'zend opcache' { $handle = 'opcache' }
             'advanced php debugger (apd)' { $handle = 'apd' }
             'nt user api' { $handle = 'ntuser' }
             default {
-                If (-Not($handle -match '^[a-z0-9][a-z0-9_\-]+$')) {
-                    Throw "Unrecognized PHP extension name: $Name"
+                if (-Not($handle -match '^[a-z0-9][a-z0-9_\-]+$')) {
+                    throw "Unrecognized PHP extension name: $Name"
                 }
             }
         }
     }
-    End {
+    end {
         $handle
     }
 }

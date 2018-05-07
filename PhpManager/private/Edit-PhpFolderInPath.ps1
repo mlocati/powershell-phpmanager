@@ -1,4 +1,4 @@
-Function Edit-PhpFolderInPath
+function Edit-PhpFolderInPath
 {
     <#
     .Synopsis
@@ -16,7 +16,7 @@ Function Edit-PhpFolderInPath
     .Parameter CurrentProcess
     When Operation is Add: specify this switch to add Path to the current PATH environment variable.
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]
         [ValidateSet('Add', 'Remove')]
@@ -30,25 +30,25 @@ Function Edit-PhpFolderInPath
         [string]$Persist,
         [switch]$CurrentProcess
     )
-    Begin {
+    begin {
     }
-    Process {
+    process {
         $pathSeparator = [System.IO.Path]::PathSeparator
         $directorySeparator = [System.IO.Path]::DirectorySeparatorChar
         $Path = [System.IO.Path]::GetFullPath($Path).TrimEnd($directorySeparator)
         $alternativePath = $Path + $directorySeparator
         $needDirectRegistryAccess = [System.Environment]::GetEnvironmentVariable[0].OverloadDefinitions.Count -lt 2
-        If ($Operation -eq 'Add') {
+        if ($Operation -eq 'Add') {
             $targets = @{}
-            If ($CurrentProcess) {
+            if ($CurrentProcess) {
                 $targets[$Script:ENVTARGET_PROCESS] = $null
             }
-            If ($Persist -eq 'User') {
+            if ($Persist -eq 'User') {
                 $targets[$Script:ENVTARGET_USER] = 'HKCU:\Environment'
-            } ElseIf ($Persist -eq 'System') {
+            } elseif ($Persist -eq 'System') {
                 $targets[$Script:ENVTARGET_MACHINE] = 'HKLM:\System\CurrentControlSet\Control\Session Manager\Environment'
             }
-        } Else {
+        } else {
             $targets = @{
                 $Script:ENVTARGET_PROCESS = $null
                 $Script:ENVTARGET_USER = 'HKCU:\Environment'
@@ -56,71 +56,71 @@ Function Edit-PhpFolderInPath
             }
         }
         $haveToBroadcast = $false
-        ForEach ($target in $targets.Keys) {
-            If ($target -eq $Script:ENVTARGET_PROCESS) {
+        foreach ($target in $targets.Keys) {
+            if ($target -eq $Script:ENVTARGET_PROCESS) {
                 $originalPath = $Env:Path
-            } ElseIf ($needDirectRegistryAccess) {
+            } elseif ($needDirectRegistryAccess) {
                 $originalPath = ''
-                If (Test-Path -LiteralPath $targets[$target]) {
+                if (Test-Path -LiteralPath $targets[$target]) {
                     $pathProperties = Get-ItemProperty -LiteralPath $targets[$target] -Name 'Path'
-                    If ($pathProperties | Get-Member -Name 'Path') {
+                    if ($pathProperties | Get-Member -Name 'Path') {
                         $originalPath = $pathProperties.Path
                     }
                 }
-            } Else {
+            } else {
                 $originalPath = [System.Environment]::GetEnvironmentVariable('Path', $target)
             }
-            If ($null -eq $originalPath -or $originalPath -eq '') {
+            if ($null -eq $originalPath -or $originalPath -eq '') {
                 $parts = @()
-            } Else {
+            } else {
                 $parts = $originalPath.Split($pathSeparator)
             }
             $newPath = $null
-            If ($Operation -eq 'Add') {
-                If (-Not($parts -icontains $Path -or $parts -icontains $alternativePath)) {
+            if ($Operation -eq 'Add') {
+                if (-Not($parts -icontains $Path -or $parts -icontains $alternativePath)) {
                     $parts += $Path
                     $newPath = $parts -join $pathSeparator
                 }
-            } ElseIf ($Operation -eq 'Remove') {
-                $parts = $parts | Where-Object {$_ -ne $Path -and $_ -ne $alternativePath}
+            } elseif ($Operation -eq 'Remove') {
+                $parts = $parts | Where-Object { $_ -ne $Path -and $_ -ne $alternativePath }
                 $newPath = $parts -join $pathSeparator
             }
-            If ($null -ne $newPath -and $newPath -ne $originalPath) {
-                If ($target -eq $Script:ENVTARGET_PROCESS) {
+            if ($null -ne $newPath -and $newPath -ne $originalPath) {
+                if ($target -eq $Script:ENVTARGET_PROCESS) {
                     $Env:Path = $newPath
-                } Else {
+                } else {
                     $requireRunAs = $false
-                    If ($target -eq $Script:ENVTARGET_MACHINE) {
+                    if ($target -eq $Script:ENVTARGET_MACHINE) {
                         $currentUser = [System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()
-                        If (-Not($currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
+                        if (-Not($currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
                             $requireRunAs = $true
                         }
                     }
-                    If ($requireRunAs) {
+                    if ($requireRunAs) {
                         $newPathEscaped = $newPath -replace "'", "''"
-                        If ($needDirectRegistryAccess) {
+                        if ($needDirectRegistryAccess) {
                             $exeCommand = "New-ItemProperty -Path '$($targets[$target])' -Name 'Path' -Value '$newPathEscaped' -PropertyType ExpandString -Force | Out-Null"
                             $haveToBroadcast = $True
-                        } Else {
+                        } else {
                             $exeCommand = "[System.Environment]::SetEnvironmentVariable('Path', '$newPathEscaped', '$Script:ENVTARGET_MACHINE') | Out-Null"
                         }
                         Start-Process -FilePath 'powershell.exe' -ArgumentList "-Command ""$exeCommand""" -WindowStyle Hidden -Verb RunAs -Wait
                     } else {
-                        If ($needDirectRegistryAccess) {
+                        if ($needDirectRegistryAccess) {
                             New-ItemProperty -Path $targets[$target] -Name 'Path' -Value $newPath -PropertyType ExpandString -Force | Out-Null
                             $haveToBroadcast = $True
-                        } Else {
+                        } else {
                             [System.Environment]::SetEnvironmentVariable('Path', $newPath, $target) | Out-Null
                         }
                     }
                 }
             }
         }
-        If ($haveToBroadcast) {
-            Try {
+        if ($haveToBroadcast) {
+            try {
                 $className = 'PhpManager_Env_Broadcaster_v1'
                 $classType = ([System.Management.Automation.PSTypeName]$className).Type
-                If ($null -eq $classType) {
+                if ($null -eq $classType) {
                     Add-Type -Language CSharp -TypeDefinition @"
 using System;
 using System.ComponentModel;
@@ -209,12 +209,11 @@ public sealed class $className
                     $classType = ([System.Management.Automation.PSTypeName]$className).Type
                 }
                 $classType.GetMethod('BroadcastEnvironmentChange').Invoke($null, @())
-            }
-            Catch {
+            } catch {
                 Write-Debug -Message $_
             }
         }
     }
-    End {
+    end {
     }
 }

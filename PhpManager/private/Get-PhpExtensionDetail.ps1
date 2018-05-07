@@ -1,4 +1,4 @@
-Function Get-PhpExtensionDetail
+function Get-PhpExtensionDetail
 {
     <#
     .Synopsis
@@ -17,7 +17,7 @@ Function Get-PhpExtensionDetail
     .Example
     Get-PhpExtensionDetail -PhpVersion $phpVersion -Path 'C:\Dev\PHP\ext\php_ext.dll'
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want to inspect the extension(s)')]
         [ValidateNotNull()]
         [PhpVersionInstalled]$PhpVersion,
@@ -26,38 +26,38 @@ Function Get-PhpExtensionDetail
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path
     )
-    Begin {
+    begin {
         $result = $null
     }
-    Process {
+    process {
         $inspectorParameters = @()
-        If ($null -ne $Path -and $Path -ne '' -and (Test-Path -Path $Path -PathType Leaf)) {
+        if ($null -ne $Path -and $Path -ne '' -and (Test-Path -Path $Path -PathType Leaf)) {
             $result = $null
             $inspectingSingleFile = $true
             $inspectorParameters += $Path
             $somethingToInspect = $true
-        } Else {
+        } else {
             $result = @()
             $inspectingSingleFile = $false
-            If ($null -eq $Path -or $Path -eq '') {
+            if ($null -eq $Path -or $Path -eq '') {
                 $folder = $PhpVersion.ExtensionsPath
-            } Else {
+            } else {
                 $folder = $Path
-                If (-Not(Test-Path -Path $folder -PathType Container)) {
+                if (-Not(Test-Path -Path $folder -PathType Container)) {
                     throw "Unable to find the file/folder $folder"
                 }
             }
-            If (Test-Path -Path $folder -PathType Container) {
+            if (Test-Path -Path $folder -PathType Container) {
                 $subFiles = Get-ChildItem -Path $folder -Filter '*.dll' | Select-Object -ExpandProperty 'FullName'
                 $somethingToInspect = $subFiles.Count -gt 0
-                If ($somethingToInspect) {
+                if ($somethingToInspect) {
                     $inspectorParameters += $subFiles
                 }
-            } Else {
+            } else {
                 $somethingToInspect = $false
             }
         }
-        If ($somethingToInspect) {
+        if ($somethingToInspect) {
             $rxGood = '^'
             $rxGood += 'php:(?:' + $PhpVersion.ComparableVersion.Major + '\.' + $PhpVersion.ComparableVersion.Minor + '(?:\.\d+)*)?'
             $rxGood += '\tarchitecture:' + $PhpVersion.Architecture
@@ -69,16 +69,16 @@ Function Get-PhpExtensionDetail
             $rxGood += '$'
             $inspectorPath = [System.IO.Path]::Combine($PSScriptRoot, 'bin', 'Inspect-PhpExtension-' + $PhpVersion.Architecture + '.exe')
             $inspectorResults = & $inspectorPath $inspectorParameters
-            If ($LASTEXITCODE -ne 0) {
+            if ($LASTEXITCODE -ne 0) {
                 throw 'Failed to inspect extension(s)'
             }
-            ForEach ($inspectorResult in $inspectorResults) {
+            foreach ($inspectorResult in $inspectorResults) {
                 $match = $inspectorResult | Select-String -Pattern $rxGood
-                If (-Not($match)) {
-                    If ($inspectingSingleFile) {
+                if (-Not($match)) {
+                    if ($inspectingSingleFile) {
                         throw "Failed to inspect extension: $inspectorResult"
                     }
-                } Else {
+                } else {
                     $result1 = New-PhpExtension -Dictionary @{
                         'Type' = $match.Matches.Groups[1].Value;
                         'State' = $Script:EXTENSIONSTATE_UNKNOWN;
@@ -87,7 +87,7 @@ Function Get-PhpExtensionDetail
                         'Version' = $match.Matches.Groups[3].Value;
                         'Filename' = $match.Matches.Groups[4].Value;
                     }
-                    If ($inspectingSingleFile) {
+                    if ($inspectingSingleFile) {
                         $result = $result1;
                     } else {
                         $result += $result1;
@@ -96,7 +96,7 @@ Function Get-PhpExtensionDetail
             }
         }
     }
-    End {
+    end {
         $result
     }
 }

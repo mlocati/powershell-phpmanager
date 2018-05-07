@@ -1,4 +1,4 @@
-Function Add-PhpToSwitcher
+function Add-PhpToSwitcher
 {
     <#
     .Synopsis
@@ -19,7 +19,7 @@ Function Add-PhpToSwitcher
     Add-PhpToSwitcher 7.2 C:\PHP7.2
     Switch-Php 5.6
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The symbolic name to give to the PHP installation')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -30,28 +30,28 @@ Function Add-PhpToSwitcher
         [string]$Path,
         [switch]$Force
     )
-    Begin {
+    begin {
     }
-    Process {
+    process {
         $switcher = Get-PhpSwitcher
         if ($null -eq $switcher) {
-            Throw 'PHP Switcher is not initialized: you can initialize it with the Initialize-PhpSwitcher command'
+            throw 'PHP Switcher is not initialized: you can initialize it with the Initialize-PhpSwitcher command'
         }
-        If ($switcher.Targets.ContainsKey($Name) -and -Not($Force)) {
-            Throw "Another PHP installation ($($switcher.Targets[$Name])) is already assigned to the PHP Switcher with the name $Name. Use the -Force flag to force the operation anyway."
+        if ($switcher.Targets.ContainsKey($Name) -and -Not($Force)) {
+            throw "Another PHP installation ($($switcher.Targets[$Name])) is already assigned to the PHP Switcher with the name $Name. Use the -Force flag to force the operation anyway."
         }
         $Path = [System.IO.Path]::GetFullPath($Path)
-        If (-Not(Test-Path -LiteralPath $Path -PathType Container)) {
-            Throw "Unable to find the folder $Path"
+        if (-Not(Test-Path -LiteralPath $Path -PathType Container)) {
+            throw "Unable to find the folder $Path"
         }
         $pathInfo = Get-Item -LiteralPath $Path
-        If ($pathInfo.LinkType -eq 'Junction') {
-            Throw "$Path must be a regular directory (it is a junction)."
+        if ($pathInfo.LinkType -eq 'Junction') {
+            throw "$Path must be a regular directory (it is a junction)."
         }
         [PhpVersionInstalled]::FromPath($Path) | Out-Null
         $switcher.Targets[$Name] = $Path
         Set-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Value $switcher -Scope $switcher.Scope
     }
-    End {
+    end {
     }
 }

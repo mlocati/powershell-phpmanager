@@ -1,31 +1,31 @@
 Describe 'Edit-PhpFolderInPath' {
     $pathSeparator = [System.IO.Path]::PathSeparator
-    Function GetFakeDir() {
+    function GetFakeDir() {
         return 'C:\This\Directory\Should\Not\Exist\' + (New-Guid).Guid
     }
-    Function GetPath([string][ValidateSet('Env', 'User', 'System')]$what) {
-        If ($what -eq 'Env') {
+    function GetPath([string][ValidateSet('Env', 'User', 'System')]$what) {
+        if ($what -eq 'Env') {
             $result = $Env:Path
-        } Else {
-            If ($what -eq 'User') {
+        } else {
+            if ($what -eq 'User') {
                 $key = 'HKCU:\Environment'
-            } Else {
+            } else {
                 $key = 'HKLM:\System\CurrentControlSet\Control\Session Manager\Environment'
             }
             $result = ''
-            If (Test-Path -LiteralPath $key) {
+            if (Test-Path -LiteralPath $key) {
                 $pathProperties = Get-ItemProperty -LiteralPath $key -Name 'Path'
-                If ($pathProperties | Get-Member -Name 'Path') {
+                if ($pathProperties | Get-Member -Name 'Path') {
                     $result = $pathProperties.Path
-                    If ($null -eq $result) {
+                    if ($null -eq $result) {
                         $result = $result
                     }
                 }
             }
         }
-        If ($null -eq $result) {
+        if ($null -eq $result) {
             $result = ''
-        } Else {
+        } else {
             $result = $result -replace ('^' + [regex]::Escape($pathSeparator) + '+'), ''
             $result = $result -replace ([regex]::Escape($pathSeparator) + '+$'), ''
             $result = $result -replace ([regex]::Escape($pathSeparator) + '{2,}'), $pathSeparator
@@ -91,7 +91,7 @@ Describe 'Edit-PhpFolderInPath' {
         GetPath('System') | Should -BeExactly $preSystem
     }
 
-    If ($isAdministrator -or $runAs) {
+    if ($isAdministrator -or $runAs) {
         It 'should set SYSTEM' {
             $dir = GetFakeDir
             $preEnv = GetPath('Env')
@@ -109,7 +109,7 @@ Describe 'Edit-PhpFolderInPath' {
             GetPath('User') | Should -BeExactly $preUser
             GetPath('System') | Should -BeExactly $preSystem
         }
-    } Else {
+    } else {
         It 'should set SYSTEM' -Skip {
         }
     }
@@ -132,7 +132,7 @@ Describe 'Edit-PhpFolderInPath' {
         GetPath('System') | Should -BeExactly $preSystem
     }
 
-    If ($isAdministrator -or $runAs) {
+    if ($isAdministrator -or $runAs) {
         It 'should set ENV and SYSTEM' {
             $dir = GetFakeDir
             $preEnv = GetPath('Env')
@@ -150,7 +150,7 @@ Describe 'Edit-PhpFolderInPath' {
             GetPath('User') | Should -BeExactly $preUser
             GetPath('System') | Should -BeExactly $preSystem
         }
-    } Else {
+    } else {
         It 'should set ENV and SYSTEM' -Skip {
         }
     }

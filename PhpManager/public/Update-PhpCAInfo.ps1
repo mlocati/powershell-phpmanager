@@ -19,7 +19,7 @@ function Update-PhpCAInfo() {
     .Outputs
     bool
     #>
-    Param(
+    param (
         [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path of the PHP installation; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -31,18 +31,18 @@ function Update-PhpCAInfo() {
         [ValidateNotNull()]
         [string] $CustomCAPath = ''
     )
-    Begin {
+    begin {
     }
-    Process {
-        If ($null -eq $Path -or $Path -eq '') {
+    process {
+        if ($null -eq $Path -or $Path -eq '') {
             $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
-        } Else {
+        } else {
             $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
-        If ($null -eq $CustomCAPath -or $CustomCAPath -eq '') {
+        if ($null -eq $CustomCAPath -or $CustomCAPath -eq '') {
             $CustomCAPath = ''
-        } ElseIf (-Not(Test-Path -Path $CustomCAPath -PathType Leaf)) {
-            Throw "Unable to find your custom CA file $CustomCAPath"
+        } elseif (-Not(Test-Path -Path $CustomCAPath -PathType Leaf)) {
+            throw "Unable to find your custom CA file $CustomCAPath"
         }
         Write-Output "Downloading CACert checksum file"
         $checksum = [System.Text.Encoding]::ASCII.GetString($(Invoke-WebRequest -Uri $Script:CACERT_CHECKSUM_URL).Content)
@@ -50,74 +50,70 @@ function Update-PhpCAInfo() {
         $cacertBytes = $(Invoke-WebRequest -Uri $Script:CACERT_PEM_URL).Content
         Write-Output "Checking CACert file"
         $stream = New-Object System.IO.MemoryStream
-        Try {
+        try {
             $streamWriter = New-Object -TypeName System.IO.BinaryWriter -ArgumentList @($stream)
-            Try {
+            try {
                 $streamWriter.Write($cacertBytes)
                 $streamWriter.Flush()
                 $stream.Position = 0
                 $checksum2 = Get-FileHash -InputStream $stream -Algorithm $Script:CACERT_CHECKSUM_ALGORITHM
-                }
-            Finally {
+            } finally {
                 $streamWriter.Dispose()
             }
-        }
-        Finally {
+        } finally {
             $stream.Dispose()
         }
-        If (-Not($checksum -match ('^' + $checksum2.Hash + '($|\s)'))) {
-            Throw "The checksum of the downloaded CA certificates is wrong!"
+        if (-Not($checksum -match ('^' + $checksum2.Hash + '($|\s)'))) {
+            throw "The checksum of the downloaded CA certificates is wrong!"
         }
-        If ($CustomCAPath -ne '') {
+        if ($CustomCAPath -ne '') {
             Write-Output "Appending custom CA file"
             $headerTitle = 'Custom CA from {0}' -f $CustomCAPath
             $headerTitle = [System.Text.Encoding]::ASCII.GetString([System.Text.Encoding]::ASCII.GetBytes($headerTitle))
             $header = "`n" + $headerTitle + "`n" + '=' * $headerTitle.Length + "`n"
             $stream = New-Object System.IO.MemoryStream
-            Try {
+            try {
                 $streamWriter = New-Object -TypeName System.IO.BinaryWriter -ArgumentList @($stream)
-                Try {
+                try {
                     $streamWriter.Write($cacertBytes)
                     $streamWriter.Write([System.Text.Encoding]::ASCII.GetBytes($header))
                     $streamWriter.Write([System.IO.File]::ReadAllBytes($CustomCAPath))
                     $streamWriter.Flush()
                     $cacertBytes = $stream.ToArray()
-                }
-                Finally {
+                } finally {
                     $streamWriter.Dispose()
                 }
-            }
-            Finally {
+            } finally {
                 $stream.Dispose()
             }
         }
         Write-Output "Saving CA file"
-        If ($null -eq $CAPath -or $CAPath -eq '') {
+        if ($null -eq $CAPath -or $CAPath -eq '') {
             $CAPath = Join-Path -Path $installedVersion.ActualFolder -ChildPath ssl | Join-Path -ChildPath cacert.pem
-        } Else {
+        } else {
             $CAPath = [System.IO.Path]::GetFullPath($CAPath)
        }
        $caFolder = Split-Path -LiteralPath $CAPath
-       If (-Not(Test-Path -Path $caFolder -PathType Container)) {
+       if (-Not(Test-Path -Path $caFolder -PathType Container)) {
            New-Item -Path $caFolder -ItemType Directory | Out-Null
         }
         Set-Content -Path $CAPath -Value $cacertBytes -Encoding Byte
         $iniPath = $phpVersion.IniPath
         $iniValue = Get-PhpIniKey -Key 'curl.cainfo' -Path $iniPath
-        If ($iniValue -eq $CAPath) {
+        if ($iniValue -eq $CAPath) {
             Write-Output "curl.cainfo did not require to be updated"
-        } Else {
+        } else {
             Set-PhpIniKey -Key 'curl.cainfo' -Value $CAPath -Path $iniPath
             Write-Output "curl.cainfo updated in php.ini"
         }
         $iniValue = Get-PhpIniKey -Key 'openssl.cafile' -Path $iniPath
-        If ($iniValue -eq $CAPath) {
+        if ($iniValue -eq $CAPath) {
             Write-Output "openssl.cafile did not require to be updated"
-        } Else {
+        } else {
             Set-PhpIniKey -Key 'openssl.cafile' -Value $CAPath -Path $iniPath
             Write-Output "openssl.cafile updated in php.ini"
         }
     }
-    End {
+    end {
     }
 }

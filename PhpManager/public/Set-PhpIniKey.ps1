@@ -1,4 +1,4 @@
-Function Set-PhpIniKey
+function Set-PhpIniKey
 {
     <#
     .Synopsis
@@ -44,7 +44,7 @@ Function Set-PhpIniKey
     .Example
     Set-PhpIniKey 'default_charset' -Uncomment
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The key of the php.ini to set')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -59,62 +59,62 @@ Function Set-PhpIniKey
         [switch]$Comment,
         [switch]$Uncomment
     )
-    Begin {
+    begin {
         $newLines = @()
     }
-    Process {
+    process {
         $phpVersion = $null
-        If ($null -eq $Path -or $Path -eq '') {
+        if ($null -eq $Path -or $Path -eq '') {
             $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
-        } ElseIf ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
+        } elseif ($Path -like '*.exe' -or (Test-Path -Path $Path -PathType Container)) {
             $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
-        If ($null -ne $phpVersion) {
+        if ($null -ne $phpVersion) {
             $iniPath = $phpVersion.IniPath
-        } Else {
+        } else {
             $iniPath = $Path
         }
-        If ($Key -match '^\s*(zend_)?extension\s*$') {
-            Throw 'You can''t use this command to set the extensions'
+        if ($Key -match '^\s*(zend_)?extension\s*$') {
+            throw 'You can''t use this command to set the extensions'
         }
-        If ($null -eq $Value) {
+        if ($null -eq $Value) {
             $Value = ''
         }
         $operation = 'SET'
         $numSwitches = 0
-        If ($Delete) {
-            If ($Value -ne '') {
-                Throw 'If you specify the -Delete switch, you can''t specify -Value parameter'
+        if ($Delete) {
+            if ($Value -ne '') {
+                throw 'If you specify the -Delete switch, you can''t specify -Value parameter'
             }
             $operation = 'DELETE'
             $numSwitches += 1
         }
-        If ($Comment) {
-            If ($Value -ne '') {
-                Throw 'If you specify the -Comment switch, you can''t specify -Value parameter'
+        if ($Comment) {
+            if ($Value -ne '') {
+                throw 'If you specify the -Comment switch, you can''t specify -Value parameter'
             }
             $operation = 'COMMENT'
             $numSwitches += 1
         }
-        If ($Uncomment) {
-            If ($Value -ne '') {
-                Throw 'If you specify the -Uncomment switch, you can''t specify -Value parameter'
+        if ($Uncomment) {
+            if ($Value -ne '') {
+                throw 'If you specify the -Uncomment switch, you can''t specify -Value parameter'
             }
             $operation = 'UNCOMMENT'
             $numSwitches += 1
         }
-        If ($numSwitches -gt 1) {
-            Throw 'You can specify only one of the -Delete, -Comment, -Uncomment switches'
+        if ($numSwitches -gt 1) {
+            throw 'You can specify only one of the -Delete, -Comment, -Uncomment switches'
         }
         $rxSearch = '^(\s*)([;#][\s;#]*)?(' + [Regex]::Escape($Key) + '\s*=.*)$'
         $found = $false
-        ForEach ($line in $(Get-PhpIniLine -Path $iniPath)) {
+        foreach ($line in $(Get-PhpIniLine -Path $iniPath)) {
             $match = $line | Select-String -Pattern $rxSearch
             if ($null -eq $match) {
                 $newLines += $line
-            } ElseIf ($found) {
-                If ($operation -ne 'DELETE') {
-                    If ($match.Matches[0].Groups[2].Value -eq '') {
+            } elseif ($found) {
+                if ($operation -ne 'DELETE') {
+                    if ($match.Matches[0].Groups[2].Value -eq '') {
                         $newLines += ';' + $line;
                     } else {
                         $newLines += $line
@@ -122,19 +122,19 @@ Function Set-PhpIniKey
                 }
             } else {
                 $found = $true
-                If ($operation -eq 'COMMENT') {
-                    If ($match.Matches[0].Groups[2].Value -eq '') {
+                if ($operation -eq 'COMMENT') {
+                    if ($match.Matches[0].Groups[2].Value -eq '') {
                         $newLines += ';' + $line;
-                    } Else {
+                    } else {
                         $newLines += $line;
                     }
-                } ElseIf ($operation -eq 'UNCOMMENT') {
-                    If ($match.Matches[0].Groups[2].Value -ne '') {
+                } elseif ($operation -eq 'UNCOMMENT') {
+                    if ($match.Matches[0].Groups[2].Value -ne '') {
                         $newLines += $match.Matches[0].Groups[1].Value + $match.Matches[0].Groups[3].Value;
-                    } Else {
+                    } else {
                         $newLines += $line;
                     }
-                } ElseIf ($operation -eq 'SET') {
+                } elseif ($operation -eq 'SET') {
                     $newLines += $match.Matches[0].Groups[1].Value + "$Key=$Value"
                 }
             }
@@ -143,7 +143,7 @@ Function Set-PhpIniKey
             $newLines += "$Key=$Value"
         }
     }
-    End {
+    end {
         Set-PhpIniLine -Path $iniPath -Lines $newLines
     }
 }

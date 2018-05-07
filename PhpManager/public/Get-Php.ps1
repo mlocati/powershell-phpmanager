@@ -13,21 +13,21 @@ function Get-Php() {
     .Outputs
     System.Array
     #>
-    Param(
+    param (
         [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path where PHP is installed')]
         [string] $Path
     )
-    Begin {
+    begin {
         $result = @()
     }
-    Process {
-        If ($null -ne $Path -and $Path -ne '') {
+    process {
+        if ($null -ne $Path -and $Path -ne '') {
             $result += [PhpVersionInstalled]::FromPath($Path)
-        } Else {
+        } else {
             $result += [PhpVersionInstalled]::FromEnvironment()
         }
     }
-    End {
+    end {
         $result
     }
 }

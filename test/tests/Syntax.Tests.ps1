@@ -1,9 +1,9 @@
 Describe 'Syntax' {
 
-    $testCases = Get-ChildItem -Path $Global:PHPMANAGER_FOLDER -Include *.ps1, *.psm1 -Recurse | ForEach-Object {@{file = $_}}
+    $testCases = Get-ChildItem -Path $Global:PHPMANAGER_FOLDER -Include *.ps1, *.psm1 -Recurse | ForEach-Object { @{file = $_} }
 
     It -Name '<file> should be a valid PowerShell script' -TestCases $testCases {
-        param($file)
+        param ($file)
         $file.FullName | Should -Exist
         $contents = Get-Content -Path $file.FullName -ErrorAction Stop
         $errors = $null
@@ -11,11 +11,11 @@ Describe 'Syntax' {
         $errors.Count | Should -Be 0
     }
 
-    If ($PSVersionTable.PSEdition -ne 'Core') {
+    if ($PSVersionTable.PSEdition -ne 'Core') {
         It -Name '<file> should pass PSScriptAnalyzer' -TestCases $testCases {
-            param($file)
+            param ($file)
             $problems = @(Invoke-ScriptAnalyzer -Path $file.FullName -ExcludeRule PSUseShouldProcessForStateChangingFunctions -Severity Warning, Error)
-            If ($problems) {
+            if ($problems) {
                 $problems | Format-Table | Out-String | Write-Host
             }
             @($problems).Count | Should -Be 0

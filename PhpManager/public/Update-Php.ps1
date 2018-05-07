@@ -19,7 +19,7 @@ function Update-Php() {
     .Outputs
     bool
     #>
-    Param(
+    param (
         [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path of the PHP installation; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -27,27 +27,27 @@ function Update-Php() {
         [switch] $ConfirmAuto,
         [switch] $Force
     )
-    Begin {
+    begin {
         $updated = $null
     }
-    Process {
-        If ($null -eq $Path -or $Path -eq '') {
+    process {
+        if ($null -eq $Path -or $Path -eq '') {
             $installedVersion = [PhpVersionInstalled]::FromEnvironmentOne()
             $confirmAutomaticallyFoundPhp = $true
-        } Else {
+        } else {
             $installedVersion = [PhpVersionInstalled]::FromPath($Path)
             $confirmAutomaticallyFoundPhp = $false
         }
-        If ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
+        if ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
             Write-Output "The PHP installation has been found at $($installedVersion.ActualFolder))"
             $confirmed = $false
-            While (-Not($confirmed)) {
+            while (-Not($confirmed)) {
                 $answer = Read-Host -Prompt "Do you confirm updating this installation [use -ConfirmAuto to confirm autumatically]? [y/n]"
-                If ($answer -match '^\s*y') {
+                if ($answer -match '^\s*y') {
                     $confirmed = $true
-                } ElseIf ($answer -match '^\s*n') {
+                } elseif ($answer -match '^\s*n') {
                     throw 'Operation aborted.'
-                } Else {
+                } else {
                     Write-Output 'Please answer with Y or N'
                 }
             }
@@ -59,17 +59,17 @@ function Update-Php() {
         }
         $compatibleVersions = $null
         foreach ($possibleReleaseState in $possibleReleaseStates) {
-            $compatibleVersions = Get-PhpAvailableVersion -State $possibleReleaseState | Where-Object {Get-PhpVersionsCompatibility -A $installedVersion -B $_}
+            $compatibleVersions = Get-PhpAvailableVersion -State $possibleReleaseState | Where-Object { Get-PhpVersionsCompatibility -A $installedVersion -B $_ }
             if ($null -ne $compatibleVersions) {
                 break
             }
         }
         $bestNewVersion = $null
         if ($null -ne $compatibleVersions) {
-            ForEach ($compatibleVersion in $compatibleVersions) {
-                If ($null -eq $bestNewVersion) {
+            foreach ($compatibleVersion in $compatibleVersions) {
+                if ($null -eq $bestNewVersion) {
                     $bestNewVersion = $compatibleVersion
-                } ElseIf ($compatibleVersion -gt $bestNewVersion) {
+                } elseif ($compatibleVersion -gt $bestNewVersion) {
                     $bestNewVersion = $compatibleVersion
                 }
             }
@@ -88,7 +88,7 @@ function Update-Php() {
             }
         }
     }
-    End {
+    end {
         $updated
     }
 }

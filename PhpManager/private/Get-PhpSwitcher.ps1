@@ -1,4 +1,4 @@
-Function Get-PhpSwitcher
+function Get-PhpSwitcher
 {
     <#
     .Synopsis
@@ -7,41 +7,40 @@ Function Get-PhpSwitcher
     .Outputs
     PSCustomObject|$null
     #>
-    Begin {
+    begin {
         $result = $null
     }
-    Process {
+    process {
         $scope = 'CurrentUser'
         $data = Get-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Scope $scope
-        If ($null -eq $data) {
+        if ($null -eq $data) {
             $scope = 'AllUsers'
             $data = Get-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Scope $scope
         }
-        If ($null -ne $data) {
+        if ($null -ne $data) {
             $result = New-Object PSObject
             $result | Add-Member -MemberType NoteProperty -Name 'Scope' -Value $scope
             $alias = ''
-            If ($data | Get-Member -Name 'Alias') {
-                If ($data.Alias) {
+            if ($data | Get-Member -Name 'Alias') {
+                if ($data.Alias) {
                     $alias = [string]$data.Alias
                 }
             }
             $result | Add-Member -MemberType NoteProperty -Name 'Alias' -Value $alias
             $targets = @{}
-            If ($data | Get-Member -Name 'Targets') {
-                Try {
+            if ($data | Get-Member -Name 'Targets') {
+                try {
                     $data.Targets.PSObject.Properties | ForEach-Object {
                         $targets[$_.Name] = [string] $_.Value
                     }
-                }
-                Catch {
+                } catch {
                     Write-Debug $_.Exception.Message
                 }
             }
             $result | Add-Member -MemberType NoteProperty -Name 'Targets' -Value $targets
         }
     }
-    End {
+    end {
         $result
     }
 }

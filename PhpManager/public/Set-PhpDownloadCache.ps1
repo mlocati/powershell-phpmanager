@@ -1,4 +1,4 @@
-Function Set-PhpDownloadCache
+function Set-PhpDownloadCache
 {
     <#
     .Synopsis
@@ -30,32 +30,32 @@ Function Set-PhpDownloadCache
     .Example
     Set-PhpDownloadCache '' AllUsers
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $False, Position = 0, HelpMessage = 'The path to a local directory; if empty, the download cache will be disabled')]
         [string]$Path,
         [Parameter(Mandatory = $False, Position = 1, HelpMessage = 'If set and not ''No'', this setting should be persisted for the current user (''CurrentUser''), for any user (''AllUsers'')')]
         [ValidateSet('No', 'CurrentUser', 'AllUsers')]
         [string] $Persist = 'No'
     )
-    Begin {
+    begin {
     }
-    Process {
-        If ($null -eq $Path -or $Path -eq '') {
+    process {
+        if ($null -eq $Path -or $Path -eq '') {
             $Path = ''
-        } Else {
+        } else {
             $Path = [System.IO.Path]::GetFullPath($Path)
-            If (Test-Path -LiteralPath $Path -PathType Leaf) {
-                Throw "$Path is an existing file: the path of download cache must be a directory"
+            if (Test-Path -LiteralPath $Path -PathType Leaf) {
+                throw "$Path is an existing file: the path of download cache must be a directory"
             }
-            If (-Not(Test-Path -LiteralPath $Path -PathType Container)) {
+            if (-Not(Test-Path -LiteralPath $Path -PathType Container)) {
                 New-Item -Path $Path -ItemType Directory | Out-Null
             }
         }
-        If ($Persist -ne 'No') {
-            Set-PhpManagerConfigurationKey -Key 'DOWNLOADCACHE_PATH' -Value $(If ($Path -eq '') { $null } Else { $Path }) -Scope $Persist
+        if ($Persist -ne 'No') {
+            Set-PhpManagerConfigurationKey -Key 'DOWNLOADCACHE_PATH' -Value $(if ($Path -eq '') { $null } else { $Path }) -Scope $Persist
         }
         Set-Variable -Scope Script -Name 'DOWNLOADCACHE_PATH' -Value $Path -Force
     }
-    End {
+    end {
     }
 }

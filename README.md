@@ -110,7 +110,7 @@ If you want to let **Apache** work with PHP, you have to add the `LoadModule` di
 For instance, with PHP 5.6 it is  
 ```
 LoadModule php5_module "C:\Dev\PHP5.6\php5apache2_4.dll"
-```  
+```
 And for PHP 7.2 it is  
 ```
 LoadModule php7_module "C:\Dev\PHP7.2\php7apache2_4.dll"

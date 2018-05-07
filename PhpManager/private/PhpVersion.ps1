@@ -1,4 +1,4 @@
-Class PhpVersion : System.IComparable
+class PhpVersion : System.IComparable
 {
     <#
     The version of PHP, without the RC state
@@ -56,14 +56,14 @@ Class PhpVersion : System.IComparable
     hidden PhpVersion([Hashtable] $data)
     {
         $this.Version = $data.Version
-        If ($data.ContainsKey('RC') -and $data.RC -ne '') {
+        if ($data.ContainsKey('RC') -and $data.RC -ne '') {
             $this.RC = [int] $data.RC
-        } Else {
+        } else {
             $this.RC = $null
         }
         $dv = $this.Version
         $cv = $this.Version
-        If ($null -eq $this.RC) {
+        if ($null -eq $this.RC) {
             $cv += '.9999'
         } else {
             $dv += 'RC' + $this.RC
@@ -80,7 +80,7 @@ Class PhpVersion : System.IComparable
         } elseif ($this.Architecture -eq $Script:ARCHITECTURE_64BITS) {
             $dn += ' (64-bit)'
         }
-        If ($this.ThreadSafe) {
+        if ($this.ThreadSafe) {
             $dn += ' Thread-Safe'
         } else {
             $dn += ' Non-Thread-Safe'
@@ -90,25 +90,24 @@ Class PhpVersion : System.IComparable
 
     [int] CompareTo($that)
     {
-        If (-Not($that -is [PhpVersion])) {
-            Throw "A PhpVersion instance can be compared only to another PhpVersion instance"
+        if (-Not($that -is [PhpVersion])) {
+            throw "A PhpVersion instance can be compared only to another PhpVersion instance"
         }
-        If ($this.ComparableVersion -lt $that.ComparableVersion) {
+        if ($this.ComparableVersion -lt $that.ComparableVersion) {
             $cmp = -1
-        }
-        ElseIf ($this.ComparableVersion -gt $that.ComparableVersion) {
+        } elseif ($this.ComparableVersion -gt $that.ComparableVersion) {
             $cmp = 1
-        } Else {
-            If ($this.Architecture -gt $that.Architecture) {
+        } else {
+            if ($this.Architecture -gt $that.Architecture) {
                 $cmp = -1
-            } ElseIf ($this.Architecture -lt $that.Architecture) {
+            } elseif ($this.Architecture -lt $that.Architecture) {
                 $cmp = -1
-            } Else {
-                If ($this.ThreadSafe -and -Not $that.ThreadSafe) {
+            } else {
+                if ($this.ThreadSafe -and -Not $that.ThreadSafe) {
                     $cmp = -1
-                } ElseIf ($that.ThreadSafe -and -Not $this.ThreadSafe) {
+                } elseif ($that.ThreadSafe -and -Not $this.ThreadSafe) {
                     $cmp = 1
-                } Else {
+                } else {
                     $cmp = 0
                 }
             }
@@ -117,7 +116,7 @@ Class PhpVersion : System.IComparable
     }
 }
 
-Class PhpVersionDownloadable : PhpVersion
+class PhpVersionDownloadable : PhpVersion
 {
     <#
     The state of the release
@@ -142,39 +141,9 @@ Class PhpVersionDownloadable : PhpVersion
         $this.ReleaseState = $data.ReleaseState
         $this.DownloadUrl = $data.DownloadUrl
     }
-    <#
-    .Synopsis
-    Creates a new object representing a PHP version from an PHP download URL.
-    .Parameter Url
-    The PHP download URL (eventually relative to PageUrl).
-    .Parameter PageUrl
-    The URL of the page where the download link has been retrieved from.
-    .Parameter ReleaseState
-    One of the $Script:RELEASESTATE_... constants.
-    #>
-    [PhpVersionDownloadable] static FromUrl([string] $Url, [string] $PageUrl, [string] $ReleaseState)
-    {
-        $match = $Url | Select-String -CaseSensitive -Pattern ('/' + $Script:RX_ZIPARCHIVE + '$')
-        If ($null -eq $match) {
-            Throw "Unrecognized PHP ZIP archive url: $Url"
-        }
-        $data = @{}
-        $data.Version = $match.Matches.Groups[1].Value;
-        $data.RC = $match.Matches.Groups[2].Value;
-        $data.Architecture = $match.Matches.Groups[5].Value;
-        $data.ThreadSafe = $match.Matches.Groups[3].Value -ne '-nts';
-        $data.VCVersion = $match.Matches.Groups[4].Value;
-        $data.ReleaseState = $ReleaseState;
-        If ($null -ne $PageUrl -and $PageUrl -ne '') {
-            $data.DownloadUrl = [Uri]::new([Uri]$PageUrl, $Url).AbsoluteUri
-        } else {
-            $data.DownloadUrl = $Url
-        }
-        return [PhpVersionDownloadable]::new($data)
-    }
 }
 
-Class PhpVersionInstalled : PhpVersion
+class PhpVersionInstalled : PhpVersion
 {
     <#
     The folder where PHP is installed (always set)
@@ -219,9 +188,9 @@ Class PhpVersionInstalled : PhpVersion
         $this.ActualFolder = $data.ActualFolder.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
         $this.ExecutablePath = $data.ExecutablePath
         $this.IniPath = $data.IniPath
-        If ($data.ContainsKey('ExtensionsPath') -and $null -ne $data.ExtensionsPath) {
+        if ($data.ContainsKey('ExtensionsPath') -and $null -ne $data.ExtensionsPath) {
             $this.ExtensionsPath = $data.ExtensionsPath
-        } Else {
+        } else {
             $this.ExtensionsPath = ''
         }
     }
@@ -230,37 +199,37 @@ Class PhpVersionInstalled : PhpVersion
         $directorySeparator = [System.IO.Path]::DirectorySeparatorChar
         $data = @{}
         $item = Get-Item -LiteralPath $Path
-        If ($item -is [System.IO.FileInfo]) {
+        if ($item -is [System.IO.FileInfo]) {
             if ($item.Extension -ne '.exe') {
                 return PhpVersionInstalled::FromPath($item.DirectoryName)
             }
             $directory = $item.Directory
             $data.ExecutablePath = $item.FullName
-        } ElseIf($item -is [System.IO.DirectoryInfo]) {
+        } elseif ($item -is [System.IO.DirectoryInfo]) {
             $directory = $item
             $data.ExecutablePath = Join-Path -Path $item.FullName -ChildPath 'php.exe'
-            If (-Not(Test-Path -LiteralPath $data.ExecutablePath -PathType Leaf)) {
-                Throw "Unable to find php.exe in $Path"
+            if (-Not(Test-Path -LiteralPath $data.ExecutablePath -PathType Leaf)) {
+                throw "Unable to find php.exe in $Path"
             }
-        } Else {
-            Throw "Unrecognized PHP path: $Path"
+        } else {
+            throw "Unrecognized PHP path: $Path"
         }
         $directoryPath = $directory.FullName.TrimEnd($directorySeparator) + $directorySeparator
         $actualDirectoryPath = $null
-        If ($directory.Target -and $directory.Target.Count -gt 0 -and $directory.Target[0]) {
-            Try {
+        if ($directory.Target -and $directory.Target.Count -gt 0 -and $directory.Target[0]) {
+            try {
                 $actualDirectoryPath = (Get-Item -LiteralPath $directory.Target[0]).FullName.TrimEnd($directorySeparator) + $directorySeparator
-            } Catch {
+            } catch {
                 Write-Debug $_
             }
         }
-        If (-Not($actualDirectoryPath)) {
+        if (-Not($actualDirectoryPath)) {
             $actualDirectoryPath = $directoryPath
         }
         $data.ActualFolder = $actualDirectoryPath.TrimEnd($directorySeparator)
         $executableResult = & $data.ExecutablePath @('-n', '-r', 'echo PHP_VERSION, ''@'', PHP_INT_SIZE * 8;')
-        If (-Not($executableResult)) {
-            Throw "Failed to execute php.exe: $LASTEXITCODE"
+        if (-Not($executableResult)) {
+            throw "Failed to execute php.exe: $LASTEXITCODE"
         }
         $match = $executableResult | Select-String -Pattern '^(\d+\.\d+\.\d+)(?:RC(\d+))?@(\d+)$'
         $data.Version = $match.Matches.Groups[1].Value
@@ -270,39 +239,39 @@ Class PhpVersionInstalled : PhpVersion
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Thread Safety\s*=>\s*(\w+)'
         $data.ThreadSafe = $match.Matches.Groups[1].Value -eq 'enabled'
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Compiler\s*=>\s*MSVC([\d]{1,2})'
-        If ($null -eq $match) {
-            If ([System.Version]$data.Version -le [System.Version]'5.2.9999') {
+        if ($null -eq $match) {
+            if ([System.Version]$data.Version -le [System.Version]'5.2.9999') {
                 $data.VCVersion = 6
-            } Else {
-                Throw 'Failed to recognize VCVersion'
+            } else {
+                throw 'Failed to recognize VCVersion'
             }
-        } Else {
+        } else {
             $data.VCVersion = $match.Matches.Groups[1].Value
         }
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Loaded Configuration File\s*=>\s*([\S].*[\S])\s*$'
         $data.IniPath = ''
-        If ($match) {
+        if ($match) {
             $data.IniPath = $match.Matches.Groups[1].Value
-            If ($data.IniPath -eq '(none)') {
+            if ($data.IniPath -eq '(none)') {
                 $data.IniPath = ''
-            } Else {
+            } else {
                 $data.IniPath = $data.IniPath -replace '/',$directorySeparator
                 $data.IniPath = [System.IO.Path]::Combine($actualDirectoryPath, $data.IniPath)
                 $data.IniPath = $data.IniPath -replace [regex]::Escape("$directorySeparator.$directorySeparator"),$directorySeparator
             }
         }
-        If ($data.IniPath -eq '') {
+        if ($data.IniPath -eq '') {
             $data.IniPath = Join-Path -Path $actualDirectoryPath -ChildPath 'php.ini'
-        } ElseIf ($directoryPath -ne $actualDirectoryPath -and $data.IniPath -imatch ('^' + [regex]::Escape($directoryPath) + '.+')) {
+        } elseif ($directoryPath -ne $actualDirectoryPath -and $data.IniPath -imatch ('^' + [regex]::Escape($directoryPath) + '.+')) {
             $data.IniPath = $data.IniPath -ireplace ('^' + [regex]::Escape($directoryPath)),$actualDirectoryPath
         }
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*extension_dir\s*=>\s*([\S].*[\S])\s*=>'
         $data.ExtensionsPath = ''
-        If ($match) {
+        if ($match) {
             $data.ExtensionsPath = $match.Matches.Groups[1].Value
-            If ($data.ExtensionsPath -eq '(none)') {
+            if ($data.ExtensionsPath -eq '(none)') {
                 $data.ExtensionsPath = ''
-            } Else {
+            } else {
                 $data.ExtensionsPath = $data.ExtensionsPath -replace '/',$directorySeparator
                 $data.ExtensionsPath = [System.IO.Path]::Combine($actualDirectoryPath, $data.ExtensionsPath)
                 $data.ExtensionsPath = $data.ExtensionsPath -replace [regex]::Escape("$directorySeparator.$directorySeparator"),$directorySeparator
@@ -314,16 +283,16 @@ Class PhpVersionInstalled : PhpVersion
     {
         $result = @()
         $envPath = $env:Path
-        If ($null -ne $envPath -and $envPath -ne '') {
+        if ($null -ne $envPath -and $envPath -ne '') {
             $donePaths = @{}
             $envPaths = $envPath -split [System.IO.Path]::PathSeparator
-            ForEach ($path in $envPaths) {
-                If ($path -ne '') {
+            foreach ($path in $envPaths) {
+                if ($path -ne '') {
                     $ep = Join-Path -Path $path -ChildPath 'php.exe'
-                    If (Test-Path -Path $ep -PathType Leaf) {
+                    if (Test-Path -Path $ep -PathType Leaf) {
                         $ep = (Get-Item -LiteralPath $ep).FullName
                         $key = $ep.ToLowerInvariant()
-                        If (-Not($donePaths.ContainsKey($key))) {
+                        if (-Not($donePaths.ContainsKey($key))) {
                             $donePaths[$key] = $true
                             $result += [PhpVersionInstalled]::FromPath($ep)
                         }
@@ -336,11 +305,11 @@ Class PhpVersionInstalled : PhpVersion
     [PhpVersionInstalled] static FromEnvironmentOne()
     {
         $found = [PhpVersionInstalled]::FromEnvironment()
-        If ($found.Count -eq 0) {
-            Throw "No PHP versions found in the current PATHs: use the -Path argument to specify the location of installed PHP"
+        if ($found.Count -eq 0) {
+            throw "No PHP versions found in the current PATHs: use the -Path argument to specify the location of installed PHP"
         }
-        If ($found.Count -gt 1) {
-            Throw "Multiple PHP versions found in the current PATHs: use the -Path argument to specify the location of installed PHP"
+        if ($found.Count -gt 1) {
+            throw "Multiple PHP versions found in the current PATHs: use the -Path argument to specify the location of installed PHP"
         }
         return $found[0]
     }

@@ -1,4 +1,4 @@
-Function New-TempDirectory
+function New-TempDirectory
 {
     <#
     .Synopsis
@@ -7,22 +7,22 @@ Function New-TempDirectory
     .Outputs
     string
     #>
-    Param (
+    param (
     )
-    Begin {
+    begin {
         $result = $null
     }
-    Process {
+    process {
         $tempContainer = [System.IO.Path]::GetTempPath()
-        For (;;) {
+        for (;;) {
             $result = Join-Path -Path $tempContainer -ChildPath ([System.IO.Path]::GetRandomFileName())
-            If (-Not(Test-Path -Path $result)) {
+            if (-Not(Test-Path -Path $result)) {
                 New-Item -Path $result -ItemType Directory | Out-Null
                 break
             }
         }
     }
-    End {
+    end {
         $result
     }
 }

@@ -1,4 +1,4 @@
-Function Get-PhpIniLine
+function Get-PhpIniLine
 {
     <#
     .Synopsis
@@ -10,24 +10,24 @@ Function Get-PhpIniLine
     .Outputs
     System.Array
     #>
-    Param (
+    param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to the php.ini (or to the folder containing it)')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path
     )
-    Begin {
+    begin {
         $lines = @()
     }
-    Process {
-        If (Test-Path -Path $Path -PathType Container) {
+    process {
+        if (Test-Path -Path $Path -PathType Container) {
             $Path = [System.IO.Path]::Combine($Path, 'php.ini')
         }
-        If (Test-Path -Path $Path -PathType Leaf) {
+        if (Test-Path -Path $Path -PathType Leaf) {
             $lines = Get-Content -Path $Path
         }
     }
-    End {
+    end {
         $lines
     }
 }
