@@ -22,7 +22,7 @@ environment:
     - TEST_NANOSERVER: yes
 
 cache:
-  - C:\downloads -> .appveyor.yml
+  - test\download-cache -> .appveyor.yml
   - '%ProgramFiles%\WindowsPowerShell\Modules\VcRedist -> .appveyor.yml'
   - '%ProgramFiles%\WindowsPowerShell\Modules\PSScriptAnalyzer -> .appveyor.yml'
   - '%ProgramFiles%\WindowsPowerShell\Modules\Pester -> .appveyor.yml'
@@ -34,7 +34,13 @@ install:
       if ($Env:TEST_NANOSERVER -ne 'yes') {
         .\test\setup.ps1
       } else {
-        docker build --rm --force-rm --file test\Nanoserver.Dockerfile --tag nanoserver/phpmanager .
+        if (-Not(Test-Path -LiteralPath .\test\docker-build)) {
+          New-Item -ItemType Directory -Path .\test\docker-build | Out-Null
+        }
+        Copy-Item -LiteralPath "$($Env:SystemRoot)\System32\vcruntime140.dll" -Destination .\test\docker-build\
+        Copy-Item -LiteralPath .\test\setup.ps1 -Destination .\test\docker-build\
+        docker build --rm --force-rm --file test\Nanoserver.Dockerfile --tag nanoserver/phpmanager .\test\docker-build\
+        Remove-Item -LiteralPath .\test\docker-build -Recurse
       }
 
 test_script:
