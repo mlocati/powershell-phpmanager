@@ -116,7 +116,7 @@ function Install-Php() {
         # Filter the list of available PHP versions, and get the latest one
         $versionToInstall = $null
         foreach ($searchReleaseState in $searchReleaseStates) {
-            $compatibleVersions = Get-PhpAvailableVersion -State $searchReleaseState | Where-Object { $_.FullVersion -match $rxSearchVersion } | Where-Object { $_.Architecture -eq $Architecture } | Where-Object { $_.ThreadSafe -eq $ThreadSafe }
+            $compatibleVersions = Get-PhpAvailableVersion -State $searchReleaseState | Where-Object { $_.FullVersion -match $rxSearchVersion -and $_.Architecture -eq $Architecture -and $_.ThreadSafe -eq $ThreadSafe }
             foreach ($compatibleVersion in $compatibleVersions) {
                 if ($null -eq $versionToInstall) {
                     $versionToInstall = $compatibleVersion
@@ -132,7 +132,7 @@ function Install-Php() {
             throw 'No PHP version matches the specified criterias'
         }
         # Install the found PHP version
-        Write-Output $('Installing PHP ' + $versionToInstall.DisplayName)
+        Write-Verbose $('Installing PHP ' + $versionToInstall.DisplayName)
         Install-PhpFromUrl -Url $versionToInstall.DownloadUrl -Path $Path -PhpVersion $versionToInstall -InstallVCRedist $InstallVC
         # Initialize the php.ini
         $iniPath = [System.IO.Path]::Combine($Path, 'php.ini');

@@ -31,16 +31,16 @@ function Uninstall-Php() {
             $confirmAutomaticallyFoundPhp = $false
         }
         if ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
-            Write-Output "The PHP installation has been found at $($phpVersion.ActualFolder)"
+            Write-Verbose "The PHP installation has been found at $($phpVersion.ActualFolder)"
             $confirmed = $false
             while (-Not($confirmed)) {
-                $answer = Read-Host -Prompt "Do you confirm removing this installation [use -ConfirmAuto to confirm autumatically]? [y/n]"
+                $answer = Read-Host -Prompt "Do you confirm removing PHP from $($phpVersion.ActualFolder) [use -ConfirmAuto to confirm autumatically]? [y/n]"
                 if ($answer -match '^\s*y') {
                     $confirmed = $true
                 } elseif ($answer -match '^\s*n') {
                     throw 'Operation aborted.'
                 } else {
-                    Write-Output 'Please answer with Y or N'
+                    Write-Error 'Please answer with Y or N' -ErrorAction Continue
                 }
             }
         }

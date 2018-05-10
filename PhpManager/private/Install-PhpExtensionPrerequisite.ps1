@@ -20,7 +20,7 @@ function Install-PhpExtensionPrerequisite() {
     begin {
     }
     process {
-        Write-Output ('Checking prerequisites for {0}' -f $Extension.Name)
+        Write-Verbose ('Checking prerequisites for {0}' -f $Extension.Name)
         switch ($Extension.Handle) {
             imagick {
                 $rxSearch = '/ImageMagick-[\d\.\-]+-vc' + $PhpVersion.VCVersion + '-' + $PhpVersion.Architecture + '\.zip$'
@@ -42,7 +42,7 @@ function Install-PhpExtensionPrerequisite() {
                 if ($null -eq $zipUrl) {
                     throw ('Unable to find the imagick package dependencies on {0} for {1}' -f $pageUrl, $PhpVersion.DisplayName)
                 }
-                Write-Output "Downloading and extracting $zipUrl"
+                Write-Verbose "Downloading and extracting $zipUrl"
                 $zipFile, $keepZipFile = Get-FileFromUrlOrCache -Url $zipUrl
                 try {
                     $tempFolder = New-TempDirectory

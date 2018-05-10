@@ -13,9 +13,9 @@ function Remove-PhpSwitcher
                 }
             }
             Set-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Value $null -Scope $switcher.Scope
-            Write-Output ('The PHP Switcher has been deleted (scope: ' + $switcher.Scope + ').')
+            Write-Verbose ('The PHP Switcher has been deleted (scope: ' + $switcher.Scope + ').')
         } else {
-            Write-Output 'No PHP Switcher is defined.'
+            Write-Verbose 'No PHP Switcher is defined.'
         }
     }
     end {

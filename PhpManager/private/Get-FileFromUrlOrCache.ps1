@@ -80,6 +80,7 @@ function Get-FileFromUrlOrCache
             $fullCachePath = Join-Path -Path $downloadCachePath -ChildPath $CachedFileName
         }
         if ($fullCachePath -ne '' -and (Test-Path -LiteralPath $fullCachePath -PathType Leaf)) {
+            Write-Verbose "Using cached file for $Url"
             $localFile = $fullCachePath
             $fromCache = $true
         } else {
@@ -90,7 +91,7 @@ function Get-FileFromUrlOrCache
                 } catch {
                     Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
                 }
-                Write-Debug "Downloading from $Url"
+                Write-Verbose "Downloading from $Url"
                 Invoke-WebRequest -UseBasicParsing $Url -OutFile $temporaryFile
                 if ($fullCachePath -ne '') {
                     Move-Item -LiteralPath $temporaryFile -Destination $fullCachePath

@@ -95,7 +95,7 @@ function Install-PhpExtension() {
                 if ($null -eq $availablePackageVersion) {
                     throw "No compatible Windows DLL found for PECL package $peclPackageHandle with a $MinimumStability minimum stability"
                 }
-                Write-Output ("Downloading PECL package {0} {1} from {2}" -f $peclPackageHandle, $availablePackageVersion.PackageVersion, $availablePackageVersion.PackageArchiveUrl)
+                Write-Verbose ("Downloading PECL package {0} {1} from {2}" -f $peclPackageHandle, $availablePackageVersion.PackageVersion, $availablePackageVersion.PackageArchiveUrl)
                 $zip, $keepZip = Get-FileFromUrlOrCache -Url $availablePackageVersion.PackageArchiveUrl
                 try {
                     $tempFolder = New-TempDirectory

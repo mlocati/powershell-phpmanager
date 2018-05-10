@@ -44,7 +44,7 @@ function Install-PhpFromUrl() {
                     $keepTemporaryFile = $false
                     throw
                 }
-                $exePath = Join-Path -Path $temporaryDirectory -ChildPath 'php.exe'
+                $exePath = Join-Path -Path $temporaryDirectory -ChildPath php.exe
                 if (-Not(Test-Path -Path $exePath -PathType Leaf)) {
                     throw "Unable to find php.exe in the downloaded archive"
                 }
@@ -80,11 +80,11 @@ function Install-PhpFromUrl() {
                             throw "The Visual C++ $redistName Redistributable seems to be missing: you have to manually install it (the VcRedist PowerShell module doesn't support it)"
                         }
                     }
-                    Write-Output "Downloading the Visual C++ $redistName Redistributable (it's required by this version of PHP)"
+                    Write-Verbose "Downloading the Visual C++ $redistName Redistributable (it's required by this version of PHP)"
                     $temporaryDirectory2 = New-TempDirectory
                     try {
                         $vcList | Get-VcRedist -Path $temporaryDirectory2
-                        Write-Output "Installing the Visual C++ $redistName Redistributable"
+                        Write-Verbose "Installing the Visual C++ $redistName Redistributable"
                         $currentUser = [System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()
                         if ($currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)) {
                             $vcList | Install-VcRedist -Path $temporaryDirectory2
