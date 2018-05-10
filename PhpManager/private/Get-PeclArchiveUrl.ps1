@@ -67,6 +67,11 @@ function Get-PeclArchiveUrl
                 if ($_.Exception -and $_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
                     continue
                 }
+            } catch [System.Net.Http.HttpRequestException] {
+                if ($_.Exception -and $_.Exception -and $_.Exception.Message -like '*404 (Not Found)*') {
+                    continue
+                }
+                throw
             }
             foreach ($link in $webResponse.Links) {
                 $linkUrl = [Uri]::new([Uri]$url, $link.Href).AbsoluteUri
