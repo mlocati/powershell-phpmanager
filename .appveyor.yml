@@ -39,7 +39,8 @@ install:
         }
         Copy-Item -LiteralPath "$($Env:SystemRoot)\System32\vcruntime140.dll" -Destination .\test\docker-build\
         Copy-Item -LiteralPath .\test\setup.ps1 -Destination .\test\docker-build\
-        docker build --rm --force-rm --file test\Nanoserver.Dockerfile --tag nanoserver/phpmanager .\test\docker-build\
+        Copy-Item -LiteralPath .\test\Nanoserver.Dockerfile -Destination .\test\docker-build\Dockerfile
+        docker build --rm --force-rm --tag nanoserver/phpmanager .\test\docker-build\
         Remove-Item -LiteralPath .\test\docker-build -Recurse
       }
 
