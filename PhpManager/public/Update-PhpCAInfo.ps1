@@ -45,6 +45,11 @@ function Update-PhpCAInfo() {
             throw "Unable to find your custom CA file $CustomCAPath"
         }
         Write-Output "Downloading CACert checksum file"
+        try {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
+        } catch {
+            Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
+        }
         $checksum = [System.Text.Encoding]::ASCII.GetString($(Invoke-WebRequest -Uri $Script:CACERT_CHECKSUM_URL).Content)
         Write-Output "Downloading CACert file"
         $cacertBytes = $(Invoke-WebRequest -Uri $Script:CACERT_PEM_URL).Content
