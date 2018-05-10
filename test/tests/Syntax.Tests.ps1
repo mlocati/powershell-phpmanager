@@ -1,6 +1,6 @@
 Describe 'Syntax' {
 
-    $testCases = Get-ChildItem -Path $Global:PHPMANAGER_FOLDER -Include *.ps1, *.psm1 -Recurse | ForEach-Object { @{file = $_} }
+    $testCases = Get-ChildItem -Path $Global:PHPMANAGER_MODULEPATH -Include *.ps1, *.psm1 -Recurse | ForEach-Object { @{file = $_} }
 
     It -Name '<file> should be a valid PowerShell script' -TestCases $testCases {
         param ($file)
