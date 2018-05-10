@@ -16,7 +16,7 @@ class PhpVersion : System.IComparable
     #>
     [ValidateNotNull()]
     [ValidateLength(1, [int]::MaxValue)]
-    [string] $DisplayVersion
+    [string] $FullVersion
     <#
     A string used to display the details of the version
     #>
@@ -69,12 +69,12 @@ class PhpVersion : System.IComparable
             $dv += 'RC' + $this.RC
             $cv += '.' + $this.RC
         }
-        $this.DisplayVersion = $dv
+        $this.FullVersion = $dv
         $this.ComparableVersion = [System.Version] $cv
         $this.Architecture = $data.Architecture
         $this.ThreadSafe = $data.ThreadSafe
         $this.VCVersion = $data.VCVersion
-        $dn = 'PHP ' + $this.DisplayVersion + ' ' + $this.Architecture
+        $dn = 'PHP ' + $this.FullVersion + ' ' + $this.Architecture
         if ($this.Architecture -eq $Script:ARCHITECTURE_32BITS) {
             $dn += ' (32-bit)'
         } elseif ($this.Architecture -eq $Script:ARCHITECTURE_64BITS) {
