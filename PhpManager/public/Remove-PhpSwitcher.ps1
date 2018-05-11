@@ -1,5 +1,8 @@
 function Remove-PhpSwitcher
 {
+    [OutputType()]
+    param (
+    )
     begin {
     }
     process {

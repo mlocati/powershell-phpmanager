@@ -7,6 +7,7 @@ function Get-PhpManagerConfigurationKey
     .Parameter Key
     The key of the configuration to be fetched.
     #>
+    [OutputType([object])]
     param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]

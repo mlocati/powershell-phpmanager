@@ -15,6 +15,7 @@ function Get-TemporaryFileWithExtension() {
     .Outputs
     string
     #>
+    [OutputType([string])]
     param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]

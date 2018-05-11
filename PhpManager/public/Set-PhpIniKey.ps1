@@ -44,6 +44,7 @@ function Set-PhpIniKey
     .Example
     Set-PhpIniKey 'default_charset' -Uncomment
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The key of the php.ini to set')]
         [ValidateNotNull()]

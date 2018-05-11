@@ -15,6 +15,7 @@ function Install-PhpFromUrl() {
     .Parameter InstallVCRedist
     Install the Visual C++ Redistributables if they are missing?
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The URL where the binary archive can be downloaded from')]
         [ValidateNotNull()]

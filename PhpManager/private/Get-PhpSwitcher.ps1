@@ -5,8 +5,11 @@ function Get-PhpSwitcher
     Gets the currently configured PHP Switcher (if configured).
 
     .Outputs
-    PSCustomObject|$null
+    PSObject|$null
     #>
+    [OutputType([psobject])]
+    param (
+    )
     begin {
         $result = $null
     }

@@ -19,6 +19,7 @@ function Initialize-PhpSwitcher
     Add-PhpToSwitcher 7.2 C:\PHP7.2
     Switch-Php 5.6
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path where PHP will be visible when switching to a PHP version')]
         [ValidateNotNull()]
@@ -30,7 +31,6 @@ function Initialize-PhpSwitcher
         [switch]$Force
     )
     begin {
-
     }
     process {
         $existingSwitcher = Get-PhpSwitcher

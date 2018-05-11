@@ -44,6 +44,7 @@ function Install-Php() {
     .Parameter Force
     Use this switch to enable installing PHP even if the destination directory already exists and it's not empty.
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The PHP version to be installed')]
         [ValidatePattern('^\d+(\.\d+)?(\.\d+)?(RC\d*)?$')]

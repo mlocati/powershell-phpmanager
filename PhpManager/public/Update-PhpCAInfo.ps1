@@ -19,6 +19,7 @@ function Update-PhpCAInfo() {
     .Outputs
     bool
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path of the PHP installation; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]

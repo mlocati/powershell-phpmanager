@@ -13,6 +13,7 @@ function Get-PhpExtension() {
     .Outputs
     System.Array
     #>
+    [OutputType([psobject[]])]
     param (
         [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path to the PHP installation (or the path to the php.exe file); if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]

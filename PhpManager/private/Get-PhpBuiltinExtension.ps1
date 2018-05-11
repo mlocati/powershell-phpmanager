@@ -13,6 +13,7 @@ function Get-PhpBuiltinExtension
     .Example
     Get-PhpBuiltinExtension -PhpVersion $phpVersion
     #>
+    [OutputType([psobject[]])]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want the extensions')]
         [ValidateNotNull()]

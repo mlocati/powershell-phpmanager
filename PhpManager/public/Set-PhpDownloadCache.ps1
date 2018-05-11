@@ -30,6 +30,7 @@ function Set-PhpDownloadCache
     .Example
     Set-PhpDownloadCache '' AllUsers
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $False, Position = 0, HelpMessage = 'The path to a local directory; if empty, the download cache will be disabled')]
         [string]$Path,

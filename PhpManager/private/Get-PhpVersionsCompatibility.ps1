@@ -13,6 +13,7 @@ function Get-PhpVersionsCompatibility
     .Outputs
     bool
     #>
+    [OutputType([bool])]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The first PhpVersion instance to compare')]
         [ValidateNotNull()]

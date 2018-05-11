@@ -23,6 +23,7 @@ function Enable-PhpExtension() {
     .Example
     Enable-PhpExtension gd C:\Path\To\Php
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The name (or the handle) of the PHP extension to be enabled')]
         [ValidateNotNull()]

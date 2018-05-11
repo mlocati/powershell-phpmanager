@@ -13,6 +13,7 @@ function Set-PhpManagerConfigurationKey
     .Parameter Scope
     Persist the value for 'CurrentUser' or for 'AllUsers'
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]

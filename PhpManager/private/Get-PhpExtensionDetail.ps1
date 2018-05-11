@@ -17,6 +17,8 @@ function Get-PhpExtensionDetail
     .Example
     Get-PhpExtensionDetail -PhpVersion $phpVersion -Path 'C:\Dev\PHP\ext\php_ext.dll'
     #>
+    [OutputType([psobject])]
+    [OutputType([psobject[]])]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want to inspect the extension(s)')]
         [ValidateNotNull()]

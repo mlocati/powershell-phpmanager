@@ -13,6 +13,7 @@ function Uninstall-Php() {
     .Parameter ConfirmAuto
     If -Path is omitted, specify this flag to assume that the PHP installation found in PATH is the correct one.
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path of the PHP installation; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]

@@ -9,6 +9,7 @@ function Install-PhpExtensionPrerequisite() {
     .Parameter Extension
     The PhpExtension instance representing the extension.
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]

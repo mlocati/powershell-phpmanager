@@ -17,6 +17,7 @@ function Remove-PhpFromSwitcher
     Add-PhpToSwitcher 7.2 C:\PHP7.2
     Remove-PhpFromSwitcher 5.6
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The symbolic name of the PHP installation to be removed from the PHP Switcher')]
         [ValidateNotNull()]

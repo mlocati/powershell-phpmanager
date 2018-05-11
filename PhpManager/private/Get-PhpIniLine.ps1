@@ -10,6 +10,7 @@ function Get-PhpIniLine
     .Outputs
     System.Array
     #>
+    [OutputType([string[]])]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to the php.ini (or to the folder containing it)')]
         [ValidateNotNull()]

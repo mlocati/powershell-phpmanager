@@ -10,6 +10,7 @@ function Move-PhpSwitcher
     .Example
     Move-PhpSwitcher C:\PHP
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The new path where PHP will be visible when switching to a PHP version')]
         [ValidateNotNull()]

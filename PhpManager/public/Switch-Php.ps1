@@ -16,6 +16,7 @@ function Switch-Php
     Add-PhpToSwitcher 7.2 C:\PHP7.2
     Switch-Php 5.6
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The symbolic name of the PHP installation to activate')]
         [ValidateNotNull()]

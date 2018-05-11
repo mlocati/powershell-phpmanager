@@ -13,6 +13,7 @@ function Get-Php() {
     .Outputs
     System.Array
     #>
+    [OutputType([psobject[]])]
     param (
         [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path where PHP is installed')]
         [string] $Path

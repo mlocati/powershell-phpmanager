@@ -22,6 +22,7 @@ function Install-PhpExtension() {
     The path of the PHP installation.
     If omitted we'll use the one found in the PATH environment variable.
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The name of the PHP extension to be downloaded, or the path to an already downloaded file')]
         [ValidateNotNull()]

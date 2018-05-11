@@ -10,6 +10,7 @@ function Get-PhpDownloadCache
     .Outputs
     [string]
     #>
+    [OutputType([string])]
     param (
     )
     begin {

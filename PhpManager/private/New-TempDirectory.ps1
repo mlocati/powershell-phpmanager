@@ -7,6 +7,7 @@ function New-TempDirectory
     .Outputs
     string
     #>
+    [OutputType([string])]
     param (
     )
     begin {

@@ -13,6 +13,7 @@ function Get-PhpExtensionHandle
     .Example
     Get-PhpExtensionHandle -Name 'Zend OPcache'
     #>
+    [OutputType([string])]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The name of the PHP extension')]
         [ValidateNotNull()]
