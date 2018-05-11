@@ -79,14 +79,14 @@ function Get-PhpExtensionDetail
                         throw "Failed to inspect extension: $inspectorResult"
                     }
                 } else {
-                    $result1 = New-PhpExtension -Dictionary @{
+                    $result1 = [PhpExtension]::new(@{
                         'Type' = $match.Matches.Groups[1].Value;
                         'State' = $Script:EXTENSIONSTATE_UNKNOWN;
                         'Name' = $match.Matches.Groups[2].Value;
                         'Handle' = Get-PhpExtensionHandle -Name $match.Matches.Groups[2].Value;
                         'Version' = $match.Matches.Groups[3].Value;
                         'Filename' = $match.Matches.Groups[4].Value;
-                    }
+                    })
                     if ($inspectingSingleFile) {
                         $result = $result1;
                     } else {

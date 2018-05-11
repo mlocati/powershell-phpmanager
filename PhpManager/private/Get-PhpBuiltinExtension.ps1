@@ -30,7 +30,7 @@ function Get-PhpBuiltinExtension
             $extensionHandle = Get-PhpExtensionHandle -Name $extensionName
             if (-Not($alreadyExtensions.ContainsKey($extensionHandle))) {
                 $alreadyExtensions[$extensionHandle] = $true
-                $extensions += New-PhpExtension -Dictionary @{'Name' = $extensionName; 'Handle' = $extensionHandle; 'Type' = $Script:EXTENSIONTYPE_BUILTIN; 'State' = $Script:EXTENSIONSTATE_BUILTIN}
+                $extensions += [PhpExtension]::new(@{'Name' = $extensionName; 'Handle' = $extensionHandle; 'Type' = $Script:EXTENSIONTYPE_BUILTIN; 'State' = $Script:EXTENSIONSTATE_BUILTIN})
             }
         }
     }

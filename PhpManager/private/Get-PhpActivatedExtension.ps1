@@ -47,7 +47,7 @@ function Get-PhpActivatedExtension
                     if ($alreadyExtensions.ContainsKey($extensionHandle)) {
                         $alreadyExtensions[$extensionHandle].Type = $type
                     } else {
-                        $extension = New-PhpExtension -Dictionary @{'Name' = $extensionName; 'Handle' = $extensionHandle; 'Type' = $type; 'State' = $Script:EXTENSIONSTATE_ENABLED}
+                        $extension = [PhpExtension]::new(@{'Name' = $extensionName; 'Handle' = $extensionHandle; 'Type' = $type; 'State' = $Script:EXTENSIONSTATE_ENABLED})
                         $alreadyExtensions[$extensionHandle] = $extension
                         $extensions += $extension
                     }

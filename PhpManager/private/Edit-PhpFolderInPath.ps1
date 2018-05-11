@@ -16,6 +16,7 @@ function Edit-PhpFolderInPath
     .Parameter CurrentProcess
     When Operation is Add: specify this switch to add Path to the current PATH environment variable.
     #>
+    [OutputType()]
     param (
         [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]
