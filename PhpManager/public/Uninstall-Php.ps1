@@ -49,7 +49,7 @@ function Uninstall-Php() {
         if ($phpVersion.Folder -ne $phpVersion.ActualFolder) {
             Edit-PhpFolderInPath -Operation Remove -Path $phpVersion.Folder
         }
-        Write-Output ($phpVersion.DisplayName + ' has been uninstalled from ' + $phpVersion.ActualFolder)
+        Write-Verbose ($phpVersion.DisplayName + ' has been uninstalled from ' + $phpVersion.ActualFolder)
     }
     end {
     }

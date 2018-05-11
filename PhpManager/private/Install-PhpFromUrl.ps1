@@ -37,7 +37,7 @@ function Install-PhpFromUrl() {
         try {
             $temporaryDirectory = New-TempDirectory
             try {
-                Write-Debug "Extracting $temporaryFile to temporary directory"
+                Write-Verbose "Extracting $temporaryFile to temporary directory"
                 try {
                     Expand-Archive -LiteralPath $temporaryFile -DestinationPath $temporaryDirectory -Force
                 } catch {
@@ -109,7 +109,7 @@ function Install-PhpFromUrl() {
                     Write-Debug 'Failed to remove temporary folder'
                 }
             }
-            Write-Debug "Extracting $temporaryFile to destination directory"
+            Write-Verbose "Extracting $temporaryFile to destination directory"
             Expand-Archive -LiteralPath $temporaryFile -DestinationPath $Path -Force
             try {
                 $mostRecentApacheFile = $null

@@ -44,16 +44,16 @@ function Update-PhpCAInfo() {
         } elseif (-Not(Test-Path -Path $CustomCAPath -PathType Leaf)) {
             throw "Unable to find your custom CA file $CustomCAPath"
         }
-        Write-Output "Downloading CACert checksum file"
+        Write-Verbose "Downloading CACert checksum file"
         try {
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
         } catch {
             Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
         }
         $checksum = [System.Text.Encoding]::ASCII.GetString($(Invoke-WebRequest -Uri $Script:CACERT_CHECKSUM_URL).Content)
-        Write-Output "Downloading CACert file"
+        Write-Verbose "Downloading CACert file"
         $cacertBytes = $(Invoke-WebRequest -Uri $Script:CACERT_PEM_URL).Content
-        Write-Output "Checking CACert file"
+        Write-Verbose "Checking CACert file"
         $stream = New-Object System.IO.MemoryStream
         try {
             $streamWriter = New-Object -TypeName System.IO.BinaryWriter -ArgumentList @($stream)
@@ -72,7 +72,7 @@ function Update-PhpCAInfo() {
             throw "The checksum of the downloaded CA certificates is wrong!"
         }
         if ($CustomCAPath -ne '') {
-            Write-Output "Appending custom CA file"
+            Write-Verbose "Appending custom CA file"
             $headerTitle = 'Custom CA from {0}' -f $CustomCAPath
             $headerTitle = [System.Text.Encoding]::ASCII.GetString([System.Text.Encoding]::ASCII.GetBytes($headerTitle))
             $header = "`n" + $headerTitle + "`n" + '=' * $headerTitle.Length + "`n"
@@ -92,7 +92,7 @@ function Update-PhpCAInfo() {
                 $stream.Dispose()
             }
         }
-        Write-Output "Saving CA file"
+        Write-Verbose "Saving CA file"
         if ($null -eq $CAPath -or $CAPath -eq '') {
             $CAPath = Join-Path -Path $installedVersion.ActualFolder -ChildPath ssl | Join-Path -ChildPath cacert.pem
         } else {
@@ -106,17 +106,17 @@ function Update-PhpCAInfo() {
         $iniPath = $phpVersion.IniPath
         $iniValue = Get-PhpIniKey -Key 'curl.cainfo' -Path $iniPath
         if ($iniValue -eq $CAPath) {
-            Write-Output "curl.cainfo did not require to be updated"
+            Write-Verbose "curl.cainfo did not require to be updated"
         } else {
             Set-PhpIniKey -Key 'curl.cainfo' -Value $CAPath -Path $iniPath
-            Write-Output "curl.cainfo updated in php.ini"
+            Write-Verbose "curl.cainfo updated in php.ini"
         }
         $iniValue = Get-PhpIniKey -Key 'openssl.cafile' -Path $iniPath
         if ($iniValue -eq $CAPath) {
-            Write-Output "openssl.cafile did not require to be updated"
+            Write-Verbose "openssl.cafile did not require to be updated"
         } else {
             Set-PhpIniKey -Key 'openssl.cafile' -Value $CAPath -Path $iniPath
-            Write-Output "openssl.cafile updated in php.ini"
+            Write-Verbose "openssl.cafile updated in php.ini"
         }
     }
     end {

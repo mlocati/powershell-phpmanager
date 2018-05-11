@@ -128,15 +128,15 @@ function Install-PhpExtension() {
             $oldExtension = Get-PhpExtension -Path $phpVersion.ExecutablePath | Where-Object {$_.Handle -eq $newExtension.Handle}
             if ($null -ne $oldExtension) {
                 if ($oldExtension.Type -eq $Script:EXTENSIONTYPE_BUILTIN) {
-                    Write-Output ("'{0}' is a builtin extension" -f $oldExtension.Name)
+                    Write-Verbose ("'{0}' is a builtin extension" -f $oldExtension.Name)
                 }
-                Write-Output ("Upgrading extension '{0}' from version {1} to version {2}" -f $oldExtension.Name, $oldExtension.Version, $newExtension.Version)
+                Write-Verbose ("Upgrading extension '{0}' from version {1} to version {2}" -f $oldExtension.Name, $oldExtension.Version, $newExtension.Version)
                 Move-Item -Path $dllPath -Destination $oldExtension.Filename -Force
                 if ($oldExtension.State -eq $Script:EXTENSIONSTATE_DISABLED -and -Not($DontEnable)) {
                     Enable-PhpExtension -Extension $oldExtension.Name -Path $phpVersion.ExecutablePath
                 }
             } else {
-                Write-Output ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
+                Write-Verbose ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
                 Install-PhpExtensionPrerequisite -PhpVersion $phpVersion -Extension $newExtension
                 $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($dllPath))
                 Move-Item -Path $dllPath -Destination $newExtensionFilename

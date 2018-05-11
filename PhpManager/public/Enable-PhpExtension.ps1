@@ -67,9 +67,9 @@ function Enable-PhpExtension() {
             }
             $extensionDir = $extensionDir.TrimEnd('/', '\') + [System.IO.Path]::DirectorySeparatorChar
             if ($extensionToEnable.State -eq $Script:EXTENSIONSTATE_BUILTIN) {
-                Write-Output ('The extension "' + $extensionToEnable.Name + '" is builtin: it''s enabled by default')
+                Write-Verbose ('The extension "' + $extensionToEnable.Name + '" is builtin: it''s enabled by default')
             } elseif ($extensionToEnable.State -eq $Script:EXTENSIONSTATE_ENABLED) {
-                Write-Output ('The extension "' + $extensionToEnable.Name + '" is already enabled')
+                Write-Verbose ('The extension "' + $extensionToEnable.Name + '" is already enabled')
             } elseif ($extensionToEnable.State -ne $Script:EXTENSIONSTATE_DISABLED) {
                 throw ('Unknown extension state: "' + $extensionToEnable.State + '"')
             } else {
@@ -118,7 +118,7 @@ function Enable-PhpExtension() {
                 }
                 Set-PhpIniLine -Path $iniPath -Lines $newIniLines
                 $extensionToEnable.State = $Script:EXTENSIONSTATE_ENABLED
-                Write-Output ('The extension ' + $extensionToEnable.Name + ' v' + $extensionToEnable.Version + ' has been enabled')
+                Write-Verbose ('The extension ' + $extensionToEnable.Name + ' v' + $extensionToEnable.Version + ' has been enabled')
                 $iniLines = $newIniLines
             }
         }
