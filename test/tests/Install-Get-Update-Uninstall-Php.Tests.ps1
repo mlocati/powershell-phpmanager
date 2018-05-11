@@ -1,8 +1,8 @@
 Describe 'Install-Get-Update-Uninstall-Php' {
 
     Mock -ModuleName PhpManager Get-PhpDownloadCache { return Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath download-cache }
+    $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid
     It 'should install/get/update/remove PHP' {
-        $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid
         if (Test-Path -LiteralPath $phpPath) {
             Remove-Item -LiteralPath $phpPath -Recurse -Force
         }
@@ -46,6 +46,28 @@ Describe 'Install-Get-Update-Uninstall-Php' {
             $updatedPhpVersion.ExtensionsPath | Should -BeExactly (Join-Path -Path $phpPath -ChildPath 'ext')
             Uninstall-Php -Path $phpPath
             $phpPath | Should -Not -Exist
+        } finally {
+            try {
+                if (Test-Path -LiteralPath $phpPath) {
+                    Remove-Item -LiteralPath $phpPath -Recurse -Force
+                }
+            } catch {
+            }
+        }
+    }
+    It 'should use the configured initial php.ini' {
+        if (Test-Path -LiteralPath $phpPath) {
+            Remove-Item -LiteralPath $phpPath -Recurse -Force
+        }
+        try {
+            Install-Php -Version 7.1.0 -Architecture x64 -ThreadSafe $true -Path $phpPath
+            Get-PhpIniKey -Key display_errors -Path $phpPath | Should -BeNullOrEmpty
+            Uninstall-Php -Path $phpPath
+            Install-Php -Version 7.1.0 -Architecture x64 -ThreadSafe $true -Path $phpPath -InitialPhpIni Development
+            Get-PhpIniKey -Key display_errors -Path $phpPath | Should -BeExactly 'On'
+            Uninstall-Php -Path $phpPath
+            Install-Php -Version 7.1.0 -Architecture x64 -ThreadSafe $true -Path $phpPath -InitialPhpIni Production
+            Get-PhpIniKey -Key display_errors -Path $phpPath | Should -BeExactly 'Off'
         } finally {
             try {
                 if (Test-Path -LiteralPath $phpPath) {
