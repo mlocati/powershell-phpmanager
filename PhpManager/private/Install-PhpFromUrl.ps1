@@ -50,7 +50,7 @@ function Install-PhpFromUrl() {
                     throw "Unable to find php.exe in the downloaded archive"
                 }
                 & $exePath @('-n', '-v') | Out-Null
-                if ($LASTEXITCODE -eq $Script:STATUS_DLL_NOT_FOUND) {
+                if ($LASTEXITCODE -eq $Script:STATUS_DLL_NOT_FOUND -or $LASTEXITCODE -eq $Script:ENTRYPOINT_NOT_FOUND) {
                     switch ($PhpVersion.VCVersion) {
                         6 { $redistName = '6' } # PHP 5.2, PHP 5.3
                         7 { $redistName = '2002' }
