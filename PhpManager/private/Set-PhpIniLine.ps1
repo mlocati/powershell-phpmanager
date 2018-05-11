@@ -12,13 +12,13 @@ function Set-PhpIniLine
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to the php.ini (or to the folder containing it)')]
+        [Parameter(Mandatory = $True, Position = 0)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path,
-        [Parameter(Mandatory = $True, Position = 1, HelpMessage = 'The new lines to be added to the php.ini')]
+        [Parameter(Mandatory = $False, Position = 1)]
         [ValidateNotNull()]
-        [System.Array]$Lines
+        [string[]]$Lines
     )
     begin {
     }
