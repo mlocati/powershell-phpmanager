@@ -49,7 +49,7 @@ function Install-PhpExtensionPrerequisite() {
                     $tempFolder = New-TempDirectory
                     try {
                         try {
-                            Expand-Archive -LiteralPath $zipFile -DestinationPath $tempFolder
+                            Expand-ArchiveWith7Zip -ArchivePath $zipFile -DestinationPath $tempFolder
                         } catch {
                             $keepZipFile = $false
                             throw

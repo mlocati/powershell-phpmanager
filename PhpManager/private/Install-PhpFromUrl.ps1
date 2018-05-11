@@ -40,7 +40,7 @@ function Install-PhpFromUrl() {
             try {
                 Write-Verbose "Extracting $temporaryFile to temporary directory"
                 try {
-                    Expand-Archive -LiteralPath $temporaryFile -DestinationPath $temporaryDirectory -Force
+                    Expand-ArchiveWith7Zip -ArchivePath $temporaryFile -DestinationPath $temporaryDirectory -Overwrite
                 } catch {
                     $keepTemporaryFile = $false
                     throw
@@ -111,7 +111,7 @@ function Install-PhpFromUrl() {
                 }
             }
             Write-Verbose "Extracting $temporaryFile to destination directory"
-            Expand-Archive -LiteralPath $temporaryFile -DestinationPath $Path -Force
+            Expand-ArchiveWith7Zip -ArchivePath $temporaryFile -DestinationPath $Path -Overwrite
             try {
                 $mostRecentApacheFile = $null
                 $mostRecentApacheFileVersion = $null

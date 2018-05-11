@@ -100,7 +100,7 @@ function Install-PhpExtension() {
                 $zip, $keepZip = Get-FileFromUrlOrCache -Url $availablePackageVersion.PackageArchiveUrl
                 try {
                     $tempFolder = New-TempDirectory
-                    Expand-Archive -LiteralPath $zip -DestinationPath $tempFolder
+                    Expand-ArchiveWith7Zip -ArchivePath $zip -DestinationPath $tempFolder
                     $phpDlls = @(Get-ChildItem -Path $tempFolder\php_*.dll -File -Depth 0)
                     if ($phpDlls.Count -eq 0) {
                         $phpDlls = @(Get-ChildItem -Path $tempFolder\php_*.dll -File -Depth 1)
