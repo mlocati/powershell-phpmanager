@@ -53,7 +53,7 @@ class PhpVersion : System.IComparable
     - ThreadSafe: required
     - VCVersion: required
     #>
-    hidden PhpVersion([Hashtable] $data)
+    hidden PhpVersion([hashtable] $data)
     {
         $this.Version = $data.Version
         if ($data.ContainsKey('RC') -and $data.RC -ne '') {
@@ -136,7 +136,7 @@ class PhpVersionDownloadable : PhpVersion
     - ReleaseState: required
     - DownloadUrl: required
     #>
-    hidden PhpVersionDownloadable([Hashtable] $data) : base($data)
+    hidden PhpVersionDownloadable([hashtable] $data) : base($data)
     {
         $this.ReleaseState = $data.ReleaseState
         $this.DownloadUrl = $data.DownloadUrl
@@ -182,7 +182,7 @@ class PhpVersionInstalled : PhpVersion
     - IniPath: required
     - ExtensionsPath: optional
     #>
-    hidden PhpVersionInstalled([Hashtable] $data) : base($data)
+    hidden PhpVersionInstalled([hashtable] $data) : base($data)
     {
         $this.Folder = (Split-Path -LiteralPath $data.ExecutablePath).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
         $this.ActualFolder = $data.ActualFolder.TrimEnd([System.IO.Path]::DirectorySeparatorChar)

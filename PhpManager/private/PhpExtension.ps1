@@ -50,7 +50,7 @@ class PhpExtension
     - Version: optional
     - Filename: optional
     #>
-    hidden PhpExtension([Hashtable] $data)
+    hidden PhpExtension([hashtable] $data)
     {
         $this.Type = $data.Type
         $this.State = $data.State
