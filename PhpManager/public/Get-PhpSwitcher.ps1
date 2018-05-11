@@ -39,7 +39,7 @@ function Get-PhpSwitcher
                         Write-Debug $_.Exception.Message
                     }
                 }
-                $result = [PhpSwitcher]::new($data)
+                $result = New-PhpSwitcher -Data $data
             }
         }
     }

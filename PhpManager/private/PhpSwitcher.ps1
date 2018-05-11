@@ -21,17 +21,4 @@ class PhpSwitcher
     [hashtable]
     [ValidateNotNull()]
     $Targets
-    <#
-    Initialize the instance.
-    Keys for $data:
-    - scope: required
-    - alias: required
-    - targets: required
-    #>
-    hidden PhpSwitcher([hashtable] $data)
-    {
-        $this.Scope = $data.scope
-        $this.Alias = $data.alias
-        $this.Targets = $data.targets
-    }
 }
