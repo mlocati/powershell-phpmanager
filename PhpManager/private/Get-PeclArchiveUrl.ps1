@@ -63,13 +63,14 @@ function Get-PeclArchiveUrl
         foreach ($url in $urls) {
             try {
                 $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $url
-            } catch [System.Net.WebException] {
-                if ($_.Exception -and $_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
-                    continue
-                }
-            } catch [System.Net.Http.HttpRequestException] {
-                if ($_.Exception -and $_.Exception -and $_.Exception.Message -like '*404 (Not Found)*') {
-                    continue
+            } catch {
+                if ($_.Exception) {
+                    if ($_.Exception.GetType().FullName -eq 'System.Net.WebException' -and $_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
+                        continue
+                    }
+                    if ($_.Exception.GetType().FullName -eq 'System.Net.Http.HttpRequestException' -and $_.Exception.Message -and $_.Exception.Message -like '*404 (Not Found)*') {
+                        continue
+                    }
                 }
                 throw
             }
