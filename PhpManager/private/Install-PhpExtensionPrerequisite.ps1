@@ -16,7 +16,7 @@ function Install-PhpExtensionPrerequisite() {
         [PhpVersionInstalled] $PhpVersion,
         [Parameter(Mandatory = $True, Position = 1)]
         [ValidateNotNull()]
-        [PhpVersionInstalled] $Extension
+        [PhpExtension] $Extension
     )
     begin {
     }
