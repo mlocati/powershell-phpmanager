@@ -95,7 +95,7 @@ function Update-PhpCAInfo() {
         }
         Write-Verbose "Saving CA file"
         if ($null -eq $CAPath -or $CAPath -eq '') {
-            $CAPath = Join-Path -Path $installedVersion.ActualFolder -ChildPath ssl | Join-Path -ChildPath cacert.pem
+            $CAPath = Join-Path -Path $phpVersion.ActualFolder -ChildPath ssl | Join-Path -ChildPath cacert.pem
         } else {
             $CAPath = [System.IO.Path]::GetFullPath($CAPath)
        }
