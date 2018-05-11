@@ -23,7 +23,7 @@ function Get-PhpIniKey
     .Example
     Get-PhpIniKey 'default_charset' 'C:\Dev\PHP\php.exe'
     #>
-    [OutputType([Nullable[string]])]
+    [OutputType([string])]
     param (
         [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The key of the php.ini to get')]
         [ValidateNotNull()]
