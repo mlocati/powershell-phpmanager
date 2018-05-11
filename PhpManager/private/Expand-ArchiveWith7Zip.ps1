@@ -45,7 +45,7 @@ function Expand-ArchiveWith7Zip
         $sevenZipArguments += '-bse1' # error messages -> stdout
         $sevenZipArguments += '-bsp0' # progress information -> disabled
         $sevenZipArguments += '-bb0' # disable log
-        $sevenZipArguments += '-bd' #  disable progress indicator
+        $sevenZipArguments += '-bd' # disable progress indicator
         $sevenZipArguments += '-o' + $DestinationPath # set output directory
         $sevenZipArguments += '-y' # assume Yes on all queries
         if ($Overwrite) {
