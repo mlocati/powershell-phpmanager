@@ -89,6 +89,11 @@ Then, you can add to the PHP Switcher the PHP versions you installed:
 Add-PhpToSwitcher -Name 5.6 -Path C:\Dev\PHP5.6
 Add-PhpToSwitcher -Name 7.2 -Path C:\Dev\PHP7.2
 ```
+You can get the details about the configured PHP Switcher with the `Get-PhpSwitcher` command:
+```powershell
+Get-PhpSwitcher
+(Get-PhpSwitcher).Targets
+```
 Once you have done that, you can switch the current PHP version as easily as calling the `Switch-Php` command.  
 Here's a sample session:
 ```powershell
