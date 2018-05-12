@@ -80,10 +80,10 @@ function Update-Php() {
             $updated = $false
         } else {
             if (-Not($Force) -and $bestNewVersion.CompareTo($installedVersion) -le 0) {
-                Write-Verbose "No new version available (latest version is $($bestNewVersion.FullVersion)"
+                Write-Verbose "No new version available (latest version is $($bestNewVersion.FullVersion))"
                 $updated = $false
             } else {
-                Write-Verbose "Installing new version: $($bestNewVersion.DisplayName)"
+                Write-Verbose "Installing new version $($bestNewVersion.DisplayName) over $($installedVersion.DisplayName)"
                 Install-PhpFromUrl -Url $bestNewVersion.DownloadUrl -Path $installedVersion.ActualFolder -PhpVersion $bestNewVersion -InstallVCRedist $false
                 $updated = $true
             }
