@@ -51,9 +51,9 @@
         } catch {
             Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
         }
-        $checksum = [System.Text.Encoding]::ASCII.GetString($(Invoke-WebRequest -Uri $Script:CACERT_CHECKSUM_URL).Content)
+        $checksum = [System.Text.Encoding]::ASCII.GetString($(Invoke-WebRequest -UseBasicParsing -Uri $Script:CACERT_CHECKSUM_URL).Content)
         Write-Verbose "Downloading CACert file"
-        $cacertBytes = $(Invoke-WebRequest -Uri $Script:CACERT_PEM_URL).Content
+        $cacertBytes = $(Invoke-WebRequest -UseBasicParsing -Uri $Script:CACERT_PEM_URL).Content
         Write-Verbose "Checking CACert file"
         $stream = New-Object System.IO.MemoryStream
         try {
