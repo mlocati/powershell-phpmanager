@@ -53,25 +53,23 @@ function Disable-PhpExtension() {
         $extensionsToDisable = @()
         foreach ($wantedExtension in $Extension) {
             $foundExtensions = @($allExtensions | Where-Object { $_.Name -like $wantedExtension })
-            if ($foundExtensions.Count -ne 1) {
+            if ($foundExtensions.Count -eq 0) {
                 $foundExtensions = @($allExtensions | Where-Object { $_.Handle -like $wantedExtension })
                 if ($foundExtensions.Count -eq 0) {
                     throw "Unable to find a locally available extension with name (or handle) `"$wantedExtension`": use the Enab-PhpExtension to download it"
                 }
-                if ($foundExtensions.Count -ne 1) {
-                    throw "Multiple extensions match the name (or handle) `"$wantedExtension`""
+            }
+            foreach ($extensionToDisable in $foundExtensions) {
+                if ($extensionToDisable.State -eq $Script:EXTENSIONSTATE_BUILTIN) {
+                    throw ('The extension "' + $extensionToDisable.Name + '" is builtin: it can''t be disabled')
                 }
-            }
-            $extensionToDisable = $foundExtensions[0]
-            if ($extensionToDisable.State -eq $Script:EXTENSIONSTATE_BUILTIN) {
-                throw ('The extension "' + $extensionToDisable.Name + '" is builtin: it can''t be disabled')
-            }
-            if ($extensionToDisable.State -eq $Script:EXTENSIONSTATE_DISABLED) {
-                Write-Verbose ('The extension "' + $extensionToDisable.Name + '" is already disabled')
-            } elseif ($extensionToDisable.State -ne $Script:EXTENSIONSTATE_ENABLED) {
-                throw ('Unknown extension state: "' + $extensionToDisable.State + '"')
-            } else {
-                $extensionsToDisable += $extensionToDisable
+                if ($extensionToDisable.State -eq $Script:EXTENSIONSTATE_DISABLED) {
+                    Write-Verbose ('The extension "' + $extensionToDisable.Name + '" is already disabled')
+                } elseif ($extensionToDisable.State -ne $Script:EXTENSIONSTATE_ENABLED) {
+                    throw ('Unknown extension state: "' + $extensionToDisable.State + '"')
+                } else {
+                    $extensionsToDisable += $extensionToDisable
+                }
             }
         }
         if ($extensionsToDisable) {
@@ -109,13 +107,12 @@ function Disable-PhpExtension() {
                         }
                     }
                 }
-                if (-Not($disabled)) {
-                    throw "The entry in the php.ini file has not been found (?)"
+                if ($disabled) {
+                    Set-PhpIniLine -Path $iniPath -Lines $newIniLines
+                    $extensionToDisable.State = $Script:EXTENSIONSTATE_ENABLED
+                    Write-Verbose ('The extension ' + $extensionToDisable.Name + ' v' + $extensionToDisable.Version + ' has been disabled')
+                    $iniLines = $newIniLines
                 }
-                Set-PhpIniLine -Path $iniPath -Lines $newIniLines
-                $extensionToDisable.State = $Script:EXTENSIONSTATE_ENABLED
-                Write-Verbose ('The extension ' + $extensionToDisable.Name + ' v' + $extensionToDisable.Version + ' has been disabled')
-                $iniLines = $newIniLines
             }
         }
     }

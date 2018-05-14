@@ -45,14 +45,22 @@ function Enable-PhpExtension() {
         $extensionsToEnable = @()
         $allExtensions = Get-PhpExtension -Path $phpVersion.ExecutablePath
         foreach ($wantedExtension in $Extension) {
-            $foundExtensions = @($allExtensions | Where-Object { $_.Name -like $wantedExtension })
+            $match = $wantedExtension | Select-String -Pattern '^([^:]*)(?::(.*))?$'
+            $wantedExtensionName = $match.Matches.Groups[1].Value
+            $wantedExtensionVersion = $match.Matches.Groups[2].Value
+            $foundExtensions = @($allExtensions | Where-Object { $_.Name -like $wantedExtensionName -and $_.Version -like ($wantedExtensionVersion + '*') })
             if ($foundExtensions.Count -ne 1) {
-                $foundExtensions = @($allExtensions | Where-Object { $_.Handle -like $wantedExtension })
+                $foundExtensions = @($allExtensions | Where-Object { $_.Handle -like $wantedExtensionName -and $_.Version -like ($wantedExtensionVersion + '*') })
                 if ($foundExtensions.Count -eq 0) {
                     throw "Unable to find a locally available extension with name (or handle) `"$Extension`": use the Install-PhpExtension to download it"
                 }
                 if ($foundExtensions.Count -ne 1) {
-                    throw "Multiple extensions match the name (or handle) `"$Extension`""
+                    $msg = "Multiple extensions match the name (or handle) `"$Extension`":"
+                    foreach ($foundExtension in $foundExtensions) {
+                        $msg += "`n- handle: $($foundExtension.Handle) version $($foundExtension.Version)"
+                    }
+                    $msg += "`nYou can filter the extension to enable by adding :version to the -Extension parameter (example: `"-Extension '$($foundExtension.Handle):$($foundExtension.Version)'`")"
+                    throw $msg
                 }
             }
             $extensionsToEnable += $foundExtensions[0]

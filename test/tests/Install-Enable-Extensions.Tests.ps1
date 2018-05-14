@@ -58,6 +58,28 @@ Describe 'Install-Enable-Extensions' {
             $imagick.Type | Should -BeExactly 'Php'
             $imagick.State | Should -BeExactly 'Disabled'
         }
+        It -Name 'should handle multiple extension versions' {
+            $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid
+            Install-Php -Version 7.1 -Architecture x64 -ThreadSafe $true -Path $phpPath
+            $phpVersion = Get-Php -Path $phpPath
+            try {
+                Install-PhpExtension -Path $phpPath -Extension xdebug -Version 2.6 -DontEnable
+                Move-Item -LiteralPath (Join-Path -Path $phpVersion.ExtensionsPath -ChildPath 'php_xdebug.dll') -Destination (Join-Path -Path $phpVersion.ExtensionsPath -ChildPath 'php_xdebug-2.6')
+                Install-PhpExtension -Path $phpPath -Extension xdebug -Version 2.7 -MinimumStability alpha -DontEnable
+                Move-Item -LiteralPath (Join-Path -Path $phpVersion.ExtensionsPath -ChildPath 'php_xdebug.dll') -Destination (Join-Path -Path $phpVersion.ExtensionsPath -ChildPath 'php_xdebug-2.7')
+                Move-Item -LiteralPath (Join-Path -Path $phpVersion.ExtensionsPath -ChildPath 'php_xdebug-2.6') -Destination (Join-Path -Path $phpVersion.ExtensionsPath -ChildPath 'php_xdebug-2.6.dll')
+                Move-Item -LiteralPath (Join-Path -Path $phpVersion.ExtensionsPath -ChildPath 'php_xdebug-2.7') -Destination (Join-Path -Path $phpVersion.ExtensionsPath -ChildPath 'php_xdebug-2.7.dll')
+                { Enable-PhpExtension -Path $phpPath -Extension xdebug } | Should -Throw
+                { Enable-PhpExtension -Path $phpPath -Extension 'xdebug:2.6' } | Should -Not -Throw
+                Disable-PhpExtension -Path $phpPath -Extension xdebug
+                { Enable-PhpExtension -Path $phpPath -Extension 'xdebug:2.7' } | Should -Not -Throw
+            } finally {
+                try {
+                    Remove-Item -LiteralPath $phpPath -Recurse
+                } catch {
+                }
+            }
+        }
     } finally {
         foreach ($testCase in $testCases) {
             if (Test-Path -LiteralPath $testCase.path) {
