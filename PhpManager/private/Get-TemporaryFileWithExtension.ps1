@@ -1,4 +1,4 @@
-function Get-TemporaryFileWithExtension() {
+﻿function Get-TemporaryFileWithExtension() {
     <#
     .Synopsis
     Creates a new empty temporary file with the specified file extension.

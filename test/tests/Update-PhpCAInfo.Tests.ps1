@@ -1,4 +1,4 @@
-Describe 'Update-PhpCAInfo' {
+﻿Describe 'Update-PhpCAInfo' {
 
     Mock -ModuleName PhpManager Get-PhpDownloadCache { return Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath download-cache }
 

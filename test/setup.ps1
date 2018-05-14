@@ -1,4 +1,4 @@
-Write-Host "Setting up test dependencies"
+﻿Write-Host "Setting up test dependencies"
 
 Write-Host " - PowerShell edition: $($PSVersionTable.PSEdition)"
 Write-Host " - PowerShell version: $($PSVersionTable.PSVersion.ToString())"

@@ -1,4 +1,4 @@
-function Get-PhpSwitcher
+﻿function Get-PhpSwitcher
 {
     <#
     .Synopsis

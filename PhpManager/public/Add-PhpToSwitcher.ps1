@@ -1,4 +1,4 @@
-function Add-PhpToSwitcher
+﻿function Add-PhpToSwitcher
 {
     <#
     .Synopsis

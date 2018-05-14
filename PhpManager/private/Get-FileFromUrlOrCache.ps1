@@ -1,4 +1,4 @@
-function Get-FileFromUrlOrCache
+﻿function Get-FileFromUrlOrCache
 {
     <#
     .Synopsis

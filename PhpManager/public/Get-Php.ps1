@@ -1,4 +1,4 @@
-function Get-Php() {
+﻿function Get-Php() {
     <#
     .Synopsis
     Get the details about installed PHP versions.

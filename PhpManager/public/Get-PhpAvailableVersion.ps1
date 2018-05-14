@@ -1,4 +1,4 @@
-function Get-PhpAvailableVersion
+﻿function Get-PhpAvailableVersion
 {
     <#
     .Synopsis

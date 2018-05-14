@@ -1,4 +1,4 @@
-function Edit-PhpFolderInPath
+﻿function Edit-PhpFolderInPath
 {
     <#
     .Synopsis

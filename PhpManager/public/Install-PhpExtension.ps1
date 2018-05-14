@@ -1,4 +1,4 @@
-function Install-PhpExtension() {
+﻿function Install-PhpExtension() {
     <#
     .Synopsis
     Installs a PHP extension.

@@ -1,4 +1,4 @@
-Describe 'PhpSwitcher' {
+﻿Describe 'PhpSwitcher' {
     Mock -ModuleName PhpManager Get-PhpDownloadCache { return Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath download-cache }
 
     $alias = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid

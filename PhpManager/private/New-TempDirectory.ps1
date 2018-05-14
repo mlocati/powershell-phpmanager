@@ -1,4 +1,4 @@
-function New-TempDirectory
+﻿function New-TempDirectory
 {
     <#
     .Synopsis

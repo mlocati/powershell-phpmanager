@@ -1,4 +1,4 @@
-function Move-PhpSwitcher
+﻿function Move-PhpSwitcher
 {
     <#
     .Synopsis

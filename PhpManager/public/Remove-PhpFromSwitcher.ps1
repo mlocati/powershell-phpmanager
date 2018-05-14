@@ -1,4 +1,4 @@
-function Remove-PhpFromSwitcher
+﻿function Remove-PhpFromSwitcher
 {
     <#
     .Synopsis

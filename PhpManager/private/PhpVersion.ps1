@@ -1,4 +1,4 @@
-class PhpVersion : System.IComparable
+﻿class PhpVersion : System.IComparable
 {
     <#
     The version of PHP, without the RC state

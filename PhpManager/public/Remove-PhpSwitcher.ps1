@@ -1,4 +1,4 @@
-function Remove-PhpSwitcher
+﻿function Remove-PhpSwitcher
 {
     [OutputType()]
     param (

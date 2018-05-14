@@ -1,4 +1,4 @@
-param ([string[]]$TestName)
+﻿param ([string[]]$TestName)
 
 Import-Module -Name Pester -MinimumVersion 4.0
 

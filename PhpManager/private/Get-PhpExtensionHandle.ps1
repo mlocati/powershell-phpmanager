@@ -1,4 +1,4 @@
-function Get-PhpExtensionHandle
+﻿function Get-PhpExtensionHandle
 {
     <#
     .Synopsis

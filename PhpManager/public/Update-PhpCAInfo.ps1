@@ -1,4 +1,4 @@
-function Update-PhpCAInfo() {
+﻿function Update-PhpCAInfo() {
     <#
     .Synopsis
     Initializes or updates the certification authority file for a PHP installation.

@@ -1,4 +1,4 @@
-function Disable-PhpExtension() {
+﻿function Disable-PhpExtension() {
     <#
     .Synopsis
     Disables a PHP extension.

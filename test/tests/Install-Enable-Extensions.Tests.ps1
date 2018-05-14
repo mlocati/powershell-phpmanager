@@ -1,4 +1,4 @@
-Describe 'Install-Enable-Extensions' {
+﻿Describe 'Install-Enable-Extensions' {
     Mock -ModuleName PhpManager Get-PhpDownloadCache { return Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath download-cache }
 
     $testCases = @(

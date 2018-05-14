@@ -1,4 +1,4 @@
-function Get-PeclPackageVersion
+﻿function Get-PeclPackageVersion
 {
     <#
     .Synopsis

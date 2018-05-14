@@ -12,5 +12,8 @@
         "editor.wordWrap": "on",
         "editor.quickSuggestions": false,
         "files.trimTrailingWhitespace": false
+    },
+    "[powershell]": {
+        "files.encoding": "utf8bom"
     }
 }

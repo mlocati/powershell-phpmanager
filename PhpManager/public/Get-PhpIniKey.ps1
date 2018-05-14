@@ -1,4 +1,4 @@
-function Get-PhpIniKey
+﻿function Get-PhpIniKey
 {
     <#
     .Synopsis

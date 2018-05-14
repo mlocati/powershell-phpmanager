@@ -1,4 +1,4 @@
-Describe 'Get-FileFromUrlOrCache' {
+﻿Describe 'Get-FileFromUrlOrCache' {
 
     Context 'Context #1' {
         It 'should download when cache is disabled' {

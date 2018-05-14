@@ -1,4 +1,4 @@
-function Get-PhpDownloadCache
+﻿function Get-PhpDownloadCache
 {
     <#
     .Synopsis

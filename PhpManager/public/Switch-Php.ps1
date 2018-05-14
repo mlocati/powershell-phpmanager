@@ -1,4 +1,4 @@
-function Switch-Php
+﻿function Switch-Php
 {
     <#
     .Synopsis

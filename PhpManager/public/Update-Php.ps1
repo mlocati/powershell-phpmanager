@@ -1,4 +1,4 @@
-function Update-Php() {
+﻿function Update-Php() {
     <#
     .Synopsis
     Updates PHP.

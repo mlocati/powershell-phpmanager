@@ -1,4 +1,4 @@
-function Get-PhpExtension() {
+﻿function Get-PhpExtension() {
     <#
     .Synopsis
     Lists the extensions for PHP installation.

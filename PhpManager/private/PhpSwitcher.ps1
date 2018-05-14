@@ -1,4 +1,4 @@
-class PhpSwitcher
+﻿class PhpSwitcher
 {
     <#
     The scope of the PHP Switcher.

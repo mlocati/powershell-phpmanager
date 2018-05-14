@@ -1,4 +1,4 @@
-function Enable-PhpExtension() {
+﻿function Enable-PhpExtension() {
     <#
     .Synopsis
     Enables a PHP extension.

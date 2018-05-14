@@ -1,4 +1,4 @@
-class PhpExtension
+﻿class PhpExtension
 {
     <#
     The type of the PHP extension

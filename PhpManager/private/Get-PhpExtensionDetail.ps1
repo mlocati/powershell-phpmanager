@@ -1,4 +1,4 @@
-function Get-PhpExtensionDetail
+﻿function Get-PhpExtensionDetail
 {
     <#
     .Synopsis

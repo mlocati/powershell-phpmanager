@@ -1,4 +1,4 @@
-function Get-PhpBuiltinExtension
+﻿function Get-PhpBuiltinExtension
 {
     <#
     .Synopsis

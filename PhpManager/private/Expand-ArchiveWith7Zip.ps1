@@ -1,4 +1,4 @@
-function Expand-ArchiveWith7Zip
+﻿function Expand-ArchiveWith7Zip
 {
     <#
     .Synopsis

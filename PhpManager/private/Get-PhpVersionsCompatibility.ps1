@@ -1,4 +1,4 @@
-function Get-PhpVersionsCompatibility
+﻿function Get-PhpVersionsCompatibility
 {
     <#
     .Synopsis

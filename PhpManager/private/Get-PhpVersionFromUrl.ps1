@@ -1,4 +1,4 @@
-function Get-PhpVersionFromUrl
+﻿function Get-PhpVersionFromUrl
 {
     <#
     .Synopsis

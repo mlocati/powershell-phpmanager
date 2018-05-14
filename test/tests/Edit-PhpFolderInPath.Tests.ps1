@@ -1,4 +1,4 @@
-Describe 'Edit-PhpFolderInPath' {
+﻿Describe 'Edit-PhpFolderInPath' {
     $pathSeparator = [System.IO.Path]::PathSeparator
     function GetFakeDir() {
         return 'C:\This\Directory\Should\Not\Exist\' + (New-Guid).Guid

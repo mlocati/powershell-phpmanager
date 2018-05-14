@@ -1,4 +1,4 @@
-Describe 'Install-Get-Update-Uninstall-Php' {
+﻿Describe 'Install-Get-Update-Uninstall-Php' {
 
     Mock -ModuleName PhpManager Get-PhpDownloadCache { return Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath download-cache }
     $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid

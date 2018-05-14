@@ -1,4 +1,4 @@
-function Install-PhpFromUrl() {
+﻿function Install-PhpFromUrl() {
     <#
     .Synopsis
     Installs PHP, fetching its binary archive from an URL.

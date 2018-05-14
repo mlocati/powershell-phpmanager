@@ -1,4 +1,4 @@
-Describe 'Syntax' {
+﻿Describe 'Syntax' {
 
     $testCases = Get-ChildItem -Path $Global:PHPMANAGER_MODULEPATH -Include *.ps1, *.psm1 -Recurse | ForEach-Object { @{file = $_} }
 

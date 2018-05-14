@@ -1,4 +1,4 @@
-function Install-Php() {
+﻿function Install-Php() {
     <#
     .Synopsis
     Installs PHP.

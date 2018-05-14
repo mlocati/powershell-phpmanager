@@ -1,4 +1,4 @@
-Describe 'Get-PeclAvailablePackage' {
+﻿Describe 'Get-PeclAvailablePackage' {
 
     It 'should return an array of strings' {
         $packages = Get-PeclAvailablePackage

@@ -1,4 +1,4 @@
-function New-PhpSwitcher
+﻿function New-PhpSwitcher
 {
     <#
     .Synopsis

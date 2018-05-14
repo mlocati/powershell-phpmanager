@@ -1,4 +1,4 @@
-Describe 'Get-PeclArchiveUrl' {
+﻿Describe 'Get-PeclArchiveUrl' {
     $phpVersion = Get-PhpVersionFromUrl -Url http://www.example.com/php-7.2.5-nts-Win32-VC15-x64.zip -ReleaseState Release
     It 'returns an empty string if the package handle is not recognized' {
         Get-PeclArchiveUrl -PackageHandle ThisIsAnInvalidNameOfAPECLPackage -PackageVersion 1.0.0 -PhpVersion $phpVersion | Should -BeExactly ''

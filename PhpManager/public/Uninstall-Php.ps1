@@ -1,4 +1,4 @@
-function Uninstall-Php() {
+﻿function Uninstall-Php() {
     <#
     .Synopsis
     Uninstalls PHP.

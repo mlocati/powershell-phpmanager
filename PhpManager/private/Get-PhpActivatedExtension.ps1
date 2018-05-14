@@ -1,4 +1,4 @@
-function Get-PhpActivatedExtension
+﻿function Get-PhpActivatedExtension
 {
     <#
     .Synopsis

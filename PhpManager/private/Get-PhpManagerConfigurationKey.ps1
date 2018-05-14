@@ -1,4 +1,4 @@
-function Get-PhpManagerConfigurationKey
+﻿function Get-PhpManagerConfigurationKey
 {
     <#
     .Synopsis
