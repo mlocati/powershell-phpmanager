@@ -57,8 +57,8 @@
                     throw 'Premature end of local web server'
                 }
                 if (Test-Path -LiteralPath $webServerStdOut) {
-                    $webServerStdOut = Get-Content -LiteralPath $webServerStdOut
-                    if ($webServerStdOut -and $webServerStdOut -contains 'ready') {
+                    $webServerStdOutContent = Get-Content -LiteralPath $webServerStdOut
+                    if ($webServerStdOutContent -and $webServerStdOutContent -contains 'ready') {
                         break
                     }
                 }
