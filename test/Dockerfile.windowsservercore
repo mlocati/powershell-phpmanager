@@ -1,4 +1,4 @@
-FROM microsoft/nanoserver:sac2016
+FROM microsoft/windowsservercore:10.0.14393.2007
 
 COPY vcruntime140.dll C:/Windows/System32/
 

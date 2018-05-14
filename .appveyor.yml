@@ -18,8 +18,9 @@ environment:
   PsgKey:
     secure: tlhLuUS6x8FcP159+X/EIBDlj9m+u5KCTTuqwzsiNHlPX6K4AolpaZcfAP4ClOdB
   matrix:
-    - TEST_NANOSERVER: no
-    - TEST_NANOSERVER: yes
+    - DOCKER_IMAGE:
+    - DOCKER_IMAGE: nanoserver
+    - DOCKER_IMAGE: windowsservercore
 
 cache:
   - test\download-cache -> .appveyor.yml
@@ -31,27 +32,20 @@ build: off
 
 install:
   - ps: |
-      if ($Env:TEST_NANOSERVER -ne 'yes') {
+      if ($null -eq $Env:DOCKER_IMAGE -or $Env:DOCKER_IMAGE -eq '') {
         .\test\setup.ps1
       } else {
-        if (-Not(Test-Path -LiteralPath .\test\docker-build)) {
-          New-Item -ItemType Directory -Path .\test\docker-build | Out-Null
-        }
-        Copy-Item -LiteralPath "$($Env:SystemRoot)\System32\vcruntime140.dll" -Destination .\test\docker-build\
-        Copy-Item -LiteralPath .\test\setup.ps1 -Destination .\test\docker-build\
-        Copy-Item -LiteralPath .\test\Nanoserver.Dockerfile -Destination .\test\docker-build\Dockerfile
-        docker build --rm --force-rm --tag nanoserver/phpmanager .\test\docker-build\
-        Remove-Item -LiteralPath .\test\docker-build -Recurse
+        & ".\test\Dockerfile.$Env:DOCKER_IMAGE.ps1"
       }
 
 test_script:
   - ps: |
-      if ($Env:TEST_NANOSERVER -ne 'yes') {
+      if ($null -eq $Env:DOCKER_IMAGE -or $Env:DOCKER_IMAGE -eq '') {
         $pesterResult = .\test\pester.ps1
         $failCount = $pesterResult.FailedCount
       } else {
         $volume="$($Env:APPVEYOR_BUILD_FOLDER):C:\App"
-        docker run --rm --volume $volume --workdir C:\App nanoserver/phpmanager powershell.exe '$pesterResult=.\test\pester.ps1; exit $pesterResult.FailedCount'
+        docker run --rm --volume $volume --workdir C:\App phpmanager/test powershell.exe '$pesterResult=.\test\pester.ps1; exit $pesterResult.FailedCount'
         $failCount = $LASTEXITCODE
       }
       (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path -LiteralPath .\TestsResults.xml))
@@ -61,7 +55,7 @@ test_script:
 
 deploy_script:
   - ps: |
-      if ($Env:TEST_NANOSERVER -ne 'yes' -and $true -eq $Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
+      if (($null -eq $Env:DOCKER_IMAGE -or $Env:DOCKER_IMAGE -eq '') -and $true -eq $Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
         $newVersion = $Env:APPVEYOR_REPO_TAG_NAME + '.' + $Env:APPVEYOR_BUILD_NUMBER
         Write-Host "Publishing new version: $newVersion"
         $releaseNotes = ''
