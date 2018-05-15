@@ -1,5 +1,7 @@
 ﻿Write-Host "Setting up test dependencies"
-
+$pcInfo = Get-ComputerInfo
+Write-Host " - Windows installation type: $($pcInfo.WindowsInstallationType)"
+Write-Host " - Windows version name: $($pcInfo.WindowsProductName)"
 Write-Host " - PowerShell edition: $($PSVersionTable.PSEdition)"
 Write-Host " - PowerShell version: $($PSVersionTable.PSVersion.ToString())"
 $nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
