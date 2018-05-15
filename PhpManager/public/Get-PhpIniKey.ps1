@@ -29,7 +29,7 @@
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Key,
-        [Parameter(Mandatory = $True, Position = 1, HelpMessage = 'The path to a php.ini file, the path to a php.exe file or the folder containing php.exe; if omitted we''ll use the one found in the PATH environment variable')]
+        [Parameter(Mandatory = $False, Position = 1, HelpMessage = 'The path to a php.ini file, the path to a php.exe file or the folder containing php.exe; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path
