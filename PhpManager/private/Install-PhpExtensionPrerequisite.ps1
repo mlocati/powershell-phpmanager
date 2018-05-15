@@ -11,10 +11,10 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [PhpVersionInstalled] $PhpVersion,
-        [Parameter(Mandatory = $True, Position = 1)]
+        [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
         [PhpExtension] $Extension
     )

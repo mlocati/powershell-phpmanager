@@ -17,7 +17,7 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The URL where the binary archive can be downloaded from')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The URL where the binary archive can be downloaded from')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Url,

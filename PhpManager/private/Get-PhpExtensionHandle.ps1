@@ -15,7 +15,7 @@
     #>
     [OutputType([string])]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The name of the PHP extension')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The name of the PHP extension')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Name

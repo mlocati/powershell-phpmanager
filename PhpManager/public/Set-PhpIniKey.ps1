@@ -46,13 +46,13 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The key of the php.ini to set')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The key of the php.ini to set')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Key,
-        [Parameter(Mandatory = $False, Position = 1, HelpMessage = 'The value of the php.ini key to set')]
+        [Parameter(Mandatory = $false, Position = 1, HelpMessage = 'The value of the php.ini key to set')]
         [string]$Value,
-        [Parameter(Mandatory = $False, Position = 2, HelpMessage = 'The path to a php.ini file, the path to a php.exe file or the folder containing php.exe; if omitted we''ll use the one found in the PATH environment variable')]
+        [Parameter(Mandatory = $false, Position = 2, HelpMessage = 'The path to a php.ini file, the path to a php.exe file or the folder containing php.exe; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path,

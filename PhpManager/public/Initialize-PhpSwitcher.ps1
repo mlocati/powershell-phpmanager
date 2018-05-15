@@ -21,11 +21,11 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path where PHP will be visible when switching to a PHP version')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The path where PHP will be visible when switching to a PHP version')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Alias,
-        [Parameter(Mandatory = $False, Position = 99, HelpMessage = 'Initialize the PHP Switcher for the current user only (''CurrentUser''), or for any user (''AllUsers'')')]
+        [Parameter(Mandatory = $false, Position = 99, HelpMessage = 'Initialize the PHP Switcher for the current user only (''CurrentUser''), or for any user (''AllUsers'')')]
         [ValidateSet('CurrentUser', 'AllUsers')]
         [string]$Scope = 'CurrentUser',
         [switch]$Force

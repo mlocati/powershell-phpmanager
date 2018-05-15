@@ -12,7 +12,7 @@
     #>
     [OutputType([string[]])]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The path to the php.ini (or to the folder containing it)')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The path to the php.ini (or to the folder containing it)')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path

@@ -18,15 +18,15 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [ValidateSet('Add', 'Remove')]
         [string]$Operation,
-        [Parameter(Mandatory = $True, Position = 1)]
+        [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path,
-        [Parameter(Mandatory = $False, Position = 2)]
+        [Parameter(Mandatory = $false, Position = 2)]
         [ValidateSet('User', 'System')]
         [string]$Persist,
         [switch]$CurrentProcess
@@ -101,7 +101,7 @@
                         $newPathEscaped = $newPath -replace "'", "''"
                         if ($needDirectRegistryAccess) {
                             $exeCommand = "New-ItemProperty -Path '$($targets[$target])' -Name 'Path' -Value '$newPathEscaped' -PropertyType ExpandString -Force | Out-Null"
-                            $haveToBroadcast = $True
+                            $haveToBroadcast = $true
                         } else {
                             $exeCommand = "[System.Environment]::SetEnvironmentVariable('Path', '$newPathEscaped', '$Script:ENVTARGET_MACHINE') | Out-Null"
                         }
@@ -109,7 +109,7 @@
                     } else {
                         if ($needDirectRegistryAccess) {
                             New-ItemProperty -Path $targets[$target] -Name 'Path' -Value $newPath -PropertyType ExpandString -Force | Out-Null
-                            $haveToBroadcast = $True
+                            $haveToBroadcast = $true
                         } else {
                             [System.Environment]::SetEnvironmentVariable('Path', $newPath, $target) | Out-Null
                         }

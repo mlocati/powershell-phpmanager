@@ -15,12 +15,12 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
         [string]$ArchivePath,
-        [Parameter(Mandatory = $True, Position = 1)]
+        [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$DestinationPath,

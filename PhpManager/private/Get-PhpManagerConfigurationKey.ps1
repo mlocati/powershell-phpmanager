@@ -9,11 +9,11 @@
     #>
     [OutputType([object])]
     param (
-        [Parameter(Mandatory = $True, Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Key,
-        [Parameter(Mandatory = $False, Position = 1)]
+        [Parameter(Mandatory = $false, Position = 1)]
         [ValidateSet('Any', 'CurrentUser', 'AllUsers')]
         [string]$Scope = 'Any'
     )

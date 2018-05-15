@@ -21,11 +21,11 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The symbolic name to give to the PHP installation')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The symbolic name to give to the PHP installation')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Name,
-        [Parameter(Mandatory = $True, Position = 1, HelpMessage = 'The path to an existing PHP installation to be added to the PHP Switcher')]
+        [Parameter(Mandatory = $true, Position = 1, HelpMessage = 'The path to an existing PHP installation to be added to the PHP Switcher')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path,

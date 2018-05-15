@@ -12,7 +12,7 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The new path where PHP will be visible when switching to a PHP version')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The new path where PHP will be visible when switching to a PHP version')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$NewAlias

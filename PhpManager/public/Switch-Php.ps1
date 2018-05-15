@@ -18,7 +18,7 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The symbolic name of the PHP installation to activate')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The symbolic name of the PHP installation to activate')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Name,

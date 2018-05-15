@@ -15,13 +15,13 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Key,
         [Parameter(Mandatory = $false, Position = 1)]
         $Value,
-        [Parameter(Mandatory = $True, Position = 2)]
+        [Parameter(Mandatory = $true, Position = 2)]
         [ValidateSet('CurrentUser', 'AllUsers')]
         $Scope
     )

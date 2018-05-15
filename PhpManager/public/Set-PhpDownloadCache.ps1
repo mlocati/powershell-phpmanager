@@ -32,9 +32,9 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $False, Position = 0, HelpMessage = 'The path to a local directory; if empty, the download cache will be disabled')]
+        [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The path to a local directory; if empty, the download cache will be disabled')]
         [string]$Path,
-        [Parameter(Mandatory = $False, Position = 1, HelpMessage = 'If set and not ''No'', this setting should be persisted for the current user (''CurrentUser''), for any user (''AllUsers'')')]
+        [Parameter(Mandatory = $false, Position = 1, HelpMessage = 'If set and not ''No'', this setting should be persisted for the current user (''CurrentUser''), for any user (''AllUsers'')')]
         [ValidateSet('No', 'CurrentUser', 'AllUsers')]
         [string] $Persist = 'No'
     )

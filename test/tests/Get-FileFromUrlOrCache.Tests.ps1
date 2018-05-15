@@ -10,7 +10,7 @@
             Assert-MockCalled -ModuleName PhpManager Get-TemporaryFileWithExtension
             Assert-MockCalled -ModuleName PhpManager Invoke-WebRequest -Times 1 -Exactly
             $localFile | Should -BeExactly 'C:\Path\To\LocalFile.zip'
-            $fromCache | Should -BeExactly $False
+            $fromCache | Should -BeExactly $false
         }
     }
 
@@ -56,7 +56,7 @@
             Assert-MockCalled -ModuleName PhpManager Get-TemporaryFileWithExtension
             Assert-MockCalled -ModuleName PhpManager Invoke-WebRequest -Times 1 -Exactly
             $localFile | Should -BeExactly 'C:\Path\To\LocalFile.xz'
-            $fromCache | Should -BeExactly $False
+            $fromCache | Should -BeExactly $false
         }
     }
 

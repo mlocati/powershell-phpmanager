@@ -46,7 +46,7 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The PHP version to be installed')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The PHP version to be installed')]
         [ValidatePattern('^\d+(\.\d+)?(\.\d+)?(RC\d*)?$')]
         [string] $Version,
         [Parameter(Mandatory = $true, Position = 1, HelpMessage = 'Architecture of the PHP to be installed (x86 for 32-bit, x64 for 64-bit)')]

@@ -19,7 +19,7 @@
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The symbolic name of the PHP installation to be removed from the PHP Switcher')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The symbolic name of the PHP installation to be removed from the PHP Switcher')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Name,

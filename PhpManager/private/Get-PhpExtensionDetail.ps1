@@ -20,10 +20,10 @@
     [OutputType([psobject])]
     [OutputType([psobject[]])]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want to inspect the extension(s)')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want to inspect the extension(s)')]
         [ValidateNotNull()]
         [PhpVersionInstalled]$PhpVersion,
-        [Parameter(Mandatory = $False, Position = 1, HelpMessage = 'The path of the PHP extension file, or a directory with possible extension files; if omitted we''ll inspect all the extensions in the extension directory of PhpVersion')]
+        [Parameter(Mandatory = $false, Position = 1, HelpMessage = 'The path of the PHP extension file, or a directory with possible extension files; if omitted we''ll inspect all the extensions in the extension directory of PhpVersion')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string]$Path

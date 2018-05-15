@@ -15,10 +15,10 @@
     #>
     [OutputType([bool])]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The first PhpVersion instance to compare')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The first PhpVersion instance to compare')]
         [ValidateNotNull()]
         [PhpVersion]$A,
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The second PhpVersion instance to compare')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The second PhpVersion instance to compare')]
         [ValidateNotNull()]
         [PhpVersion]$B
     )
@@ -27,11 +27,11 @@
     }
     process {
         if ($a.Architecture -ne $b.Architecture -or $a.ThreadSafe -ne $b.ThreadSafe) {
-            $areCompatible = $False
+            $areCompatible = $false
         } elseif ($a.ComparableVersion.Major -ne $b.ComparableVersion.Major -or $a.ComparableVersion.Minor -ne $b.ComparableVersion.Minor) {
-            $areCompatible = $False
+            $areCompatible = $false
         } else {
-            $areCompatible = $True
+            $areCompatible = $true
         }
     }
     end {

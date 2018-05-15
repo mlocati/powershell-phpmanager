@@ -18,10 +18,10 @@
     #>
     [OutputType([psobject[]])]
     param (
-        [Parameter(Mandatory = $True, Position = 0, HelpMessage = 'The release state (can be ''Release'' or ''Archive'' or ''QA'')')]
+        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The release state (can be ''Release'' or ''Archive'' or ''QA'')')]
         [ValidateSet('QA', 'Release', 'Archive')]
         [string]$State,
-        [Parameter(Mandatory = $False,HelpMessage = 'Force the reload of the list')]
+        [Parameter(Mandatory = $false,HelpMessage = 'Force the reload of the list')]
         [switch]$Reload
     )
     begin {
