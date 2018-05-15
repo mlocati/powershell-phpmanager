@@ -32,10 +32,10 @@ If you won't be able to execute the module functions, you may need to tell Power
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 ```
 
+
 ## Available Features
 
 Here you can find a short description of the available commands: in order to get more details, type `Get-Help <CommandName>` (or `Get-Help -Detailed <CommandName>` or `Get-Help -Full <CommandName>`).
-
 
 ### Installing PHP
 
@@ -127,7 +127,6 @@ Include "C:\Dev\PHP\Apache.conf"
 ```
 That's all: to switch the PHP version used by Apache simply call `Switch-Php` and restart Apache.
 
-
 ### Getting details about installed PHPs
 
 Use the `Get-Php` command to list the PHP installations found in the current PATH environment variable.
@@ -191,7 +190,6 @@ Install-PhpExtension imagick -MinimumStability snapshot
 
 PS: `Install-PhpExtension` can also be used to upgrade (or downgrade) a PHP extension to the most recent version available online.
 
-
 ### Getting the list of PHP versions available online
 
 Use the `Get-PhpAvailableVersion` command to list the PHP versions available online.
@@ -212,12 +210,16 @@ The `Update-PhpCAInfo` does all that for you: a simple call to this command will
 Since the list of valid CA certificates changes over time, you should execute `Update-PhpCAInfo` on a regular basis.  
 In addition, `Update-PhpCAInfo` can optionally add your custom CA certificates to the list of official CA certificates.
 
-
 ### Caching downloads
 
 This module downloads PHP and PHP extensions from internet.  
 In order to avoid downloading the same files multiple times you can use `Set-PhpDownloadCache` to specify the path of a local folder where the downloads will be cached (to get the configured value you can use `Get-PhpDownloadCache`).  
 By default `Set-PhpDownloadCache` does not persist the configured value: you can use the `-Persist` option to store if for the current user only, or for any user.
+
+
+## Supported platforms
+
+This module is fully tested on Windows 10, Windows Server 2016, Windows Server Core, Windows Nano Server.
 
 
 ## Test
