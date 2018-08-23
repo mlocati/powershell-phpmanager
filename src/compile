@@ -13,5 +13,5 @@ then
     sudo apt-get update
     sudo apt-get install --yes mxe-i686-w64-mingw32.static-gcc mxe-x86-64-w64-mingw32.static-gcc
 fi
-echo 'Compiling MXE'
+echo 'Compiling with MXE'
 make
