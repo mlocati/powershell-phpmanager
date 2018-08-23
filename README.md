@@ -210,6 +210,24 @@ The `Update-PhpCAInfo` does all that for you: a simple call to this command will
 Since the list of valid CA certificates changes over time, you should execute `Update-PhpCAInfo` on a regular basis.  
 In addition, `Update-PhpCAInfo` can optionally add your custom CA certificates to the list of official CA certificates.
 
+### Inspecting a PHP extension DLL file
+
+`Get-PhpExtension` is able to inspect a DLL file of a PHP extension:
+
+```powershell
+PS C:\> Invoke-WebRequest -Uri https://xdebug.org/files/php_xdebug-2.6.1-7.0-vc14-nts-x86_64.dll -OutFile test.dll
+PS C:\> Get-PhpExtension test.dll
+Type         : Zend
+State        : Unknown
+Name         : Xdebug
+Handle       : xdebug
+Version      : 2.6.1
+PhpVersion   : 7.0
+Architecture : x64
+ThreadSafe   : False
+Filename     : test.dll
+```
+
 ### Caching downloads
 
 This module downloads PHP and PHP extensions from internet.  
