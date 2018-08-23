@@ -68,13 +68,13 @@
         It 'php should fail connecting to a server certificated with official CA when no CA certificate is configured' {
             Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
             Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
-            CheckHttps 'www.google.com' 443 | Should -BeLike 'curl:<*>;openssl:<*>'
+            CheckHttps 'www.google.com' 443 | Should -Match '(curl:<.*>)|(openssl:<.*>)'
         }
         if ($null -ne $localServerProcess) {
             It 'php should fail connecting to a server certificated with custom CA when no CA certificate is configured' {
                 Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
                 Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
-                CheckHttps 'localhost' $localServerPort | Should -BeLike 'curl:<*>;openssl:<*>'
+                CheckHttps 'localhost' $localServerPort | Should -Match '(curl:<.*>)|(openssl:<.*>)'
             }
         } else {
             It 'php should fail connecting to a server certificated with custom CA when no CA certificate is configured' -Skip {
@@ -91,7 +91,7 @@
                 Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
                 Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
                 Update-PhpCAInfo -Path $phpPath
-                CheckHttps 'localhost' $localServerPort | Should -BeLike 'curl:<*>;openssl:<*>'
+                CheckHttps 'localhost' $localServerPort | Should -Match '(curl:<.*>)|(openssl:<.*>)'
             }
         } else {
             It 'php should fail connecting to a server certificated with custom CA when only official CA certificates are configured' -Skip {

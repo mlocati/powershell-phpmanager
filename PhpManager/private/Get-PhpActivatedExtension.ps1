@@ -48,7 +48,15 @@
                     if ($alreadyExtensions.ContainsKey($extensionHandle)) {
                         $alreadyExtensions[$extensionHandle].Type = $type
                     } else {
-                        $extension = [PhpExtension]::new(@{'Name' = $extensionName; 'Handle' = $extensionHandle; 'Type' = $type; 'State' = $Script:EXTENSIONSTATE_ENABLED})
+                        $extension = [PhpExtension]::new(@{
+                            'Name' = $extensionName;
+                            'Handle' = $extensionHandle;
+                            'Type' = $type;
+                            'State' = $Script:EXTENSIONSTATE_ENABLED;
+                            'PhpVersion' = '' + $PhpVersion.ComparableVersion.Major + '.' + $PhpVersion.ComparableVersion.Minor;
+                            'Architecture' = $PhpVersion.Architecture;
+                            'ThreadSafe' = $PhpVersion.ThreadSafe;
+                        })
                         $alreadyExtensions[$extensionHandle] = $extension
                         $extensions += $extension
                     }

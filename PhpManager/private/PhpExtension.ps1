@@ -34,12 +34,35 @@
     [string]
     [ValidateNotNull()]
     $Version
+
+    <#
+    The PHP version for which this extension is designed for
+    #>
+    [string]
+    [ValidateNotNull()]
+    $PhpVersion
+
+    <#
+    The OS architecture (x86 or x64)
+    #>
+    [string]
+    [ValidateNotNull()]
+    $Architecture
+
+    <#
+    Is this a thread-safe extension?
+    #>
+    [bool]
+    [ValidateNotNull()]
+    $ThreadSafe
+
     <#
     The full path to the extension file (empty string if not available)
     #>
     [string]
     [ValidateNotNull()]
     $Filename
+
     <#
     Initialize the instance.
     Keys for $data:
@@ -47,6 +70,9 @@
     - State: required
     - Name: required
     - Handle: required
+    - PhpVersion: required
+    - Architecture: required
+    - ThreadSafe: required
     - Version: optional
     - Filename: optional
     #>
@@ -56,6 +82,15 @@
         $this.State = $data.State
         $this.Name = $data.Name
         $this.Handle = $data.Handle
+        $this.PhpVersion = $data.PhpVersion
+        $this.Architecture = $data.Architecture
+        if ($data.ThreadSafe -eq 0 -or $data.ThreadSafe -eq $false) {
+            $this.ThreadSafe = $false
+        } elseif ($data.ThreadSafe -eq 1 -or $data.ThreadSafe -eq $true) {
+            $this.ThreadSafe = $true
+        } else {
+            throw 'Invalid ThreadSafe value'
+        }
         $this.Version = ''
         if ($data.ContainsKey('Version') -and $null -ne $data.Version) {
             $this.Version = $data.Version

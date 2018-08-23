@@ -201,7 +201,7 @@ class PhpVersionInstalled : PhpVersion
         $item = Get-Item -LiteralPath $Path
         if ($item -is [System.IO.FileInfo]) {
             if ($item.Extension -ne '.exe') {
-                return PhpVersionInstalled::FromPath($item.DirectoryName)
+                return [PhpVersionInstalled]::FromPath($item.DirectoryName)
             }
             $directory = $item.Directory
             $data.ExecutablePath = $item.FullName
