@@ -46,9 +46,9 @@
             }
         }
         Remove-Item -LiteralPath $phpVersion.ActualFolder -Recurse -Force
-        Edit-PhpFolderInPath -Operation Remove -Path $phpVersion.ActualFolder
+        Edit-FolderInPath -Operation Remove -Path $phpVersion.ActualFolder
         if ($phpVersion.Folder -ne $phpVersion.ActualFolder) {
-            Edit-PhpFolderInPath -Operation Remove -Path $phpVersion.Folder
+            Edit-FolderInPath -Operation Remove -Path $phpVersion.Folder
         }
         Write-Verbose ($phpVersion.DisplayName + ' has been uninstalled from ' + $phpVersion.ActualFolder)
     }

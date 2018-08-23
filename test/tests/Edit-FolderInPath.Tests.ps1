@@ -1,4 +1,4 @@
-﻿Describe 'Edit-PhpFolderInPath' {
+﻿Describe 'Edit-FolderInPath' {
     $pathSeparator = [System.IO.Path]::PathSeparator
     function GetFakeDir() {
         return 'C:\This\Directory\Should\Not\Exist\' + (New-Guid).Guid
@@ -42,11 +42,11 @@
         $preEnv = GetPath('Env')
         $preUser = GetPath('User')
         $preSystem = GetPath('System')
-        Edit-PhpFolderInPath -Operation Add -Path $dir
+        Edit-FolderInPath -Operation Add -Path $dir
         $postEnv = GetPath('Env')
         $postUser = GetPath('User')
         $postSystem = GetPath('System')
-        Edit-PhpFolderInPath -Operation Remove -Path $dir
+        Edit-FolderInPath -Operation Remove -Path $dir
         $postEnv | Should -BeExactly $preEnv
         $postUser | Should -BeExactly $preUser
         $postSystem | Should -BeExactly $preSystem
@@ -60,11 +60,11 @@
         $preEnv = GetPath('Env')
         $preUser = GetPath('User')
         $preSystem = GetPath('System')
-        Edit-PhpFolderInPath -Operation Add -Path $dir -CurrentProcess
+        Edit-FolderInPath -Operation Add -Path $dir -CurrentProcess
         $postEnv = GetPath('Env')
         $postUser = GetPath('User')
         $postSystem = GetPath('System')
-        Edit-PhpFolderInPath -Operation Remove -Path $dir
+        Edit-FolderInPath -Operation Remove -Path $dir
         $postEnv | Should -BeExactly "$preEnv$pathSeparator$dir".TrimStart($pathSeparator)
         $postUser | Should -BeExactly $preUser
         $postSystem | Should -BeExactly $preSystem
@@ -78,11 +78,11 @@
         $preEnv = GetPath('Env')
         $preUser = GetPath('User')
         $preSystem = GetPath('System')
-        Edit-PhpFolderInPath -Operation Add -Path $dir -Persist User
+        Edit-FolderInPath -Operation Add -Path $dir -Persist User
         $postEnv = GetPath('Env')
         $postUser = GetPath('User')
         $postSystem = GetPath('System')
-        Edit-PhpFolderInPath -Operation Remove -Path $dir
+        Edit-FolderInPath -Operation Remove -Path $dir
         $postEnv | Should -BeExactly $preEnv
         $postUser | Should -BeExactly "$preUser$pathSeparator$dir".TrimStart($pathSeparator)
         $postSystem | Should -BeExactly $preSystem
@@ -97,11 +97,11 @@
             $preEnv = GetPath('Env')
             $preUser = GetPath('User')
             $preSystem = GetPath('System')
-            Edit-PhpFolderInPath -Operation Add -Path $dir -Persist System
+            Edit-FolderInPath -Operation Add -Path $dir -Persist System
             $postEnv = GetPath('Env')
             $postUser = GetPath('User')
             $postSystem = GetPath('System')
-            Edit-PhpFolderInPath -Operation Remove -Path $dir
+            Edit-FolderInPath -Operation Remove -Path $dir
             $postEnv | Should -BeExactly $preEnv
             $postUser | Should -BeExactly $preUser
             $postSystem | Should -BeExactly "$preSystem$pathSeparator$dir".TrimStart($pathSeparator)
@@ -119,11 +119,11 @@
         $preEnv = GetPath('Env')
         $preUser = GetPath('User')
         $preSystem = GetPath('System')
-        Edit-PhpFolderInPath -Operation Add -Path $dir -Persist User -CurrentProcess
+        Edit-FolderInPath -Operation Add -Path $dir -Persist User -CurrentProcess
         $postEnv = GetPath('Env')
         $postUser = GetPath('User')
         $postSystem = GetPath('System')
-        Edit-PhpFolderInPath -Operation Remove -Path $dir
+        Edit-FolderInPath -Operation Remove -Path $dir
         $postEnv | Should -BeExactly "$preEnv$pathSeparator$dir".TrimStart($pathSeparator)
         $postUser | Should -BeExactly "$preUser$pathSeparator$dir".TrimStart($pathSeparator)
         $postSystem | Should -BeExactly $preSystem
@@ -138,11 +138,11 @@
             $preEnv = GetPath('Env')
             $preUser = GetPath('User')
             $preSystem = GetPath('System')
-            Edit-PhpFolderInPath -Operation Add -Path $dir -Persist System -CurrentProcess
+            Edit-FolderInPath -Operation Add -Path $dir -Persist System -CurrentProcess
             $postEnv = GetPath('Env')
             $postUser = GetPath('User')
             $postSystem = GetPath('System')
-            Edit-PhpFolderInPath -Operation Remove -Path $dir
+            Edit-FolderInPath -Operation Remove -Path $dir
             $postEnv | Should -BeExactly "$preEnv$pathSeparator$dir".TrimStart($pathSeparator)
             $postUser | Should -BeExactly $preUser
             $postSystem | Should -BeExactly "$preSystem$pathSeparator$dir".TrimStart($pathSeparator)

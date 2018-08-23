@@ -153,7 +153,7 @@
             Set-PhpIniKey -Key 'extension_dir' -Value $([System.IO.Path]::Combine($Path, 'ext')) -Path $iniPath
         }
         if ($null -ne $AddToPath -and $AddToPath -ne '') {
-            Edit-PhpFolderInPath -Operation Add -Path $Path -Persist $AddToPath -CurrentProcess
+            Edit-FolderInPath -Operation Add -Path $Path -Persist $AddToPath -CurrentProcess
         }
     }
     end {

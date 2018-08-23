@@ -210,6 +210,12 @@ The `Update-PhpCAInfo` does all that for you: a simple call to this command will
 Since the list of valid CA certificates changes over time, you should execute `Update-PhpCAInfo` on a regular basis.  
 In addition, `Update-PhpCAInfo` can optionally add your custom CA certificates to the list of official CA certificates.
 
+### Installing Composer
+
+You can install [Composer](https://getcomposer.org/) with the command `Install-Composer`.
+`Install-Composer` is able to add `composer` to the path, so that you can execute it from any location.
+Type `Get-Help -Detailed Install-Composer` for more details.
+
 ### Inspecting a PHP extension DLL file
 
 `Get-PhpExtension` is able to inspect a DLL file of a PHP extension:
@@ -247,12 +253,12 @@ You can run the `test\setup.ps1` PowerShell script to install them.
 The `test\pester.ps1` script executes all the tests, which are located in the `test\tests` directory.
 You can test a specific case by specifying its name:
 ```powershell
-.\test\pester.ps1 Edit-PhpFolderInPath
+.\test\pester.ps1 Edit-FolderInPath
 ```
 Some tests may require to run commands with elevated privileges. These tests are disabled by default: you can enable them by setting the `PHPMANAGER_TEST_RUNAS` environment variable to a non empty value:
 ```powershell
 $Env:PHPMANAGER_TEST_RUNAS=1
-.\test\pester.ps1 Edit-PhpFolderInPath
+.\test\pester.ps1 Edit-FolderInPath
 ```
 Some other tests require that [Node.js](https://nodejs.org) is installed and available in the PATH environment variable.
 

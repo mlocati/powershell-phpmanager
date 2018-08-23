@@ -73,7 +73,7 @@
                 Remove-Item -LiteralPath $switcher.Alias -Recurse -Force
             }
             New-Item -ItemType Junction -Path $switcher.Alias -Value $target | Out-Null
-            Edit-PhpFolderInPath -Operation Add -Path $switcher.Alias -Persist $(if ($switcher.Scope -eq 'AllUsers') { 'System' } else { 'User' } ) -CurrentProcess
+            Edit-FolderInPath -Operation Add -Path $switcher.Alias -Persist $(if ($switcher.Scope -eq 'AllUsers') { 'System' } else { 'User' } ) -CurrentProcess
         }
     }
     end {

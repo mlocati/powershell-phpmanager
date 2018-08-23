@@ -50,7 +50,7 @@
                             }
                         }
                     }
-                    Edit-PhpFolderInPath -Operation Remove -Path $oldAlias
+                    Edit-FolderInPath -Operation Remove -Path $oldAlias
                     Remove-Item -LiteralPath $oldAlias -Recurse -Force
                 }
             }
@@ -60,7 +60,7 @@
                     Remove-Item -LiteralPath $NewAlias -Recurse -Force
                 }
                 New-Item -ItemType Junction -Path $NewAlias -Value $recreateAs | Out-Null
-                Edit-PhpFolderInPath -Operation Add -Path $NewAlias -Persist $(if ($switcher.Scope -eq 'AllUsers') { 'System' } else { 'User' } ) -CurrentProcess
+                Edit-FolderInPath -Operation Add -Path $NewAlias -Persist $(if ($switcher.Scope -eq 'AllUsers') { 'System' } else { 'User' } ) -CurrentProcess
             }
             Set-PhpManagerConfigurationKey -Key 'PHP_SWITCHER' -Value $switcher -Scope $switcher.Scope
         }

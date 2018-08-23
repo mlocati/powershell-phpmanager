@@ -8,7 +8,7 @@
     process {
         $switcher = Get-PhpSwitcher
         if ($null -ne $switcher) {
-            Edit-PhpFolderInPath -Operation Remove -Path $switcher.Alias
+            Edit-FolderInPath -Operation Remove -Path $switcher.Alias
             if (Test-Path -LiteralPath $switcher.Alias -PathType Container) {
                 $aliasItem = Get-Item -LiteralPath $switcher.Alias
                 if ($aliasItem.LinkType -eq 'Junction') {
