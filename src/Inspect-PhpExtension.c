@@ -2,17 +2,20 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+// https://github.com/php/php-src/blob/php-7.3.0beta1/Zend/zend_modules.h#L34
+// https://github.com/php/php-src/blob/php-7.3.0beta2/Zend/zend_modules.h#L34
+#define ZMA_PHP_7_3 20180731
 // https://github.com/php/php-src/blob/php-7.2.0/Zend/zend_modules.h#L36
-// https://github.com/php/php-src/blob/php-7.2.4/Zend/zend_modules.h#L36
+// https://github.com/php/php-src/blob/php-7.2.9/Zend/zend_modules.h#L36
 #define ZMA_PHP_7_2 20170718
 // https://github.com/php/php-src/blob/php-7.1.0/Zend/zend_modules.h#L36
-// https://github.com/php/php-src/blob/php-7.1.16/Zend/zend_modules.h#L36
+// https://github.com/php/php-src/blob/php-7.1.21/Zend/zend_modules.h#L36
 #define ZMA_PHP_7_1 20160303
 // https://github.com/php/php-src/blob/php-7.0.0/Zend/zend_modules.h#L36
-// https://github.com/php/php-src/blob/php-7.0.29/Zend/zend_modules.h#L36
+// https://github.com/php/php-src/blob/php-7.0.31/Zend/zend_modules.h#L36
 #define ZMA_PHP_7_0 20151012
 // https://github.com/php/php-src/blob/php-5.6.0/Zend/zend_modules.h#L36
-// https://github.com/php/php-src/blob/php-5.6.35/Zend/zend_modules.h#L36
+// https://github.com/php/php-src/blob/php-5.6.37/Zend/zend_modules.h#L36
 #define ZMA_PHP_5_6 20131226
 // https://github.com/php/php-src/blob/php-5.5.0/Zend/zend_modules.h#L36
 // https://github.com/php/php-src/blob/php-5.5.38/Zend/zend_modules.h#L36
@@ -100,6 +103,10 @@ void parsePhpExtension(HMODULE hModule, extensionInfo* extensionInfo)
     if (get_moduleAddress != NULL) {
         zend_module_entry_Base* zmeBase = ((getModuleEntryBase)get_moduleAddress)();
         switch (zmeBase->zend_api) {
+            case ZMA_PHP_7_3:
+                if (extensionInfo->php == NULL) {
+                    extensionInfo->php = "7.3";
+                }
             case ZMA_PHP_7_2:
                 if (extensionInfo->php == NULL) {
                     extensionInfo->php = "7.2";
