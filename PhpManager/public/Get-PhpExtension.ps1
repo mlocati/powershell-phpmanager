@@ -26,19 +26,25 @@
     process {
         if ($null -eq $Path -or $Path -eq '') {
             $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
+        } elseif ((Test-Path -Path $Path -PathType Leaf) -and [System.IO.Path]::GetExtension($Path) -eq '.dll') {
+            $phpVersion = $null
         } else {
             $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
-        $result += Get-PhpBuiltinExtension -PhpVersion $phpVersion
-        $dllExtensions = @(Get-PhpExtensionDetail -PhpVersion $phpVersion)
-        $activatedExtensions = @(Get-PhpActivatedExtension -PhpVersion $phpVersion)
-        foreach ($dllExtension in $dllExtensions) {
-            if ($activatedExtensions | Where-Object { $_.Handle -eq $dllExtension.Handle }) {
-                $dllExtension.State = $Script:EXTENSIONSTATE_ENABLED
-            } else {
-                $dllExtension.State = $Script:EXTENSIONSTATE_DISABLED
+        if ($null -eq $phpVersion) {
+            $result = @(Get-PhpExtensionDetail -Path $Path)
+        } else {
+            $result += Get-PhpBuiltinExtension -PhpVersion $phpVersion
+            $dllExtensions = @(Get-PhpExtensionDetail -PhpVersion $phpVersion)
+            $activatedExtensions = @(Get-PhpActivatedExtension -PhpVersion $phpVersion)
+            foreach ($dllExtension in $dllExtensions) {
+                if ($activatedExtensions | Where-Object { $_.Handle -eq $dllExtension.Handle }) {
+                    $dllExtension.State = $Script:EXTENSIONSTATE_ENABLED
+                } else {
+                    $dllExtension.State = $Script:EXTENSIONSTATE_DISABLED
+                }
+                $result += $dllExtension
             }
-            $result += $dllExtension
         }
     }
     end {

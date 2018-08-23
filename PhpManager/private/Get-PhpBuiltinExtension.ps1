@@ -31,7 +31,15 @@
             $extensionHandle = Get-PhpExtensionHandle -Name $extensionName
             if (-Not($alreadyExtensions.ContainsKey($extensionHandle))) {
                 $alreadyExtensions[$extensionHandle] = $true
-                $extensions += [PhpExtension]::new(@{'Name' = $extensionName; 'Handle' = $extensionHandle; 'Type' = $Script:EXTENSIONTYPE_BUILTIN; 'State' = $Script:EXTENSIONSTATE_BUILTIN})
+                $extensions += [PhpExtension]::new(@{
+                    'Name' = $extensionName;
+                    'Handle' = $extensionHandle;
+                    'Type' = $Script:EXTENSIONTYPE_BUILTIN;
+                    'State' = $Script:EXTENSIONSTATE_BUILTIN;
+                    'PhpVersion' = $PhpVersion.Version;
+                    'Architecture' = $PhpVersion.Architecture;
+                    'ThreadSafe' = $PhpVersion.ThreadSafe;
+                })
             }
         }
     }

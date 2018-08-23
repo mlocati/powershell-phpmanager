@@ -6,6 +6,7 @@
 
     .Parameter PhpVersion
     The instance of PhpVersion for which you want to inspect the extension(s).
+    It can be omitted.
 
     .Parameter Path
     The path of the PHP extension file, or a directory with possible extension files.
@@ -20,8 +21,7 @@
     [OutputType([psobject])]
     [OutputType([psobject[]])]
     param (
-        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want to inspect the extension(s)')]
-        [ValidateNotNull()]
+        [Parameter(Mandatory = $false, Position = 0, HelpMessage = 'The instance of PhpVersion for which you want to inspect the extension(s). If omitted you have to specify the -Path parameter.')]
         [PhpVersionInstalled]$PhpVersion,
         [Parameter(Mandatory = $false, Position = 1, HelpMessage = 'The path of the PHP extension file, or a directory with possible extension files; if omitted we''ll inspect all the extensions in the extension directory of PhpVersion')]
         [ValidateNotNull()]
@@ -38,6 +38,8 @@
             $inspectingSingleFile = $true
             $inspectorParameters += $Path
             $somethingToInspect = $true
+        } elseif ($null -eq $PhpVersion) {
+            throw "Both -PhpVersion and -Path parameters are empty, or -PhpVersion is empty and -Path is not the path of a file"
         } else {
             $result = @()
             $inspectingSingleFile = $false
@@ -60,19 +62,59 @@
             }
         }
         if ($somethingToInspect) {
+            $rxIndex = 0
+            $groups = @{}
             $rxGood = '^'
-            $rxGood += 'php:(?:' + $PhpVersion.ComparableVersion.Major + '\.' + $PhpVersion.ComparableVersion.Minor + '(?:\.\d+)*)?'
-            $rxGood += '\tarchitecture:' + $PhpVersion.Architecture
-            $rxGood += '\tthreadSafe:(?:' + ([int]$PhpVersion.ThreadSafe) + ')?'
-            $rxGood += '\ttype:(Php|Zend)'
-            $rxGood += '\tname:(.+)'
-            $rxGood += '\tversion:(.*)'
-            $rxGood += '\tfilename:(.+)'
+            $rxGood += 'php:('
+            if ($null -eq $PhpVersion) {
+                $rxGood += '\d+\.\d+(?:\.\d+)*'
+            } else {
+                $rxGood += '' + $PhpVersion.ComparableVersion.Major + '\.' + $PhpVersion.ComparableVersion.Minor + '(?:\.\d+)*'
+            }
+            $rxGood += ')?'
+            $groups['phpVersion'] = ++$rxIndex
+            $rxGood += '\t';
+            $rxGood += 'architecture:('
+            if ($null -eq $PhpVersion) {
+                $checkArchitectures = @($Script:ARCHITECTURE_32BITS, $Script:ARCHITECTURE_64BITS)
+                $rxGood += $Script:ARCHITECTURE_32BITS + '|' + $Script:ARCHITECTURE_64BITS
+            } else {
+                $checkArchitectures = @($PhpVersion.Architecture)
+                $rxGood += $PhpVersion.Architecture
+            }
+            $rxGood += ')'
+            $groups['architecture'] = ++$rxIndex
+            $rxGood += '\t';
+            $rxGood += 'threadSafe:('
+            if ($null -eq $PhpVersion) {
+                $rxGood += '0|1'
+            } else {
+                $rxGood += [int]$PhpVersion.ThreadSafe
+            }
+            $rxGood += ')'
+            $groups['threadSafe'] = ++$rxIndex
+            $rxGood += '\t';
+            $rxGood += 'type:(Php|Zend)'
+            $groups['type'] = ++$rxIndex
+            $rxGood += '\t';
+            $rxGood += 'name:(.+)'
+            $groups['name'] = ++$rxIndex
+            $rxGood += '\t';
+            $rxGood += 'version:(.*)'
+            $groups['version'] = ++$rxIndex
+            $rxGood += '\t';
+            $rxGood += 'filename:(.+)'
+            $groups['filename'] = ++$rxIndex
             $rxGood += '$'
-            $inspectorPath = [System.IO.Path]::Combine($PSScriptRoot, 'bin', 'Inspect-PhpExtension-' + $PhpVersion.Architecture + '.exe')
-            $inspectorResults = & $inspectorPath $inspectorParameters
-            if ($LASTEXITCODE -ne 0) {
-                throw 'Failed to inspect extension(s)'
+            foreach ($checkArchitecture in $checkArchitectures) {
+                $inspectorPath = [System.IO.Path]::Combine($PSScriptRoot, 'bin', 'Inspect-PhpExtension-' + $checkArchitecture + '.exe')
+                $inspectorResults = & $inspectorPath $inspectorParameters
+                if ($inspectorResults -ne 'Unable to open the DLL.') {
+                    if ($LASTEXITCODE -eq 0) {
+                        break
+                    }
+                    throw 'Failed to inspect extension(s)'
+                }
             }
             foreach ($inspectorResult in $inspectorResults) {
                 $match = $inspectorResult | Select-String -Pattern $rxGood
@@ -82,12 +124,15 @@
                     }
                 } else {
                     $result1 = [PhpExtension]::new(@{
-                        'Type' = $match.Matches.Groups[1].Value;
+                        'Type' = $match.Matches.Groups[$groups['type']].Value;
                         'State' = $Script:EXTENSIONSTATE_UNKNOWN;
-                        'Name' = $match.Matches.Groups[2].Value;
-                        'Handle' = Get-PhpExtensionHandle -Name $match.Matches.Groups[2].Value;
-                        'Version' = $match.Matches.Groups[3].Value;
-                        'Filename' = $match.Matches.Groups[4].Value;
+                        'Name' = $match.Matches.Groups[$groups['name']].Value;
+                        'Handle' = Get-PhpExtensionHandle -Name $match.Matches.Groups[$groups['name']].Value;
+                        'Version' = $match.Matches.Groups[$groups['version']].Value;
+                        'Filename' = $match.Matches.Groups[$groups['filename']].Value;
+                        'PhpVersion' = $match.Matches.Groups[$groups['phpVersion']].Value;
+                        'Architecture' = $match.Matches.Groups[$groups['architecture']].Value;
+                        'ThreadSafe' = $match.Matches.Groups[$groups['threadSafe']].Value;
                     })
                     if ($inspectingSingleFile) {
                         $result = $result1;
