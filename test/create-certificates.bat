@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableExtensions 
+setlocal EnableExtensions
 
 openssl version >NUL 2>NUL
 if errorlevel 1 (
