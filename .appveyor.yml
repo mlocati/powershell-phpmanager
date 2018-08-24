@@ -6,6 +6,8 @@ branches:
 
 version: "Build {build}"
 
+skip_tags: false
+
 skip_commits:
   files:
     - images/
