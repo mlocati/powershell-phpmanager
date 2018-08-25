@@ -65,13 +65,13 @@
             $rxIndex = 0
             $groups = @{}
             $rxGood = '^'
-            $rxGood += 'php:('
+            $rxGood += 'php:((?:'
             if ($null -eq $PhpVersion) {
                 $rxGood += '\d+\.\d+(?:\.\d+)*'
             } else {
                 $rxGood += '' + $PhpVersion.ComparableVersion.Major + '\.' + $PhpVersion.ComparableVersion.Minor + '(?:\.\d+)*'
             }
-            $rxGood += ')?'
+            $rxGood += ')?)'
             $groups['phpVersion'] = ++$rxIndex
             $rxGood += '\t';
             $rxGood += 'architecture:('
@@ -85,13 +85,13 @@
             $rxGood += ')'
             $groups['architecture'] = ++$rxIndex
             $rxGood += '\t';
-            $rxGood += 'threadSafe:('
+            $rxGood += 'threadSafe:((?:'
             if ($null -eq $PhpVersion) {
                 $rxGood += '0|1'
             } else {
                 $rxGood += [int]$PhpVersion.ThreadSafe
             }
-            $rxGood += ')'
+            $rxGood += ')?)'
             $groups['threadSafe'] = ++$rxIndex
             $rxGood += '\t';
             $rxGood += 'type:(Php|Zend)'

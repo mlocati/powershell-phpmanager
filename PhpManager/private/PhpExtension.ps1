@@ -52,8 +52,7 @@
     <#
     Is this a thread-safe extension?
     #>
-    [bool]
-    [ValidateNotNull()]
+    [Nullable[bool]]
     $ThreadSafe
 
     <#
@@ -72,7 +71,7 @@
     - Handle: required
     - PhpVersion: required
     - Architecture: required
-    - ThreadSafe: required
+    - ThreadSafe: optional
     - Version: optional
     - Filename: optional
     #>
@@ -84,12 +83,15 @@
         $this.Handle = $data.Handle
         $this.PhpVersion = $data.PhpVersion
         $this.Architecture = $data.Architecture
-        if ($data.ThreadSafe -eq 0 -or $data.ThreadSafe -eq $false) {
-            $this.ThreadSafe = $false
-        } elseif ($data.ThreadSafe -eq 1 -or $data.ThreadSafe -eq $true) {
-            $this.ThreadSafe = $true
-        } else {
-            throw 'Invalid ThreadSafe value'
+        $this.ThreadSafe = $null
+        if ($data.ContainsKey('ThreadSafe') -and $null -ne $data.ThreadSafe -and $data.ThreadSafe -ne '') {
+            if ($data.ThreadSafe -eq 0 -or $data.ThreadSafe -eq $false) {
+                $this.ThreadSafe = $false
+            } elseif ($data.ThreadSafe -eq 1 -or $data.ThreadSafe -eq $true) {
+                $this.ThreadSafe = $true
+            } else {
+                throw 'Invalid ThreadSafe value!'
+            }
         }
         $this.Version = ''
         if ($data.ContainsKey('Version') -and $null -ne $data.Version) {
