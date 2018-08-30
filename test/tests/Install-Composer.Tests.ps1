@@ -1,7 +1,7 @@
 ﻿Describe 'Install-Composer' {
     Mock -ModuleName PhpManager Get-PhpDownloadCache { return Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath download-cache }
-    $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid
-    $composerPath = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid
+    $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid
+    $composerPath = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid
     $composerBat = Join-Path -Path $composerPath -ChildPath 'composer.bat'
     It 'should install Composer' {
         if (Test-Path -LiteralPath $phpPath) {

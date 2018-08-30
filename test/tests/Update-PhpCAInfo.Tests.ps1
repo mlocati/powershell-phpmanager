@@ -2,11 +2,10 @@
 
     Mock -ModuleName PhpManager Get-PhpDownloadCache { return Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath download-cache }
 
-    $installsPath = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs
-    if (-Not(Test-Path -LiteralPath $installsPath)) {
-        New-Item -ItemType Directory -Path $installsPath
+    if (-Not(Test-Path -LiteralPath $Global:PHPMANAGER_TESTINSTALLS)) {
+        New-Item -ItemType Directory -Path $Global:PHPMANAGER_TESTINSTALLS
     }
-    $phpPath = Join-Path -Path $installsPath -ChildPath (New-Guid).Guid
+    $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid
     if (Test-Path -LiteralPath $phpPath) {
         Remove-Item -LiteralPath $phpPath -Recurse -Force
     }
@@ -31,8 +30,8 @@
         } catch {
         }
         if ($startWebServer) {
-            $webServerStdOut = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath 'https-server.log'
-            $webServerStdErr = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath 'https-server.error.log'
+            $webServerStdOut = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath 'https-server.log'
+            $webServerStdErr = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath 'https-server.error.log'
             if (Test-Path -LiteralPath $webServerStdOut) {
                 Remove-Item -LiteralPath $webServerStdOut -Recurse -Force
             }

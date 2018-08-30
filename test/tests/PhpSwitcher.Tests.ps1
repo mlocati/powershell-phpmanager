@@ -1,7 +1,7 @@
 ﻿Describe 'PhpSwitcher' {
     Mock -ModuleName PhpManager Get-PhpDownloadCache { return Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath download-cache }
 
-    $alias = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid
+    $alias = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid
     if (Test-Path -LiteralPath $alias) {
         Remove-Item -LiteralPath $alias -Recurse -Force
     }
@@ -10,8 +10,8 @@
     $Global:phpManagerTest_phpSwitcherData | Add-Member -MemberType NoteProperty -Name Alias -Value $alias
     $Global:phpManagerTest_phpSwitcherData | Add-Member -MemberType NoteProperty -Name Targets -Value (New-Object -TypeName PSCustomObject)
     $installations = @(
-        @{version = '7.0'; path = (Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid)}
-        @{version = '7.1'; path = (Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid)}
+        @{version = '7.0'; path = (Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid)}
+        @{version = '7.1'; path = (Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid)}
     )
     foreach ($installation in $installations) {
         if (Test-Path -LiteralPath $installation.path) {

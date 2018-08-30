@@ -1,7 +1,7 @@
 ﻿Describe 'Get-Set-PhpIniKey' {
 
     Mock -ModuleName PhpManager Get-PhpDownloadCache { return Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath download-cache }
-    $phpIniFolder = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs
+    $phpIniFolder = $Global:PHPMANAGER_TESTINSTALLS
     if (-Not(Test-Path -LiteralPath $phpIniFolder)) {
         New-Item -ItemType Directory -Path $phpIniFolder
     }

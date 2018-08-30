@@ -2,11 +2,11 @@
     Mock -ModuleName PhpManager Get-PhpDownloadCache { return Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath download-cache }
 
     $testCases = @(
-        @{version = '7.1'; path = (Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid)}
+        @{version = '7.1'; path = (Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid)}
     )
     <# I don't know how to setup the VCRedist 2017 on nanoserver: let's skip PHP 7.2 on it #>
     if (Join-Path -Path $Env:windir -ChildPath System32\imm32.dll | Test-Path -PathType Leaf) {
-        $testCases += @{version = '7.2'; path = (Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid)}
+        $testCases += @{version = '7.2'; path = (Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid)}
     }
     foreach ($testCase in $testCases) {
         if (Test-Path -LiteralPath $testCase.path) {
@@ -59,7 +59,7 @@
             $imagick.State | Should -BeExactly 'Disabled'
         }
         It -Name 'should handle multiple extension versions' {
-            $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath installs | Join-Path -ChildPath (New-Guid).Guid
+            $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid
             Install-Php -Version 7.1 -Architecture x64 -ThreadSafe $true -Path $phpPath
             $phpVersion = Get-Php -Path $phpPath
             try {
