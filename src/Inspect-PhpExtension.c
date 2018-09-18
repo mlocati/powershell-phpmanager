@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 // https://github.com/php/php-src/blob/php-7.3.0beta1/Zend/zend_modules.h#L34
-// https://github.com/php/php-src/blob/php-7.3.0beta3/Zend/zend_modules.h#L34
+// https://github.com/php/php-src/blob/php-7.3.0RC1/Zend/zend_modules.h#L34
 #define ZMA_PHP_7_3 20180731
 // https://github.com/php/php-src/blob/php-7.2.0/Zend/zend_modules.h#L36
 // https://github.com/php/php-src/blob/php-7.2.9/Zend/zend_modules.h#L36
