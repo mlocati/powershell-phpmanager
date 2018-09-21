@@ -57,7 +57,7 @@
         $rxMatch += '-' + [regex]::Escape($PhpVersion.Architecture)
         $rxMatch += '\.zip$'
         $urls = @("https://windows.php.net/downloads/pecl/releases/$handleLC/$PackageVersion")
-        if ($MinimumStability -eq $Script:PEARSTATE_SNAPSHOT) {
+        if ($MinimumStability -ne $Script:PEARSTATE_STABLE) {
             $urls += "https://windows.php.net/downloads/pecl/snaps/$handleLC/$PackageVersion"
         }
         foreach ($url in $urls) {
