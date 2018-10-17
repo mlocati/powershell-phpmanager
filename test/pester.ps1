@@ -1,5 +1,7 @@
 ﻿param ([string[]]$TestName)
 
+$Global:ProgressPreference = 'SilentlyContinue'
+
 Import-Module -Name Pester -MinimumVersion 4.0
 
 New-Variable -Scope Global -Option ReadOnly -Name PHPMANAGER_MODULEPATH -Value (Split-Path -LiteralPath $PSScriptRoot | Join-Path -ChildPath PhpManager) -Force
