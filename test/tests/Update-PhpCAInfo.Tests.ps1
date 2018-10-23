@@ -18,6 +18,13 @@
         }
         $phpOutput
     }
+
+    $sourceTestCases = @(
+        @{source = 'Curl'},
+        @{source = 'LocalMachine'},
+        @{source = 'CurrentUser'}
+    )
+
     $localServerProcess = $null
     $phpInstalled = $false
     try {
@@ -79,10 +86,11 @@
             It 'php should fail connecting to a server certificated with custom CA when no CA certificate is configured' -Skip {
             }
         }
-        It 'php should succeed connecting to a server certificated with official CA when only official CA certificates are configured' {
+        It 'php should succeed connecting to a server certificated with official CA when only official CA certificates are configured (<source> certs)' -TestCases $sourceTestCases {
+            param ($source)
             Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
             Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
-            Update-PhpCAInfo -Path $phpPath
+            Update-PhpCAInfo -Path $phpPath -Source $source
             CheckHttps 'www.google.com'  443 | Should -BeExactly 'curl:ok;openssl:ok'
         }
         if ($null -ne $localServerProcess) {

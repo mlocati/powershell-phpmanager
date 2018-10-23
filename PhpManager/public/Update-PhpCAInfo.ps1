@@ -16,6 +16,12 @@
     .Parameter CustomCAPath
     If you have a custom CA certificate, you can use this parameter to specify its path: it will be included with the list of the official CA certificates downloaded.
 
+    .Parameter Source
+    The source of the root CA certificates. It can be:
+    - 'Curl' [default] to fetch the certificates from the cURL website (https://curl.haxx.se)
+    - 'LocalMachine' to fetch the certificates from the Windows repository of the local machine
+    - 'CurrentUser' to fetch the certificates from the Windows repository of the current user
+
     .Outputs
     bool
     #>
@@ -30,7 +36,11 @@
         [string] $CAPath = '',
         [Parameter(Mandatory = $false, Position = 2, HelpMessage = 'The path of a file that contains a custom CA certificate to be added to the official CA list')]
         [ValidateNotNull()]
-        [string] $CustomCAPath = ''
+        [string] $CustomCAPath = '',
+        [Parameter(Mandatory = $false, Position = 3, HelpMessage = 'The source of the CA certificates')]
+        [ValidateNotNull()]
+        [ValidateSet('Curl', 'LocalMachine', 'CurrentUser')]
+        [string] $Source = 'Curl'
     )
     begin {
     }
@@ -45,32 +55,13 @@
         } elseif (-Not(Test-Path -Path $CustomCAPath -PathType Leaf)) {
             throw "Unable to find your custom CA file $CustomCAPath"
         }
-        Write-Verbose "Downloading CACert checksum file"
-        try {
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
-        } catch {
-            Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
-        }
-        $checksum = [System.Text.Encoding]::ASCII.GetString($(Invoke-WebRequest -UseBasicParsing -Uri $Script:CACERT_CHECKSUM_URL).Content)
-        Write-Verbose "Downloading CACert file"
-        $cacertBytes = $(Invoke-WebRequest -UseBasicParsing -Uri $Script:CACERT_PEM_URL).Content
-        Write-Verbose "Checking CACert file"
-        $stream = New-Object System.IO.MemoryStream
-        try {
-            $streamWriter = New-Object -TypeName System.IO.BinaryWriter -ArgumentList @($stream)
-            try {
-                $streamWriter.Write($cacertBytes)
-                $streamWriter.Flush()
-                $stream.Position = 0
-                $checksum2 = Get-FileHash -InputStream $stream -Algorithm $Script:CACERT_CHECKSUM_ALGORITHM
-            } finally {
-                $streamWriter.Dispose()
+        switch -Regex ($Source) {
+            '^(LocalMachine|CurrentUser)$' {
+                $cacertBytes = Get-CACertFromSystem -Source $Source
             }
-        } finally {
-            $stream.Dispose()
-        }
-        if (-Not($checksum -match ('^' + $checksum2.Hash + '($|\s)'))) {
-            throw "The checksum of the downloaded CA certificates is wrong!"
+            'Curl' {
+                $cacertBytes = Get-CACertFromCurl
+            }
         }
         if ($CustomCAPath -ne '') {
             Write-Verbose "Appending custom CA file"
@@ -81,10 +72,11 @@
             try {
                 $streamWriter = New-Object -TypeName System.IO.BinaryWriter -ArgumentList @($stream)
                 try {
-                    $streamWriter.Write($cacertBytes)
+                    $streamWriter.Write([byte[]]$cacertBytes)
                     $streamWriter.Write([System.Text.Encoding]::ASCII.GetBytes($header))
                     $streamWriter.Write([System.IO.File]::ReadAllBytes($CustomCAPath))
                     $streamWriter.Flush()
+                    $stream.Position = 0
                     $cacertBytes = $stream.ToArray()
                 } finally {
                     $streamWriter.Dispose()
@@ -93,12 +85,12 @@
                 $stream.Dispose()
             }
         }
-        Write-Verbose "Saving CA file"
         if ($null -eq $CAPath -or $CAPath -eq '') {
             $CAPath = Join-Path -Path $phpVersion.ActualFolder -ChildPath ssl | Join-Path -ChildPath cacert.pem
         } else {
             $CAPath = [System.IO.Path]::GetFullPath($CAPath)
        }
+       Write-Verbose "Saving CA file as $CAPath"
        $caFolder = Split-Path -LiteralPath $CAPath
        if (-Not(Test-Path -Path $caFolder -PathType Container)) {
            New-Item -Path $caFolder -ItemType Directory | Out-Null
