@@ -14,7 +14,7 @@ $PSVersionTable.PSVersion.ToString()
 
 If you have an older version, you can upgrade it [following these instructions](https://docs.microsoft.com/en-us/powershell/wmf/5.1/install-configure).
 
-To install this module for any user of your PC, open an elevated PowerShell session and run this command:
+To install this module for any user of your PC, open an elevated PowerShell session (for example with `Start-Process powershell -Verb runAs`) and run this command:
 
 ```powershell
 Install-Module -Name PhpManager -Force
