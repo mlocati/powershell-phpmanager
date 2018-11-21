@@ -10,9 +10,6 @@
     The path of the PHP installation.
     If omitted we'll use the one found in the PATH environment variable.
 
-    .Parameter ConfirmAuto
-    If -Path is omitted, specify this flag to assume that the PHP installation found in PATH is the correct one.
-
     .Parameter Force
     Use this switch to force updating PHP even if the newest available version is not newer than the installed one.
 
@@ -25,7 +22,6 @@
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Path,
-        [switch] $ConfirmAuto,
         [switch] $Force
     )
     begin {
@@ -34,24 +30,8 @@
     process {
         if ($null -eq $Path -or $Path -eq '') {
             $installedVersion = [PhpVersionInstalled]::FromEnvironmentOne()
-            $confirmAutomaticallyFoundPhp = $true
         } else {
             $installedVersion = [PhpVersionInstalled]::FromPath($Path)
-            $confirmAutomaticallyFoundPhp = $false
-        }
-        if ($confirmAutomaticallyFoundPhp -and -Not($ConfirmAuto)) {
-            Write-Verbose "The PHP installation has been found at $($installedVersion.ActualFolder))"
-            $confirmed = $false
-            while (-Not($confirmed)) {
-                $answer = Read-Host -Prompt "Do you confirm updating PHP at $($installedVersion.ActualFolder) [use -ConfirmAuto to confirm autumatically]? [y/n]"
-                if ($answer -match '^\s*y') {
-                    $confirmed = $true
-                } elseif ($answer -match '^\s*n') {
-                    throw 'Operation aborted.'
-                } else {
-                    Write-Error 'Please answer with Y or N' -ErrorAction Continue
-                }
-            }
         }
         if ($null -eq $installedVersion.RC) {
             $possibleReleaseStates = @($Script:RELEASESTATE_RELEASE, $Script:RELEASESTATE_ARCHIVE)
