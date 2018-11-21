@@ -305,12 +305,36 @@ class PhpVersionInstalled : PhpVersion
     [PhpVersionInstalled] static FromEnvironmentOne()
     {
         $found = [PhpVersionInstalled]::FromEnvironment()
-        if ($found.Count -eq 0) {
+        $numFound = $found.Count
+        if ($numFound -eq 0) {
             throw "No PHP versions found in the current PATHs: use the -Path argument to specify the location of installed PHP"
         }
-        if ($found.Count -gt 1) {
-            throw "Multiple PHP versions found in the current PATHs: use the -Path argument to specify the location of installed PHP"
+        if ($numFound -eq 1) {
+            $resultIndex = 0
+        } else {
+            $resultIndex = -1
+            Write-Host "Multiple PHP installations have been found.`nPlease specify the PHP installation you want:"
+            while($resultIndex -eq -1) {
+                for ($index = 0; $index -lt $numFound; $index++) {
+                    Write-Host "$($index + 1). $($found[$index].Folder)`n  $($found[$index].DisplayName)"
+                }
+                $choiche = Read-Host "x. Cancel`n`nYour choiche (1... $numFound, or x)? "
+                if ($choiche -eq 'x') {
+                    throw 'Operation aborted.'
+                }
+                try {
+                    $resultIndex = [int]$choiche - 1
+                    if ($resultIndex -lt 0 -or $resultIndex -ge $numFound) {
+                        $resultIndex = -1
+                    }
+                } catch {
+                    $resultIndex = -1
+                }
+                if ($resultIndex -eq -1) {
+                    Write-Host "`nPlease enter a number between 0 and $numFound, or 'x' to abort.`n"
+                }
+            }
         }
-        return $found[0]
+        return $found[$resultIndex]
     }
 }
