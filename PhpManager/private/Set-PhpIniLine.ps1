@@ -26,7 +26,17 @@
         if (Test-Path -Path $Path -PathType Container) {
             $Path = [System.IO.Path]::Combine($Path, 'php.ini')
         }
-        Set-Content -Path $Path -Value $Lines
+        $Content = $Lines | Out-String
+        for ($i = 1; ; $i++) {
+            try {
+                Set-Content -Path $Path -Value $Content
+                break
+            } catch {
+                if ($i -ge 3) {
+                    throw
+                }
+            }
+        }
     }
     end {
     }
