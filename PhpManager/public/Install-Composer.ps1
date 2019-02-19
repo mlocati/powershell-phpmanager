@@ -64,11 +64,7 @@
         try {
             if ($NoCache) {
                 $installer = [System.IO.Path]::GetTempFileName();
-                try {
-                    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
-                } catch {
-                    Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
-                }
+                Set-NetSecurityProtocolType
                 Write-Verbose "Downloading from $installerUrl"
                 Invoke-WebRequest -UseBasicParsing $installerUrl -OutFile $installer
             } else {

@@ -49,6 +49,7 @@
         }
         # https://pear.php.net/manual/en/core.rest.php
         $handleLC = $Handle.ToLowerInvariant()
+        Set-NetSecurityProtocolType
         $xmlDocument = Invoke-RestMethod -Method Get -Uri ($Script:URL_PECLREST_1_0 + "r/$handleLC/allreleases.xml")
         $xmlVersions = @($xmlDocument | Select-Xml -XPath '/ns:a/ns:r' -Namespace @{'ns' = $xmlDocument.DocumentElement.NamespaceURI} | Select-Object -ExpandProperty Node)
         foreach ($xmlVersion in $xmlVersions) {

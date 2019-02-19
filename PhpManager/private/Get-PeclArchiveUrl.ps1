@@ -39,16 +39,12 @@
         [string] $MinimumStability = 'stable'
     )
     begin {
+        Set-NetSecurityProtocolType
         $result = ''
     }
     process {
         # https://github.com/php/web-pecl/blob/467593b248d4603a3dee2ecc3e61abfb7434d24d/include/pear-win-package.php
         $handleLC = $PackageHandle.ToLowerInvariant();
-        try {
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
-        } catch {
-            Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
-        }
         $rxMatch = '/php_' + [regex]::Escape($PackageHandle)
         $rxMatch += '-' + [regex]::Escape($PackageVersion)
         $rxMatch += '-' + [regex]::Escape('' + $PhpVersion.ComparableVersion.Major + '.' + $PhpVersion.ComparableVersion.Minor)
