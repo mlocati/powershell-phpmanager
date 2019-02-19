@@ -8,6 +8,7 @@
     param (
     )
     begin {
+        Set-NetSecurityProtocolType
         $result = $null
     }
     process {

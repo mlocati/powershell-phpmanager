@@ -35,11 +35,7 @@
         if ($null -eq $result) {
             $result = @()
             $urlList = Get-Variable -Name "URL_LIST_$State" -ValueOnly -Scope Script
-            try {
-                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
-            } catch {
-                Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
-            }
+            Set-NetSecurityProtocolType
             $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $urlList
             foreach ($link in $webResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {
                 $result += Get-PhpVersionFromUrl -Url $link.Href -ReleaseState $State -PageUrl $urlList

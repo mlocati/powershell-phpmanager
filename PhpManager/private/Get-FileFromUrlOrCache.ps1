@@ -86,11 +86,7 @@
         } else {
             $temporaryFile = Get-TemporaryFileWithExtension -Extension $extension
             try {
-                try {
-                    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
-                } catch {
-                    Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
-                }
+                Set-NetSecurityProtocolType
                 Write-Verbose "Downloading from $Url"
                 Invoke-WebRequest -UseBasicParsing $Url -OutFile $temporaryFile
                 if ($fullCachePath -ne '') {

@@ -26,11 +26,7 @@
             imagick {
                 $rxSearch = '/ImageMagick-[\d\.\-]+-vc' + $PhpVersion.VCVersion + '-' + $PhpVersion.Architecture + '\.zip$'
                 $pageUrl = 'https://windows.php.net/downloads/pecl/deps/'
-                try {
-                    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 + [Net.SecurityProtocolType]::Tls11 + [Net.SecurityProtocolType]::Tls
-                } catch {
-                    Write-Debug '[Net.ServicePointManager] or [Net.SecurityProtocolType] not found in current environment'
-                }
+                Set-NetSecurityProtocolType
                 $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $pageUrl
                 $zipUrl = $null
                 foreach ($link in $webResponse.Links) {
