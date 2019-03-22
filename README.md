@@ -61,6 +61,15 @@ Also the 32/64 bit and the thread safety will be the same.
 Update-Php C:\PHP
 ```
 
+### Updating PHP to a specified version
+
+Use the `Install-Php` command to update PHP (for example existing version 7.2.10 to 7.2.15). 
+If you don't specify the ```InitialPhpIni``` parameter all  settings are retained.
+
+```powershell
+Install-Php -Version 7.2.15 -Architecture x64 -ThreadSafe 0 -Path C:\PHP
+```
+
 ### Uninstalling PHP
 
 Use the `Uninstall-Php` command to uninstall PHP.
