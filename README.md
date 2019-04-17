@@ -65,9 +65,10 @@ Update-Php C:\PHP
 
 Use the `Install-Php` command to update PHP (for example existing version 7.2.10 to 7.2.15). 
 If you don't specify the ```InitialPhpIni``` parameter all  settings are retained.
+**Also the parameter `Force` is required**
 
 ```powershell
-Install-Php -Version 7.2.15 -Architecture x64 -ThreadSafe 0 -Path C:\PHP
+Install-Php -Version 7.2.15 -Architecture x64 -ThreadSafe $true -Path C:\PHP -Force
 ```
 
 ### Uninstalling PHP
