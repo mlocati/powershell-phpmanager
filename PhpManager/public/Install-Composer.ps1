@@ -66,7 +66,7 @@
                 $installer = [System.IO.Path]::GetTempFileName();
                 Set-NetSecurityProtocolType
                 Write-Verbose "Downloading from $installerUrl"
-                Invoke-WebRequest -UseBasicParsing $installerUrl -OutFile $installer
+                Invoke-WebRequest -UseBasicParsing -Uri $installerUrl -OutFile $installer
             } else {
                 $installer = Get-FileFromUrlOrCache -Url $installerUrl -CachedFileName 'composer-installer.php'
             }
