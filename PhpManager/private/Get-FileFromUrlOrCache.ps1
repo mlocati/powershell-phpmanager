@@ -88,7 +88,7 @@
             try {
                 Set-NetSecurityProtocolType
                 Write-Verbose "Downloading from $Url"
-                Invoke-WebRequest -UseBasicParsing $Url -OutFile $temporaryFile
+                Invoke-WebRequest -UseBasicParsing -Uri $Url -OutFile $temporaryFile
                 if ($fullCachePath -ne '') {
                     Move-Item -LiteralPath $temporaryFile -Destination $fullCachePath
                     $localFile = $fullCachePath
