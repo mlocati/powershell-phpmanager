@@ -6,7 +6,7 @@
     Author = 'Michele Locati'
     CompanyName = 'Unknown'
     Copyright = '(c) 2018 Michele Locati. All rights reserved.'
-    Description = 'A PowerShell module to install/update PHP and PHP extensions'
+    Description = 'A PowerShell module to install/update PHP, PHP extensions and Composer'
     PowerShellVersion = '5.0'
     # PowerShellHostName = ''
     # PowerShellHostVersion = ''
@@ -28,7 +28,7 @@
     # FileList = @()
     PrivateData = @{
         PSData = @{
-            Tags = @('php', 'extensions', 'windows', 'win32', 'dll')
+            Tags = @('php', 'extensions', 'composer', 'windows', 'win32', 'dll')
             LicenseUri = 'https://github.com/mlocati/powershell-phpmanager/blob/master/LICENSE'
             ProjectUri = 'https://github.com/mlocati/powershell-phpmanager'
             IconUri = 'https://raw.githubusercontent.com/mlocati/powershell-phpmanager/master/images/php.png'
