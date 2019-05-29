@@ -3,13 +3,13 @@
 #include <stdio.h>
 
 // https://github.com/php/php-src/blob/php-7.3.0beta1/Zend/zend_modules.h#L34
-// https://github.com/php/php-src/blob/php-7.3.2/Zend/zend_modules.h#L34
+// https://github.com/php/php-src/blob/php-7.3.6/Zend/zend_modules.h#L34
 #define ZMA_PHP_7_3 20180731
 // https://github.com/php/php-src/blob/php-7.2.0/Zend/zend_modules.h#L36
-// https://github.com/php/php-src/blob/php-7.2.15/Zend/zend_modules.h#L36
+// https://github.com/php/php-src/blob/php-7.2.19/Zend/zend_modules.h#L36
 #define ZMA_PHP_7_2 20170718
 // https://github.com/php/php-src/blob/php-7.1.0/Zend/zend_modules.h#L36
-// https://github.com/php/php-src/blob/php-7.1.26/Zend/zend_modules.h#L36
+// https://github.com/php/php-src/blob/php-7.1.30/Zend/zend_modules.h#L36
 #define ZMA_PHP_7_1 20160303
 // https://github.com/php/php-src/blob/php-7.0.0/Zend/zend_modules.h#L36
 // https://github.com/php/php-src/blob/php-7.0.33/Zend/zend_modules.h#L36
