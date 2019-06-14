@@ -33,7 +33,7 @@
         } else {
             $installedVersion = [PhpVersionInstalled]::FromPath($Path)
         }
-        if ($null -eq $installedVersion.RC) {
+        if ($installedVersion.UnstabilityLevel -eq '') {
             $possibleReleaseStates = @($Script:RELEASESTATE_RELEASE, $Script:RELEASESTATE_ARCHIVE)
         } else {
             $possibleReleaseStates = @($Script:RELEASESTATE_QA)

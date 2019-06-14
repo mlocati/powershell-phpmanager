@@ -39,10 +39,11 @@
         }
         $data = @{}
         $data.Version = $match.Matches.Groups[1].Value;
-        $data.RC = $match.Matches.Groups[2].Value;
-        $data.Architecture = $match.Matches.Groups[5].Value;
-        $data.ThreadSafe = $match.Matches.Groups[3].Value -ne '-nts';
-        $data.VCVersion = $match.Matches.Groups[4].Value;
+        $data.UnstabilityLevel = $match.Matches.Groups[2].Value;
+        $data.UnstabilityVersion = $match.Matches.Groups[3].Value;
+        $data.Architecture = $match.Matches.Groups[6].Value;
+        $data.ThreadSafe = $match.Matches.Groups[4].Value -ne '-nts';
+        $data.VCVersion = $match.Matches.Groups[5].Value;
         $data.ReleaseState = $ReleaseState;
         if ($null -ne $PageUrl -and $PageUrl -ne '') {
             $data.DownloadUrl = [Uri]::new([Uri]$PageUrl, $Url).AbsoluteUri

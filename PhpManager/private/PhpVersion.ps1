@@ -1,18 +1,24 @@
 ﻿class PhpVersion : System.IComparable
 {
     <#
-    The version of PHP, without the RC state
+    The version of PHP, without the alpha/beta/RC state
     #>
     [string]
     [ValidateNotNull()]
     [ValidateLength(1, [int]::MaxValue)]
     $Version
     <#
-    The number of the release candidate, if any
+    The unstability level, if any (alpha, beta, RC)
     #>
-    [Nullable[int]] $RC
+    [string]
+    [ValidateNotNull()]
+    $UnstabilityLevel
     <#
-    the version of PHP, possibly including the RC state
+    The unstability version, if any
+    #>
+    [Nullable[int]] $UnstabilityVersion
+    <#
+    the version of PHP, possibly including the alpha/beta/RC state
     #>
     [ValidateNotNull()]
     [ValidateLength(1, [int]::MaxValue)]
@@ -48,7 +54,8 @@
     Initialize the instance.
     Keys for $data:
     - Version: required
-    - RC: optional
+    - UnstabilityLevel: optional
+    - UnstabilityVersion: optional
     - Architecture: required
     - ThreadSafe: required
     - VCVersion: required
@@ -56,18 +63,40 @@
     hidden PhpVersion([hashtable] $data)
     {
         $this.Version = $data.Version
-        if ($data.ContainsKey('RC') -and $data.RC -ne '') {
-            $this.RC = [int] $data.RC
+        if ($data.ContainsKey('UnstabilityLevel') -and $null -ne $data.UnstabilityLevel) {
+            $this.UnstabilityLevel = $data.UnstabilityLevel
         } else {
-            $this.RC = $null
+            $this.UnstabilityLevel = ''
+        }
+        if ($data.ContainsKey('UnstabilityVersion') -and $null -ne $data.UnstabilityVersion -and $data.UnstabilityVersion -ne '') {
+            if ($this.UnstabilityLevel -eq '') {
+                throw "UnstabilityVersion provided without UnstabilityLevel"
+            }
+            $this.UnstabilityVersion = [int] $data.UnstabilityVersion
+        } else {
+            $this.UnstabilityLevel = $null
         }
         $dv = $this.Version
         $cv = $this.Version
-        if ($null -eq $this.RC) {
-            $cv += '.9999'
-        } else {
-            $dv += 'RC' + $this.RC
-            $cv += '.' + $this.RC
+        switch ($this.UnstabilityLevel) {
+            '' {
+                $cv += '.9999999'
+            }
+            $Script:UNSTABLEPHP_RELEASECANDIDATE {
+                $dv += $Script:UNSTABLEPHP_RELEASECANDIDATE + $this.UnstabilityVersion
+                $cv += '.' + (8000000  + $this.UnstabilityVersion)
+            }
+            $Script:UNSTABLEPHP_BETA {
+                $dv += $Script:UNSTABLEPHP_BETA + $this.UnstabilityVersion
+                $cv += '.' + (4000000  + $this.UnstabilityVersion)
+            }
+            $Script:UNSTABLEPHP_ALPHA {
+                $dv += $Script:UNSTABLEPHP_ALPHA + $this.UnstabilityVersion
+                $cv += '.' + (2000000  + $this.UnstabilityVersion)
+            }
+            default {
+                throw 'Unrecognized UnstabilityLevel'
+            }
         }
         $this.FullVersion = $dv
         $this.ComparableVersion = [System.Version] $cv
@@ -231,22 +260,29 @@ class PhpVersionInstalled : PhpVersion
         if (-Not($executableResult)) {
             throw "Failed to execute php.exe: $LASTEXITCODE"
         }
-        $match = $executableResult | Select-String -Pattern '^(\d+\.\d+\.\d+)(?:RC(\d+))?@(\d+)$'
+        $match = $executableResult | Select-String -Pattern "^(\d+\.\d+\.\d+)(?:($Script:UNSTABLEPHP_RX)(\d+))?@(\d+)$"
         $data.Version = $match.Matches.Groups[1].Value
-        $data.RC = $match.Matches.Groups[2].Value
-        $data.Architecture = Get-Variable -Scope Script -ValueOnly -Name $('ARCHITECTURE_' + $match.Matches.Groups[3].Value + 'BITS')
+        $data.UnstabilityLevel = $match.Matches.Groups[2].Value
+        $data.UnstabilityVersion = $match.Matches.Groups[3].Value
+        $data.Architecture = Get-Variable -Scope Script -ValueOnly -Name $('ARCHITECTURE_' + $match.Matches.Groups[4].Value + 'BITS')
         $executableResult = & $data.ExecutablePath @('-i')
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Thread Safety\s*=>\s*(\w+)'
         $data.ThreadSafe = $match.Matches.Groups[1].Value -eq 'enabled'
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Compiler\s*=>\s*MSVC([\d]{1,2})'
-        if ($null -eq $match) {
-            if ([System.Version]$data.Version -le [System.Version]'5.2.9999') {
-                $data.VCVersion = 6
-            } else {
-                throw 'Failed to recognize VCVersion'
-            }
-        } else {
+        if ($null -ne $match) {
             $data.VCVersion = $match.Matches.Groups[1].Value
+        } elseif ([System.Version]$data.Version -le [System.Version]'5.2.9999') {
+            $data.VCVersion = 6
+        } else {
+            $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Compiler\s*=>\s*Visual C\+\+\s+(\d{4})(?:\s|$)'
+            if ($null -eq $match) {
+                throw "Failed to recognize VCVersion"
+            }
+            $vcYear = $match.Matches.Groups[1].Value
+            switch ($vcYear) {
+                '2019' { $data.VCVersion = 16 }
+                default { throw "Failed to recognize VCVersion from Visual C++ $vcYear" }
+            }
         }
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Loaded Configuration File\s*=>\s*([\S].*[\S])\s*$'
         $data.IniPath = ''

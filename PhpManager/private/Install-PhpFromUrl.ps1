@@ -49,8 +49,13 @@
                 if (-Not(Test-Path -Path $exePath -PathType Leaf)) {
                     throw "Unable to find php.exe in the downloaded archive"
                 }
-                & $exePath @('-n', '-v') | Out-Null
-                if ($LASTEXITCODE -eq $Script:STATUS_DLL_NOT_FOUND -or $LASTEXITCODE -eq $Script:ENTRYPOINT_NOT_FOUND) {
+                try {
+                    $exeOutput = & $exePath @('-n', '-v') 2>&1 | Out-String
+                } catch {
+                    $exeOutput = $_.Exception.Message
+                }
+                $exeExitCode = $LASTEXITCODE
+                if ($exeExitCode -eq $Script:STATUS_DLL_NOT_FOUND -or $exeExitCode -eq $Script:ENTRYPOINT_NOT_FOUND -or $exeOutput -match 'vcruntime.*is not compatible with this PHP build') {
                     switch ($PhpVersion.VCVersion) {
                         6 { $redistName = '6' } # PHP 5.2, PHP 5.3
                         7 { $redistName = '2002' }
@@ -61,7 +66,8 @@
                         11 { $redistName = '2012' } # PHP 5.5, PHP 5.6
                         12 { $redistName = '2013' }
                         14 { $redistName = '2015' } # PHP 7.0, PHP 7.1
-                        15 { $redistName = '2017' } # PHP 7.2
+                        15 { $redistName = '2017' } # PHP 7.2, PHP 7.3
+                        16 { $redistName = '2019' } # PHP 7.4
                         default {
                             throw ('The Visual C++ ' + $PhpVersion.VCVersion + ' Redistributable seems to be missing: you have to install it manually (we can''t recognize its version)')
                         }
@@ -102,6 +108,8 @@
                             Write-Debug 'Failed to remove temporary folder'
                         }
                     }
+                } elseif ($exeExitCode -ne 0) {
+                    throw "Running PHP resulted in the following error:`n$exeOutput"
                 }
             } finally {
                 try {

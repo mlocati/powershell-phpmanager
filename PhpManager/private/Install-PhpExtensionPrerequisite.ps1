@@ -24,7 +24,7 @@
         Write-Verbose ('Checking prerequisites for {0}' -f $Extension.Name)
         switch ($Extension.Handle) {
             imagick {
-                $rxSearch = '/ImageMagick-[\d\.\-]+-vc' + $PhpVersion.VCVersion + '-' + $PhpVersion.Architecture + '\.zip$'
+                $rxSearch = '/ImageMagick-[\d\.\-]+-(vc|vs)' + $PhpVersion.VCVersion + '-' + $PhpVersion.Architecture + '\.zip$'
                 $pageUrl = 'https://windows.php.net/downloads/pecl/deps/'
                 Set-NetSecurityProtocolType
                 $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $pageUrl

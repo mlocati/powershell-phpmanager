@@ -2,6 +2,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+// https://github.com/php/php-src/blob/php-7.4.0alpha1/Zend/zend_modules.h#L34
+#define ZMA_PHP_7_4 20190529
 // https://github.com/php/php-src/blob/php-7.3.0beta1/Zend/zend_modules.h#L34
 // https://github.com/php/php-src/blob/php-7.3.6/Zend/zend_modules.h#L34
 #define ZMA_PHP_7_3 20180731
@@ -48,6 +50,7 @@ typedef struct {
     LPCSTR version;
 } extensionInfo;
 
+// zend_module_entry is defined in php/Zend/zend_modules.h
 typedef struct {
     uint16_t size;
     DWORD zend_api;
@@ -67,6 +70,7 @@ typedef struct {
     LPVOID request_shutdown_func;
     LPVOID info_func;
     LPCSTR version;
+    // etcetera
 } zend_module_entry_20050617;
 
 typedef struct {
@@ -82,6 +86,7 @@ typedef struct {
     LPVOID request_shutdown_func;
     LPVOID info_func;
     LPCSTR version;
+    // etcetera
 } zend_module_entry_20020429;
 
 typedef zend_module_entry_Base*(__stdcall *getModuleEntryBase)();
@@ -103,6 +108,10 @@ void parsePhpExtension(HMODULE hModule, extensionInfo* extensionInfo)
     if (get_moduleAddress != NULL) {
         zend_module_entry_Base* zmeBase = ((getModuleEntryBase)get_moduleAddress)();
         switch (zmeBase->zend_api) {
+            case ZMA_PHP_7_4:
+                if (extensionInfo->php == NULL) {
+                    extensionInfo->php = "7.4";
+                }
             case ZMA_PHP_7_3:
                 if (extensionInfo->php == NULL) {
                     extensionInfo->php = "7.3";

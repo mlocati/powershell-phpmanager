@@ -14,7 +14,8 @@
             $initialPhpVersion.Version | Should -BeOfType [string]
             $initialPhpVersion.Version | Should -BeExactly '7.1.0'
             $initialPhpVersion.ComparableVersion | Should -BeOfType [version]
-            $initialPhpVersion.RC | Should -BeNullOrEmpty
+            $initialPhpVersion.UnstabilityLevel | Should -BeNullOrEmpty
+            $initialPhpVersion.UnstabilityVersion | Should -BeNullOrEmpty
             $initialPhpVersion.FullVersion | Should -BeExactly $initialPhpVersion.Version
             $initialPhpVersion.DisplayName | Should -BeLike "*$($initialPhpVersion.Version)*"
             $initialPhpVersion.Architecture | Should -BeExactly 'x64'
@@ -33,7 +34,8 @@
             $updatedPhpVersion.Version | Should -Match '^7\.1\.'
             $updatedPhpVersion.ComparableVersion | Should -BeOfType [version]
             $updatedPhpVersion.ComparableVersion | Should -BeGreaterThan $initialPhpVersion.ComparableVersion
-            $updatedPhpVersion.RC | Should -BeNullOrEmpty
+            $updatedPhpVersion.UnstabilityLevel | Should -BeNullOrEmpty
+            $updatedPhpVersion.UnstabilityVersion | Should -BeNullOrEmpty
             $updatedPhpVersion.FullVersion | Should -BeExactly $updatedPhpVersion.Version
             $updatedPhpVersion.DisplayName | Should -BeLike "*$($updatedPhpVersion.Version)*"
             $updatedPhpVersion.Architecture | Should -BeExactly $initialPhpVersion.Architecture

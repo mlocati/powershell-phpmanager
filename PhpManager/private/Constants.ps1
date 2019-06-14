@@ -10,7 +10,16 @@ New-Variable -Option Constant -Scope Script -Name 'RELEASESTATE_ARCHIVE' -Value 
 New-Variable -Option Constant -Scope Script -Name 'ARCHITECTURE_32BITS' -Value 'x86'
 New-Variable -Option Constant -Scope Script -Name 'ARCHITECTURE_64BITS' -Value 'x64'
 
-New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE' -Value 'php-(\d+\.\d+\.\d+)(?:RC([1-9]\d*))?(-nts)?-Win32-VC(\d{1,2})-(x86|x64)\.zip'
+# PHP non-stable identifier: Alpha
+New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_ALPHA' -Value 'alpha'
+# PHP non-stable identifier: Beta
+New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_BETA' -Value 'beta'
+# PHP non-stable identifier: Release candidate
+New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RELEASECANDIDATE' -Value 'RC'
+# PHP non-stable identifiers regex
+New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RX' -Value "$UNSTABLEPHP_ALPHA|$UNSTABLEPHP_BETA|$UNSTABLEPHP_RELEASECANDIDATE"
+
+New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE' -Value "php-(\d+\.\d+\.\d+)(?:($UNSTABLEPHP_RX)([1-9]\d*))?(-nts)?-Win32-(?:VC|vs)(\d{1,2})-(x86|x64)\.zip"
 
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_BUILTIN' -Value 'Builtin'
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_UNKNOWN' -Value 'Unknown'
@@ -28,15 +37,15 @@ New-Variable -Option Constant -Scope Script -Name 'ENVTARGET_MACHINE' -Value 'Ma
 
 New-Variable -Option Constant -Scope Script -Name 'URL_PECLREST_1_0' -Value 'https://pecl.php.net/rest/'
 
-# A production release.
+# PEAR stability: a production release.
 New-Variable -Option Constant -Scope Script -Name 'PEARSTATE_STABLE' -Value 'stable'
-# A non-production release. Beta should be used for code that has a stable API and is nearing a fully stable release. Regresion tests and documentation should exist or soon follow to qualify as a beta release. Release candidates should use the beta stability.
+# PEAR stability: a non-production release. Beta should be used for code that has a stable API and is nearing a fully stable release. Regresion tests and documentation should exist or soon follow to qualify as a beta release. Release candidates should use the beta stability.
 New-Variable -Option Constant -Scope Script -Name 'PEARSTATE_BETA' -Value 'beta'
-# A new non-production release. Alpha should be used for new code that has an unstable API or untested code.
+# PEAR stability: a new non-production release. Alpha should be used for new code that has an unstable API or untested code.
 New-Variable -Option Constant -Scope Script -Name 'PEARSTATE_ALPHA' -Value 'alpha'
-# A very new non-production release. Devel should be used for extremely new, practically untested code.
+# PEAR stability: a very new non-production release. Devel should be used for extremely new, practically untested code.
 New-Variable -Option Constant -Scope Script -Name 'PEARSTATE_DEVEL' -Value 'devel'
-# A frozen picture of development at a particular moment.
+# PEAR stability: a frozen picture of development at a particular moment.
 New-Variable -Option Constant -Scope Script -Name 'PEARSTATE_SNAPSHOT' -Value 'snapshot'
 
 New-Variable -Option Constant -Scope Script -Name 'CACERT_PEM_URL' -Value 'https://curl.haxx.se/ca/cacert.pem'

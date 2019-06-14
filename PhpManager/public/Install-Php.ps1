@@ -47,7 +47,7 @@
     [OutputType()]
     param (
         [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The PHP version to be installed')]
-        [ValidatePattern('^\d+(\.\d+)?(\.\d+)?(RC\d*)?$')]
+        [ValidatePattern('^\d+(\.\d+)?(\.\d+)?((alpha|beta|RC)\d*)?$')]
         [string] $Version,
         [Parameter(Mandatory = $true, Position = 1, HelpMessage = 'Architecture of the PHP to be installed (x86 for 32-bit, x64 for 64-bit)')]
         [ValidateSet('x86', 'x64')]
@@ -85,7 +85,7 @@
             }
         }
         # Check $Version format
-        $match = $Version | Select-String -Pattern '^([1-9]\d*)(?:\.(\d+))?(?:\.(\d+))?(RC(\d*))?$'
+        $match = $Version | Select-String -Pattern "^([1-9]\d*)(?:\.(\d+))?(?:\.(\d+))?(?:($Script:UNSTABLEPHP_RX)(\d*))?$"
         if ($null -eq $match) {
             throw "The specified PHP version ($Version) is malformed"
         }
@@ -105,7 +105,7 @@
         if ($match.Matches.Groups[4].Value -eq '') {
             $searchReleaseStates = @($Script:RELEASESTATE_RELEASE, $Script:RELEASESTATE_ARCHIVE)
         } else {
-            $rxSearchVersion += 'RC'
+            $rxSearchVersion += $match.Matches.Groups[4].Value
             if ($match.Matches.Groups[5].Value -eq '') {
                 $rxSearchVersion += '\d+'
             } else {
