@@ -12,7 +12,7 @@ You'll need at least PowerShell version 5: in order to determine which version y
 $PSVersionTable.PSVersion.ToString()
 ```
 
-If you have an older version, you can upgrade it [following these instructions](https://docs.microsoft.com/en-us/powershell/wmf/5.1/install-configure).
+If you have an older version, you can upgrade it [following these instructions](https://docs.microsoft.com/en-us/powershell/wmf/setup/install-configure).
 
 To install this module for any user of your PC, open an elevated PowerShell session (for example with `Start-Process powershell -Verb runAs`) and run this command:
 
