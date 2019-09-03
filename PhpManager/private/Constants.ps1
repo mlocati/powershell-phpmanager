@@ -19,7 +19,7 @@ New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RELEASECANDIDATE'
 # PHP non-stable identifiers regex
 New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RX' -Value "$UNSTABLEPHP_ALPHA|$UNSTABLEPHP_BETA|$UNSTABLEPHP_RELEASECANDIDATE"
 
-New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE' -Value "php-(\d+\.\d+\.\d+)(?:($UNSTABLEPHP_RX)([1-9]\d*))?(-nts)?-Win32-(?:VC|vs)(\d{1,2})-(x86|x64)\.zip"
+New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE' -Value "php-(\d+\.\d+\.\d+)(?:($UNSTABLEPHP_RX)([1-9]\d*))?(-nts)?-Win32-(?:VC|vc|vs)(\d{1,2})-(x86|x64)\.zip"
 
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_BUILTIN' -Value 'Builtin'
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_UNKNOWN' -Value 'Unknown'

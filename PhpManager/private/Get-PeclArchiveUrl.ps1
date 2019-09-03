@@ -49,7 +49,7 @@
         $rxMatch += '-' + [regex]::Escape($PackageVersion)
         $rxMatch += '-' + [regex]::Escape('' + $PhpVersion.ComparableVersion.Major + '.' + $PhpVersion.ComparableVersion.Minor)
         $rxMatch += '-' + $(if ($PhpVersion.ThreadSafe) { 'ts' } else { 'nts' } )
-        $rxMatch += '-(vc|vs)' + $PhpVersion.VCVersion
+        $rxMatch += '-(VC|vc|vs)' + $PhpVersion.VCVersion
         $rxMatch += '-' + [regex]::Escape($PhpVersion.Architecture)
         $rxMatch += '\.zip$'
         $urls = @("https://windows.php.net/downloads/pecl/releases/$handleLC/$PackageVersion")
