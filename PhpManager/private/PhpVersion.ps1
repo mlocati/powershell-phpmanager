@@ -280,6 +280,7 @@ class PhpVersionInstalled : PhpVersion
             }
             $vcYear = $match.Matches.Groups[1].Value
             switch ($vcYear) {
+                '2017' { $data.VCVersion = 15 }
                 '2019' { $data.VCVersion = 16 }
                 default { throw "Failed to recognize VCVersion from Visual C++ $vcYear" }
             }
