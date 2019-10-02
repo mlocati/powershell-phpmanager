@@ -21,4 +21,10 @@
     [hashtable]
     [ValidateNotNull()]
     $Targets
+    <#
+    The name of the currently activated version (empty string if none)
+    #>
+    [string]
+    [ValidateNotNull()]
+    $Current
 }

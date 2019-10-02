@@ -20,6 +20,10 @@
         $result.Scope = $Data.scope
         $result.Alias = $Data.alias
         $result.Targets = $Data.targets
+        $result.Current = ''
+        if ($Data.ContainsKey('current') -and ($null -ne $Data.current)) {
+            $result.Current = $Data.current
+        }
     }
     end {
         $result

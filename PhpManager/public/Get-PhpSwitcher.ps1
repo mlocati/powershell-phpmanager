@@ -29,11 +29,23 @@
                 }
             }
             if ($data.alias -ne '') {
+                $currentTarget = $null
+                if (Test-Path -LiteralPath $data.alias -PathType Container) {
+                    $aliasItem = Get-Item -LiteralPath $data.alias
+                    if ($aliasItem.LinkType -eq 'Junction') {
+                        $currentTarget = $aliasItem.Target
+                    }
+                }
                 $data.targets = @{}
                 if ($definition | Get-Member -Name 'Targets') {
                     try {
                         $definition.Targets.PSObject.Properties | ForEach-Object {
                             $data.targets[$_.Name] = [string] $_.Value
+                            if ($null -ne $currentTarget) {
+                                if ($_.Value -eq $currentTarget) {
+                                    $data.current = $_.Name
+                                }
+                            }
                         }
                     } catch {
                         Write-Debug $_.Exception.Message
