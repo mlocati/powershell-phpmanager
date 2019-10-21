@@ -50,6 +50,12 @@
         } else {
             $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
+        if ($phpVersion.ExtensionsPath -eq '') {
+            throw 'The PHP extension directory is not configured. You may need to set the extension_dir setting in the php.ini file'
+        }
+        if (-Not(Test-Path -LiteralPath $phpVersion.ExtensionsPath -PathType Container)) {
+            throw "The PHP extension directory ""$($phpVersion.ExtensionsPath)"" configured in your php.ini does not exist. You may need to create it, or fix the extension_dir setting in the php.ini file."
+        }
         $tempFolder = $null
         try {
             if (Test-Path -Path $Extension -PathType Leaf) {
