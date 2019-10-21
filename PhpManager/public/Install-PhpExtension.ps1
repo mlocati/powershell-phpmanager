@@ -140,8 +140,10 @@
                 Write-Verbose ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
                 Install-PhpExtensionPrerequisite -PhpVersion $phpVersion -Extension $newExtension
                 $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($dllPath))
+                Write-Verbose "Moving ""$dllPath"" to ""$newExtensionFilename"""
                 Move-Item -Path $dllPath -Destination $newExtensionFilename
                 if (-Not($DontEnable)) {
+                    Write-Verbose "Enabling extension ""$($newExtension.Name)"" for ""$($phpVersion.ExecutablePath)"""
                     Enable-PhpExtension -Extension $newExtension.Name -Path $phpVersion.ExecutablePath
                 }
             }
