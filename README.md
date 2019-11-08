@@ -1,4 +1,5 @@
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mlocati/powershell-phpmanager?branch=master&svg=true)](https://ci.appveyor.com/project/mlocati/powershell-phpmanager)
+![PowerShell Gallery Download Count](https://img.shields.io/powershellgallery/dt/PhpManager)
 
 ## Introduction
 
