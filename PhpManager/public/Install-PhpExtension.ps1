@@ -47,7 +47,8 @@
     process {
         if ($null -eq $Path -or $Path -eq '') {
             $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
-        } else {
+        }
+        else {
             $phpVersion = [PhpVersionInstalled]::FromPath($Path)
         }
         if ($phpVersion.ExtensionsPath -eq '') {
@@ -66,7 +67,8 @@
                     throw 'You can''t specify the -MinimumStability argument if you specify an existing file with the -Extension argument'
                 }
                 $dllPath = [System.IO.Path]::GetFullPath($Extension)
-            } else {
+            }
+            else {
                 if ($null -eq $MinimumStability -or $MinimumStability -eq '') {
                     $MinimumStability = $Script:PEARSTATE_STABLE
                 }
@@ -94,8 +96,9 @@
                     $archiveUrl = Get-PeclArchiveUrl -PackageHandle $peclPackageHandle -PackageVersion $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability
                     if ($archiveUrl -eq '') {
                         Write-Verbose ("No Windows DLLs found for PECL package {0} {1} compatible with {2}" -f $peclPackageHandle, $peclPackageVersion, $phpVersion.DisplayName)
-                    } else {
-                        $availablePackageVersion = @{PackageVersion = $peclPackageVersion; PackageArchiveUrl = $archiveUrl}
+                    }
+                    else {
+                        $availablePackageVersion = @{PackageVersion = $peclPackageVersion; PackageArchiveUrl = $archiveUrl }
                         break
                     }
                 }
@@ -118,31 +121,38 @@
                         throw ("Multiple PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
                     }
                     $dllPath = $phpDlls[0].FullName
-                } catch {
+                }
+                catch {
                     $keepZip = $false
                     throw
-                } finally {
+                }
+                finally {
                     if (-Not($keepZip)) {
                         try {
                             Remove-Item -Path $zip -Force
-                        } catch {
+                        }
+                        catch {
                             Write-Debug 'Failed to remove temporary zip file'
                         }
                     }
                 }
             }
             $newExtension = Get-PhpExtensionDetail -PhpVersion $phpVersion -Path $dllPath
-            $oldExtension = Get-PhpExtension -Path $phpVersion.ExecutablePath | Where-Object {$_.Handle -eq $newExtension.Handle}
+            $oldExtension = Get-PhpExtension -Path $phpVersion.ExecutablePath | Where-Object { $_.Handle -eq $newExtension.Handle }
             if ($null -ne $oldExtension) {
                 if ($oldExtension.Type -eq $Script:EXTENSIONTYPE_BUILTIN) {
                     Write-Verbose ("'{0}' is a builtin extension" -f $oldExtension.Name)
                 }
                 Write-Verbose ("Upgrading extension '{0}' from version {1} to version {2}" -f $oldExtension.Name, $oldExtension.Version, $newExtension.Version)
+                if (-Not(Test-IsFileWritable($oldExtension.Filename))) {
+                    throw "Unable to write to the file $($oldExtension.Filename)"
+                }
                 Move-Item -Path $dllPath -Destination $oldExtension.Filename -Force
                 if ($oldExtension.State -eq $Script:EXTENSIONSTATE_DISABLED -and -Not($DontEnable)) {
                     Enable-PhpExtension -Extension $oldExtension.Name -Path $phpVersion.ExecutablePath
                 }
-            } else {
+            }
+            else {
                 Write-Verbose ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
                 Install-PhpExtensionPrerequisite -PhpVersion $phpVersion -Extension $newExtension
                 $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($dllPath))
@@ -153,11 +163,13 @@
                     Enable-PhpExtension -Extension $newExtension.Name -Path $phpVersion.ExecutablePath
                 }
             }
-        } finally {
+        }
+        finally {
             if ($null -ne $tempFolder) {
                 try {
                     Remove-Item -Path $tempFolder -Recurse -Force
-                } catch {
+                }
+                catch {
                     Write-Debug 'Failed to remove temporary folder'
                 }
             }
