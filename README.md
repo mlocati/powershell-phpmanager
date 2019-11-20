@@ -309,6 +309,11 @@ $Env:PHPMANAGER_TEST_RUNAS=1
 Some other tests require that [Node.js](https://nodejs.org) is installed and available in the PATH environment variable.
 
 
+## Do you want to really say thank you?
+
+You can offer me a [montly coffee](https://github.com/sponsors/mlocati) or a [one-time coffee](https://paypal.me/mlocati) :wink:
+
+
 ## FAQ
 
 
