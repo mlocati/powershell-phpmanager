@@ -194,6 +194,19 @@ Get-PhpExtension C:\PHP | Where { $_.State -eq 'Enabled' }
 Get-PhpExtension C:\PHP | Where { $_.Type -eq 'Zend' }
 ```
 
+The `Type` property of the extension objects can be:
+
+- `Builtin` for extensions bundled in PHP (for example: `reflection`, `spl`, `tokenizer`)
+- `Php` for regular PHP extensions
+- `Zend` for Zend extensions (for example: `xdebug` or `opcache`)
+
+The `State` property of the extension objects can be:
+
+- `Builtin` for extensions bundled in PHP (for example: `reflection`, `spl`, `tokenizer`) (those extensions are always enabled)
+- `Enabled` for enabled non-builtin extensions 
+- `Disabled` for disabled non-builtin extensions 
+- `Unknown` if you pass `Get-PhpExtension` the path to a DLL extension file (see [here](#inspecting-a-php-extension-dll-file))
+
 ### Enabling and disabling PHP extensions
 
 You can use the `Enable-PhpExtension`/`Disable-PhpExtension` command to enable or disable PHP extensions.
