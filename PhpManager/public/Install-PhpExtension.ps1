@@ -57,10 +57,13 @@
         if (-Not(Test-Path -LiteralPath $phpVersion.ExtensionsPath -PathType Container)) {
             throw "The PHP extension directory ""$($phpVersion.ExtensionsPath)"" configured in your php.ini does not exist. You may need to create it, or fix the extension_dir setting in the php.ini file."
         }
+        if ($null -eq $Version) {
+            $Version = ''
+        }
         $tempFolder = $null
         try {
             if (Test-Path -Path $Extension -PathType Leaf) {
-                if ($null -ne $Version -and $Version -ne '') {
+                if ($Version -ne '') {
                     throw 'You can''t specify the -Version argument if you specify an existing file with the -Extension argument'
                 }
                 if ($null -ne $MinimumStability -and $MinimumStability -ne '') {
@@ -85,51 +88,86 @@
                 }
                 $peclPackageHandle = $foundPeclPackages[0]
                 $peclPackageVersions = @(Get-PeclPackageVersion -Handle $peclPackageHandle -Version $Version -MinimumStability $MinimumStability)
-                if ($peclPackageVersions.Count -eq 0) {
-                    if ($null -eq $Version -or $Version -eq '') {
-                        throw "The PECL package $peclPackageHandle does not have any version with a $MinimumStability minimum stability"
-                    }
-                    throw "The PECL package $peclPackageHandle does not have any $Version version with a $MinimumStability minimum stability"
-                }
                 $availablePackageVersion = $null
-                foreach ($peclPackageVersion in $peclPackageVersions) {
-                    $archiveUrl = Get-PeclArchiveUrl -PackageHandle $peclPackageHandle -PackageVersion $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability
-                    if ($archiveUrl -eq '') {
-                        Write-Verbose ("No Windows DLLs found for PECL package {0} {1} compatible with {2}" -f $peclPackageHandle, $peclPackageVersion, $phpVersion.DisplayName)
+                $remoteFileIsZip = $true
+                if ($peclPackageVersions.Count -eq 0) {
+                    if ($peclPackageHandle -eq 'xdebug' -and $MinimumStability -ne 'stable') {
+                        Write-Verbose 'Analyzing xdebug download page'
+                        $xdebugDownloadPageUrl = 'https://xdebug.org/download'
+                        $xdebugDownloadLinkRx = '^.*/php_xdebug-({0}(?:\.\d+)*){1}\d*-{2}-vc{3}{4}{5}\.dll$' -f @(
+                            @('\d+', [System.Text.RegularExpressions.Regex]::Escape($Version))[$Version -ne ''],
+                            @('(?:RC|alpha|beta)', '(?:RC|beta)')[$MinimumStability -eq 'beta'],
+                            [System.Text.RegularExpressions.Regex]::Escape($phpVersion.MajorMinorVersion),
+                            $phpVersion.VCVersion,
+                            @('-nts', '')[$phpVersion.ThreadSafe]
+                            @('', '-x86_64')[$phpVersion.Architecture -eq 'x64']
+                        )
+                        $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $xdebugDownloadPageUrl
+                        foreach ($link in $webResponse.Links) {
+                            if ('Href' -in $link.PSobject.Properties.Name) {
+                                $linkUrl = [Uri]::new([Uri]$xdebugDownloadPageUrl, $link.Href).AbsoluteUri
+                                $linkUrlMatch = $linkUrl | Select-String -Pattern $xdebugDownloadLinkRx
+                                if ($null -ne $linkUrlMatch) {
+                                    $availablePackageVersion = @{PackageVersion = $linkUrlMatch.Matches[0].Groups[1].Value; PackageArchiveUrl = $linkUrl }
+                                    $remoteFileIsZip = $false
+                                    break
+                                }
+                            }
+                        }
                     }
-                    else {
-                        $availablePackageVersion = @{PackageVersion = $peclPackageVersion; PackageArchiveUrl = $archiveUrl }
-                        break
+                    if ($null -eq $availablePackageVersion) {
+                        if ($Version -eq '') {
+                            throw "The PECL package $peclPackageHandle does not have any version with a $MinimumStability minimum stability"
+                        }
+                        throw "The PECL package $peclPackageHandle does not have any $Version version with a $MinimumStability minimum stability"
                     }
                 }
                 if ($null -eq $availablePackageVersion) {
-                    throw "No compatible Windows DLL found for PECL package $peclPackageHandle with a $MinimumStability minimum stability"
+                    foreach ($peclPackageVersion in $peclPackageVersions) {
+                        $archiveUrl = Get-PeclArchiveUrl -PackageHandle $peclPackageHandle -PackageVersion $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability
+                        if ($archiveUrl -eq '') {
+                            Write-Verbose ("No Windows DLLs found for PECL package {0} {1} compatible with {2}" -f $peclPackageHandle, $peclPackageVersion, $phpVersion.DisplayName)
+                        }
+                        else {
+                            $availablePackageVersion = @{PackageVersion = $peclPackageVersion; PackageArchiveUrl = $archiveUrl }
+                            break
+                        }
+                    }
+                    if ($null -eq $availablePackageVersion) {
+                        throw "No compatible Windows DLL found for PECL package $peclPackageHandle with a $MinimumStability minimum stability"
+                    }
                 }
                 Write-Verbose ("Downloading PECL package {0} {1} from {2}" -f $peclPackageHandle, $availablePackageVersion.PackageVersion, $availablePackageVersion.PackageArchiveUrl)
-                $zip, $keepZip = Get-FileFromUrlOrCache -Url $availablePackageVersion.PackageArchiveUrl
+                $downloadedFile, $keepDownloadedFile = Get-FileFromUrlOrCache -Url $availablePackageVersion.PackageArchiveUrl
                 try {
-                    $tempFolder = New-TempDirectory
-                    Expand-ArchiveWith7Zip -ArchivePath $zip -DestinationPath $tempFolder
-                    $phpDlls = @(Get-ChildItem -Path $tempFolder\php_*.dll -File -Depth 0)
-                    if ($phpDlls.Count -eq 0) {
-                        $phpDlls = @(Get-ChildItem -Path $tempFolder\php_*.dll -File -Depth 1)
+                    if ($remoteFileIsZip) {
+                        $tempFolder = New-TempDirectory
+                        Expand-ArchiveWith7Zip -ArchivePath $downloadedFile -DestinationPath $tempFolder
+                        $phpDlls = @(Get-ChildItem -Path $tempFolder\php_*.dll -File -Depth 0)
+                        if ($phpDlls.Count -eq 0) {
+                            $phpDlls = @(Get-ChildItem -Path $tempFolder\php_*.dll -File -Depth 1)
+                        }
+                        if ($phpDlls.Count -eq 0) {
+                            throw ("No PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
+                        }
+                        if ($phpDlls.Count -ne 1) {
+                            throw ("Multiple PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
+                        }
+                        $dllPath = $phpDlls[0].FullName
+                    } else {
+                        $keepDownloadedFile = $true
+                        $dllPath = $downloadedFile
                     }
-                    if ($phpDlls.Count -eq 0) {
-                        throw ("No PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
-                    }
-                    if ($phpDlls.Count -ne 1) {
-                        throw ("Multiple PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
-                    }
-                    $dllPath = $phpDlls[0].FullName
+                    $newExtension = Get-PhpExtensionDetail -PhpVersion $phpVersion -Path $dllPath
                 }
                 catch {
-                    $keepZip = $false
+                    $keepDownloadedFile = $false
                     throw
                 }
                 finally {
-                    if (-Not($keepZip)) {
+                    if (-Not($keepDownloadedFile)) {
                         try {
-                            Remove-Item -Path $zip -Force
+                            Remove-Item -Path $downloadedFile -Force
                         }
                         catch {
                             Write-Debug 'Failed to remove temporary zip file'
@@ -137,7 +175,6 @@
                     }
                 }
             }
-            $newExtension = Get-PhpExtensionDetail -PhpVersion $phpVersion -Path $dllPath
             $oldExtension = Get-PhpExtension -Path $phpVersion.ExecutablePath | Where-Object { $_.Handle -eq $newExtension.Handle }
             if ($null -ne $oldExtension) {
                 if ($oldExtension.Type -eq $Script:EXTENSIONTYPE_BUILTIN) {
