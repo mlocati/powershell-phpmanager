@@ -278,8 +278,13 @@ Filename     : test.dll
 ### Caching downloads
 
 This module downloads PHP and PHP extensions from internet.  
-In order to avoid downloading the same files multiple times you can use `Set-PhpDownloadCache` to specify the path of a local folder where the downloads will be cached (to get the configured value you can use `Get-PhpDownloadCache`).  
+In order to avoid downloading the same files multiple times you can use `Set-PhpDownloadCache` to specify the path of a local folder where the downloads will be cached (to get the configured value you can use `Get-PhpDownloadCache`).
+
 By default `Set-PhpDownloadCache` does not persist the configured value: you can use the `-Persist` option to store if for the current user only, or for any user.
+
+To retrieve the currently configured value you can use `Get-PhpDownloadCache`.
+
+To disable the cache, run `Set-PhpDownloadCache` without arguments (to make this setting persistent, use `Set-PhpDownloadCache -Persist CurrentUser` or `Set-PhpDownloadCache -Persist AllUsers`).
 
 
 ## Supported platforms
