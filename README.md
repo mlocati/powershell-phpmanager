@@ -18,13 +18,13 @@ If you have an older version, you can upgrade it [following these instructions](
 To install this module for any user of your PC, open an elevated PowerShell session (for example with `Start-Process powershell -Verb runAs`) and run this command:
 
 ```powershell
-Install-Module -Name PhpManager -Force
+Install-Module -Name PhpManager -Repository PSGallery -Force
 ```
 
 To install this module for the current user only:
 
 ```powershell
-Install-Module -Name PhpManager -Force -Scope CurrentUser
+Install-Module -Name PhpManager -Repository PSGallery -Force -Scope CurrentUser
 ```
 
 If you won't be able to execute the module functions, you may need to tell PowerShell to enable their execution:
