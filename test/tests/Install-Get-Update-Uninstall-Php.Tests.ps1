@@ -13,6 +13,7 @@
             $initialPhpVersion.GetType().FullName | Should -BeExactly 'PhpVersionInstalled'
             $initialPhpVersion.Version | Should -BeOfType [string]
             $initialPhpVersion.Version | Should -BeExactly '7.1.0'
+            $initialPhpVersion.MajorMinorVersion | Should -BeExactly '7.1'
             $initialPhpVersion.ComparableVersion | Should -BeOfType [version]
             $initialPhpVersion.UnstabilityLevel | Should -BeNullOrEmpty
             $initialPhpVersion.UnstabilityVersion | Should -BeNullOrEmpty

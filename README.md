@@ -147,6 +147,23 @@ You can also specify a directory: the command will display the details of the PH
 Get-Php C:\PHP
 ```
 
+Sample Output:
+
+```
+Folder             : C:\PHP
+ExecutablePath     : C:\PHP\php.exe
+ExtensionsPath     : C:\PHP\ext
+MajorMinorVersion  : 7.4
+Version            : 7.4.0
+FullVersion        : 7.4.0RC6
+UnstabilityLevel   : RC
+UnstabilityVersion : 6
+DisplayName        : PHP 7.4.0RC6 x86 (32-bit) Thread-Safe
+Architecture       : x86
+ThreadSafe         : True
+VCVersion          : 15
+```
+
 ### Getting `php.ini` configuration keys
 
 Use the `Get-PhpIniKey` command to retrieve the value of a configuration in the `php.ini` file used by a PHP installation.

@@ -1,12 +1,24 @@
 ﻿class PhpVersion : System.IComparable
 {
     <#
+    The major.minor version of PHP
+    #>
+    [ValidateNotNull()]
+    [ValidateLength(1, [int]::MaxValue)]
+    [string] $MajorMinorVersion
+    <#
     The version of PHP, without the alpha/beta/RC state
     #>
     [string]
     [ValidateNotNull()]
     [ValidateLength(1, [int]::MaxValue)]
     $Version
+    <#
+    The version of PHP, possibly including the alpha/beta/RC state
+    #>
+    [ValidateNotNull()]
+    [ValidateLength(1, [int]::MaxValue)]
+    [string] $FullVersion
     <#
     The unstability level, if any (alpha, beta, RC)
     #>
@@ -17,12 +29,6 @@
     The unstability version, if any
     #>
     [Nullable[int]] $UnstabilityVersion
-    <#
-    the version of PHP, possibly including the alpha/beta/RC state
-    #>
-    [ValidateNotNull()]
-    [ValidateLength(1, [int]::MaxValue)]
-    [string] $FullVersion
     <#
     A string used to display the details of the version
     #>
@@ -76,8 +82,8 @@
         } else {
             $this.UnstabilityLevel = $null
         }
-        $dv = $this.Version
-        $cv = $this.Version
+        $dv = $data.Version
+        $cv = $data.Version
         switch ($this.UnstabilityLevel) {
             '' {
                 $cv += '.9999999'
@@ -98,8 +104,11 @@
                 throw 'Unrecognized UnstabilityLevel'
             }
         }
+        $cv = [System.Version] $cv
+        $this.MajorMinorVersion = '{0}.{1}' -f $cv.Major,$cv.Minor
+        $this.Version = $data.Version
         $this.FullVersion = $dv
-        $this.ComparableVersion = [System.Version] $cv
+        $this.ComparableVersion = $cv
         $this.Architecture = $data.Architecture
         $this.ThreadSafe = $data.ThreadSafe
         $this.VCVersion = $data.VCVersion
