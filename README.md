@@ -325,4 +325,4 @@ That's why we need these executables: they will be started in 32-bit (`Inspect-P
 Of course you don't have to trust them: you can compile them on your own (it will require [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10)) by calling the [`compile.bat`](https://github.com/mlocati/powershell-phpmanager/blob/master/src/compile.bat) script.
 
 The folder also contains a couple of [7-Zip](https://www.7-zip.org/) executables (one for 32-bit systems and one for 64-bit systems): they are used by PhpManager to unzip the downloaded archives.  
-Sure, we could use the standard [`Expand-Archive`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.archive/expand-archive) cmdlet, but these 7-Zip tools are about one order of magnitute faster that it.
+Sure, we could use the standard [`Expand-Archive`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.archive/expand-archive) cmdlet, but these 7-Zip tools are about one order of magnitute faster than it.
