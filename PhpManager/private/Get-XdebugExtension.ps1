@@ -42,9 +42,9 @@ function Get-XdebugExtension() {
         @('\d+', [System.Text.RegularExpressions.Regex]::Escape($Version))[$Version -ne ''],
         $stabilityRxChunk,
         [System.Text.RegularExpressions.Regex]::Escape($PhpVersion.MajorMinorVersion),
-        $phpVersion.VCVersion,
-        @('-nts', '')[$phpVersion.ThreadSafe]
-        @('', '-x86_64')[$phpVersion.Architecture -eq 'x64']
+        $PhpVersion.VCVersion,
+        @('-nts', '')[$PhpVersion.ThreadSafe]
+        @('', '-x86_64')[$PhpVersion.Architecture -eq 'x64']
     )
     $result = $null
     $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $downloadPageUrl

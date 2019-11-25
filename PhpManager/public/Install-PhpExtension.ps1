@@ -87,24 +87,27 @@
                     }
                 }
                 $peclPackageHandle = $foundPeclPackages[0]
-                $peclPackageVersions = @(Get-PeclPackageVersion -Handle $peclPackageHandle -Version $Version -MinimumStability $MinimumStability)
-                $availablePackageVersion = $null
-                $remoteFileIsZip = $true
-                if ($peclPackageVersions.Count -eq 0) {
-                    if ($peclPackageHandle -eq 'xdebug') {
+                switch ($peclPackageHandle) {
+                    'xdebug' {
                         $availablePackageVersion = Get-XdebugExtension -PhpVersion $phpVersion -Version $Version -MinimumStability $MinimumStability
                         if ($null -ne $availablePackageVersion) {
                             $remoteFileIsZip = $false
+                            $finalDllName = 'php_xdebug.dll'
                         }
                     }
-                    if ($null -eq $availablePackageVersion) {
+                    default {
+                        $availablePackageVersion = $null
+                        $finalDllName = $null
+                    }
+                }
+                if ($null -eq $availablePackageVersion) {
+                    $peclPackageVersions = @(Get-PeclPackageVersion -Handle $peclPackageHandle -Version $Version -MinimumStability $MinimumStability)
+                    if ($peclPackageVersions.Count -eq 0) {
                         if ($Version -eq '') {
                             throw "The PECL package $peclPackageHandle does not have any version with a $MinimumStability minimum stability"
                         }
                         throw "The PECL package $peclPackageHandle does not have any $Version version with a $MinimumStability minimum stability"
                     }
-                }
-                if ($null -eq $availablePackageVersion) {
                     foreach ($peclPackageVersion in $peclPackageVersions) {
                         $archiveUrl = Get-PeclArchiveUrl -PackageHandle $peclPackageHandle -PackageVersion $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability
                         if ($archiveUrl -eq '') {
@@ -112,19 +115,12 @@
                         }
                         else {
                             $availablePackageVersion = @{PackageVersion = $peclPackageVersion; PackageArchiveUrl = $archiveUrl }
+                            $remoteFileIsZip = $true
                             break
                         }
                     }
                     if ($null -eq $availablePackageVersion) {
-                        if ($peclPackageHandle -eq 'xdebug') {
-                            $availablePackageVersion = Get-XdebugExtension -PhpVersion $phpVersion -Version $Version -MinimumStability $MinimumStability
-                            if ($null -ne $availablePackageVersion) {
-                                $remoteFileIsZip = $false
-                            }
-                        }
-                        if ($null -eq $availablePackageVersion) {
-                            throw "No compatible Windows DLL found for PECL package $peclPackageHandle with a $MinimumStability minimum stability"
-                        }
+                        throw "No compatible Windows DLL found for PECL package $peclPackageHandle with a $MinimumStability minimum stability"
                     }
                 }
                 Write-Verbose ("Downloading PECL package {0} {1} from {2}" -f $peclPackageHandle, $availablePackageVersion.PackageVersion, $availablePackageVersion.PackageArchiveUrl)
@@ -144,7 +140,8 @@
                             throw ("Multiple PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
                         }
                         $dllPath = $phpDlls[0].FullName
-                    } else {
+                    }
+                    else {
                         $keepDownloadedFile = $true
                         $dllPath = $downloadedFile
                     }
@@ -182,7 +179,11 @@
             else {
                 Write-Verbose ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
                 Install-PhpExtensionPrerequisite -PhpVersion $phpVersion -Extension $newExtension
-                $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($dllPath))
+                if ($null -eq $finalDllName) {
+                    $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($dllPath))
+                } else {
+                    $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($finalDllName))
+                }
                 Write-Verbose "Moving ""$dllPath"" to ""$newExtensionFilename"""
                 Move-Item -Path $dllPath -Destination $newExtensionFilename
                 if (-Not($DontEnable)) {
