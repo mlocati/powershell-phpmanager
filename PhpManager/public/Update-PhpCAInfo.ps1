@@ -95,7 +95,11 @@
        if (-Not(Test-Path -Path $caFolder -PathType Container)) {
            New-Item -Path $caFolder -ItemType Directory | Out-Null
         }
-        Set-Content -Path $CAPath -Value $cacertBytes -Encoding Byte
+        if ($PSVersionTable.PSVersion -ge '6.0') {
+            Set-Content -Path $CAPath -Value $cacertBytes -AsByteStream
+        } else {
+            Set-Content -Path $CAPath -Value $cacertBytes -Encoding Byte
+        }
         $iniPath = $phpVersion.IniPath
         $iniValue = Get-PhpIniKey -Key 'curl.cainfo' -Path $iniPath
         if ($iniValue -eq $CAPath) {
