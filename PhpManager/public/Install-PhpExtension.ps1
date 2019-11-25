@@ -91,28 +91,10 @@
                 $availablePackageVersion = $null
                 $remoteFileIsZip = $true
                 if ($peclPackageVersions.Count -eq 0) {
-                    if ($peclPackageHandle -eq 'xdebug' -and $MinimumStability -ne 'stable') {
-                        Write-Verbose 'Analyzing xdebug download page'
-                        $xdebugDownloadPageUrl = 'https://xdebug.org/download'
-                        $xdebugDownloadLinkRx = '^.*/php_xdebug-({0}(?:\.\d+)*){1}\d*-{2}-vc{3}{4}{5}\.dll$' -f @(
-                            @('\d+', [System.Text.RegularExpressions.Regex]::Escape($Version))[$Version -ne ''],
-                            @('(?:RC|alpha|beta)', '(?:RC|beta)')[$MinimumStability -eq 'beta'],
-                            [System.Text.RegularExpressions.Regex]::Escape($phpVersion.MajorMinorVersion),
-                            $phpVersion.VCVersion,
-                            @('-nts', '')[$phpVersion.ThreadSafe]
-                            @('', '-x86_64')[$phpVersion.Architecture -eq 'x64']
-                        )
-                        $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $xdebugDownloadPageUrl
-                        foreach ($link in $webResponse.Links) {
-                            if ('Href' -in $link.PSobject.Properties.Name) {
-                                $linkUrl = [Uri]::new([Uri]$xdebugDownloadPageUrl, $link.Href).AbsoluteUri
-                                $linkUrlMatch = $linkUrl | Select-String -Pattern $xdebugDownloadLinkRx
-                                if ($null -ne $linkUrlMatch) {
-                                    $availablePackageVersion = @{PackageVersion = $linkUrlMatch.Matches[0].Groups[1].Value; PackageArchiveUrl = $linkUrl }
-                                    $remoteFileIsZip = $false
-                                    break
-                                }
-                            }
+                    if ($peclPackageHandle -eq 'xdebug') {
+                        $availablePackageVersion = Get-XdebugExtension -PhpVersion $phpVersion -Version $Version -MinimumStability $MinimumStability
+                        if ($null -ne $availablePackageVersion) {
+                            $remoteFileIsZip = $false
                         }
                     }
                     if ($null -eq $availablePackageVersion) {
@@ -134,7 +116,15 @@
                         }
                     }
                     if ($null -eq $availablePackageVersion) {
-                        throw "No compatible Windows DLL found for PECL package $peclPackageHandle with a $MinimumStability minimum stability"
+                        if ($peclPackageHandle -eq 'xdebug') {
+                            $availablePackageVersion = Get-XdebugExtension -PhpVersion $phpVersion -Version $Version -MinimumStability $MinimumStability
+                            if ($null -ne $availablePackageVersion) {
+                                $remoteFileIsZip = $false
+                            }
+                        }
+                        if ($null -eq $availablePackageVersion) {
+                            throw "No compatible Windows DLL found for PECL package $peclPackageHandle with a $MinimumStability minimum stability"
+                        }
                     }
                 }
                 Write-Verbose ("Downloading PECL package {0} {1} from {2}" -f $peclPackageHandle, $availablePackageVersion.PackageVersion, $availablePackageVersion.PackageArchiveUrl)

@@ -67,6 +67,9 @@
                     if ($_.Exception.GetType().FullName -eq 'System.Net.Http.HttpRequestException' -and $_.Exception.Message -and $_.Exception.Message -like '*404 (Not Found)*') {
                         continue
                     }
+                    if ($_.Exception.GetType().FullName -eq 'Microsoft.PowerShell.Commands.HttpResponseException' -and $_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
+                        continue
+                    }
                 }
                 throw
             }
