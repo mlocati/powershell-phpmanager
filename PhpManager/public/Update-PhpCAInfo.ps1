@@ -22,6 +22,10 @@
     - 'LocalMachine' to fetch the certificates from the Windows repository of the local machine
     - 'CurrentUser' to fetch the certificates from the Windows repository of the current user
 
+    .Parameter SkipChecksumCheck
+    Use this switch to skip checking the checksum of the CA list fetched from curl website.
+    This may be used to ignore a mismatch error which is false positive if the CA is updated recently and the CA list is cached by the CDN.
+
     .Outputs
     bool
     #>
@@ -40,7 +44,8 @@
         [Parameter(Mandatory = $false, Position = 3, HelpMessage = 'The source of the CA certificates')]
         [ValidateNotNull()]
         [ValidateSet('Curl', 'LocalMachine', 'CurrentUser')]
-        [string] $Source = 'Curl'
+        [string] $Source = 'Curl',
+        [switch] $SkipChecksumCheck
     )
     begin {
     }
@@ -60,7 +65,7 @@
                 $cacertBytes = Get-CACertFromSystem -Source $Source
             }
             'Curl' {
-                $cacertBytes = Get-CACertFromCurl
+                $cacertBytes = Get-CACertFromCurl -SkipChecksumCheck $SkipChecksumCheck
             }
         }
         if ($CustomCAPath -ne '') {
