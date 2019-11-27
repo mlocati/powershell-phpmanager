@@ -16,4 +16,5 @@ if (Test-Path Env:PM_TEST_DOCKER) {
 
 Import-Module $Global:PHPMANAGER_MODULEPATH\PhpManager.psm1 -Force
 
-Invoke-Pester -Script $PSScriptRoot\tests -TestName $TestName -PassThru -OutputFile $PSScriptRoot\..\TestsResults.xml -OutputFormat NUnitXml
+$testCoverageFor = Get-ChildItem -LiteralPath $Global:PHPMANAGER_MODULEPATH -Recurse -Filter '*.ps1' | Select-Object -ExpandProperty 'FullName'
+Invoke-Pester -Script $PSScriptRoot\tests -TestName $TestName -PassThru -OutputFile $PSScriptRoot\..\TestsResults.xml -OutputFormat NUnitXml -CodeCoverage $testCoverageFor
