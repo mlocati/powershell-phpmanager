@@ -1,0 +1,57 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  powershell:
+    runs-on: windows-latest
+    steps:
+      - name: Remove installed php
+        shell: powershell
+        run: |
+          if (Test-Path -PathType Container -LiteralPath C:\tools\php) {
+            Remove-Item -Force -Recurse -LiteralPath C:\tools\php
+          }
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'stop'
+          .\test\setup.ps1
+      - name: Test
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'stop'
+          $pesterResult = .\test\pester.ps1
+          if ($pesterResult.FailedCount -ne 0) {
+            throw "$($pesterResult.FailedCount) tests failed!"
+          }
+  powershellcore:
+    runs-on: windows-latest
+    steps:
+      - name: Remove installed php
+        shell: pwsh
+        run: |
+          if (Test-Path -PathType Container -LiteralPath C:\tools\php) {
+            Remove-Item -Force -Recurse -LiteralPath C:\tools\php
+          }
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'stop'
+          .\test\setup.ps1
+      - name: Test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'stop'
+          $pesterResult = .\test\pester.ps1
+          if ($pesterResult.FailedCount -ne 0) {
+            throw "$($pesterResult.FailedCount) tests failed!"
+          }
