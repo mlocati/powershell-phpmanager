@@ -6,6 +6,7 @@ $me = Get-Item -LiteralPath $PSCommandPath
 try {
     Copy-Item -LiteralPath "$($Env:SystemRoot)\System32\vcruntime140.dll" -Destination $dockerBuildPath
     Copy-Item -LiteralPath "$($Env:SystemRoot)\System32\vcomp140.dll" -Destination $dockerBuildPath
+    Copy-Item -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath setup-nodejs.ps1) -Destination $dockerBuildPath
     Copy-Item -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath setup.ps1) -Destination $dockerBuildPath
     Copy-Item -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath $me.BaseName) -Destination (Join-Path -Path $dockerBuildPath -ChildPath Dockerfile)
     docker build --rm --force-rm --tag phpmanager/test $dockerBuildPath
