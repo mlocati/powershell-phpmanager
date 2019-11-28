@@ -1,10 +1,13 @@
+# escape=`
+
 FROM microsoft/nanoserver:10.0.14393.2007
+
+SHELL ["powershell", "-Command"]
 
 COPY vcruntime140.dll C:/Windows/System32/
 
 COPY setup-nodejs.ps1 C:/
-RUN powershell C:\setup-nodejs.ps1
-ENV PATH "C:\\Program Files\\NodeJS:%PATH%"
+RUN C:\setup-nodejs.ps1
 
 COPY setup.ps1 C:/
-RUN powershell C:\setup.ps1
+RUN C:\setup.ps1

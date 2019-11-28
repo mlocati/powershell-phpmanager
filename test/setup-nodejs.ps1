@@ -10,3 +10,6 @@ Invoke-WebRequest -Uri "https://nodejs.org/dist/v10.17.0/node-v$version-win-x64.
 Expand-Archive -LiteralPath C:\nodejs.zip -DestinationPath 'C:\Program Files'
 Remove-Item -LiteralPath C:\nodejs.zip
 Rename-Item -LiteralPath "C:\Program Files\node-v$version-win-x64" -NewName 'C:\Program Files\NodeJS'
+$newPath = "$Env:Path;C:\Program Files\NodeJS"
+setx.exe Path $newPath /m
+$Env:Path = $newPath
