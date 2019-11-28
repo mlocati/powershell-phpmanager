@@ -1,7 +1,13 @@
+# escape=`
+
 FROM microsoft/nanoserver:10.0.14393.2007
+
+SHELL ["powershell", "-Command"]
 
 COPY vcruntime140.dll C:/Windows/System32/
 
-COPY setup.ps1 C:/
+COPY setup-nodejs.ps1 C:/
+RUN C:\setup-nodejs.ps1
 
-RUN powershell C:\setup.ps1
+COPY setup.ps1 C:/
+RUN C:\setup.ps1
