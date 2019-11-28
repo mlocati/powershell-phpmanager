@@ -46,10 +46,15 @@
                 Remove-Item -LiteralPath $webServerStdErr -Recurse -Force
             }
             $localServerPort = 8043
-            $localServerArgs = @()
-            $localServerArgs += Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath 'https-server.js'
-            $localServerArgs += $localServerPort
-            $localServerProcess = Start-Process -FilePath 'node' -ArgumentList $localServerArgs -PassThru -RedirectStandardError $webServerStdErr -RedirectStandardOutput $webServerStdOut -WindowStyle Hidden
+            $localServerScript = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath 'https-server.js'
+            Copy-Item -LiteralPath (Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath 'https-server.js') -Destination $localServerScript -Force
+            Copy-Item -LiteralPath (Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath 'certs') -Destination $Global:PHPMANAGER_TESTINSTALLS -Recurse -Force
+            $localServerArgs = @($localServerScript, $localServerPort)
+            if ($PSVersionTable.PSEdition -eq 'Core') {
+                $localServerProcess = Start-Process -FilePath 'node' -ArgumentList $localServerArgs -PassThru -RedirectStandardError $webServerStdErr -RedirectStandardOutput $webServerStdOut
+            } else {
+                $localServerProcess = Start-Process -FilePath 'node' -ArgumentList $localServerArgs -PassThru -RedirectStandardError $webServerStdErr -RedirectStandardOutput $webServerStdOut -WindowStyle Hidden
+            }
             if ($null -eq $localServerProcess) {
                 throw 'Unable to start a local web server'
             }
