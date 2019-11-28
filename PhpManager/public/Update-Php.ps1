@@ -33,11 +33,12 @@
         } else {
             $installedVersion = [PhpVersionInstalled]::FromPath($Path)
         }
-        if ($installedVersion.UnstabilityLevel -eq '') {
-            $possibleReleaseStates = @($Script:RELEASESTATE_RELEASE, $Script:RELEASESTATE_ARCHIVE)
-        } else {
-            $possibleReleaseStates = @($Script:RELEASESTATE_QA)
+        $possibleReleaseStates = @()
+        $possibleReleaseStates += $Script:RELEASESTATE_RELEASE
+        if ($installedVersion.UnstabilityLevel -ne '') {
+            $possibleReleaseStates += $Script:RELEASESTATE_QA
         }
+        $possibleReleaseStates += $Script:RELEASESTATE_ARCHIVE
         $compatibleVersions = $null
         foreach ($possibleReleaseState in $possibleReleaseStates) {
             $compatibleVersions = Get-PhpAvailableVersion -State $possibleReleaseState | Where-Object { Get-PhpVersionsCompatibility -A $installedVersion -B $_ }

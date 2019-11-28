@@ -55,7 +55,7 @@ Install-Php -Version 7.2 -Architecture x64 -ThreadSafe 0 -Path C:\PHP -TimeZone 
 
 Use the `Update-Php` command to upgrade PHP.
 The command will automatically check if there's a newer version available: if so, the PHP installation will be upgraded.
-Please note that stable versions will be upgraded to stable, and non-stable (alpha/beta/release candidate) versions will be upgraded to non-stable versions.
+Please note that stable versions will be upgraded to stable, and non-stable (alpha/beta/release candidate) versions will be upgraded to stable or non-stable versions.
 Also the 32/64 bit and the thread safety will be the same.
 
 ```powershell
