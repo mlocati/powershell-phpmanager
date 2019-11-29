@@ -1,5 +1,6 @@
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mlocati/powershell-phpmanager?branch=master&svg=true)](https://ci.appveyor.com/project/mlocati/powershell-phpmanager)
-![PowerShell Gallery Download Count](https://img.shields.io/powershellgallery/dt/PhpManager)
+[![GitHub Actions Test Status](https://github.com/mlocati/powershell-phpmanager/workflows/Test/badge.svg?branch=master)](https://github.com/mlocati/powershell-phpmanager/blob/master/.github/workflows/test.yml)
+[![PowerShell Gallery Download Count](https://img.shields.io/powershellgallery/dt/PhpManager)](https://www.powershellgallery.com/packages/PhpManager)
 
 ## Introduction
 
