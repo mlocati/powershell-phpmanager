@@ -270,6 +270,9 @@ class PhpVersionInstalled : PhpVersion
             throw "Failed to execute php.exe: $LASTEXITCODE"
         }
         $match = $executableResult | Select-String -Pattern "^(\d+\.\d+\.\d+)(?:($Script:UNSTABLEPHP_RX)(\d+))?@(\d+)$"
+        if (-not($match)) {
+            throw "Unsupported PHP version: $executableResult"
+        }
         $data.Version = $match.Matches.Groups[1].Value
         $data.UnstabilityLevel = $match.Matches.Groups[2].Value
         $data.UnstabilityVersion = $match.Matches.Groups[3].Value
