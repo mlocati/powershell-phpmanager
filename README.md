@@ -133,6 +133,21 @@ PS C:\>
 
 You can use the `Remove-PhpFromSwitcher` to remove a PHP installation from the PHP Switcher, `Move-PhpSwitcher` to change the directory where `php.exe` will be visible in (`C:\Dev\PHP` in the example above), and `Remove-PhpSwitcher` to remove the PHP Switcher.
 
+You can do many fancy stuff with PHP Switcher. For example, to download and enable the `redis` PHP extension for all the PHP versions, you can write something like this:
+
+```powershell
+$phpSwitcher = Get-PhpSwitcher
+$phpSwitcher.Targets.Keys | ForEach-Object {
+    Write-Host -Object "Installing for $_... " -NoNewline
+    try {
+        Install-PhpExtension -Path $phpSwitcher.Targets[$_] redis
+        Write-Host -Object 'done.' -ForegroundColor Green
+    } catch {
+        Write-Host -Object $_ -ForegroundColor Red
+    }
+}
+```
+
 If you want to let **Apache** work with PHP, you have to add the `LoadModule` directive to the Apache configuration file, which should point to the appropriate DLL.
 For instance, with PHP 5.6 it is  
 
