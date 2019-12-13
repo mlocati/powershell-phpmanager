@@ -10,6 +10,7 @@ This repository contains a PowerShell module that implements functions to instal
 ## Installation
 
 You'll need at least PowerShell version 5: in order to determine which version you have, open PowerShell and type:
+
 ```powershell
 $PSVersionTable.PSVersion.ToString()
 ```
@@ -88,26 +89,34 @@ It's often handy to be able to use different PHP versions for different projects
 For instance, sometimes you may want that `php.exe` is PHP 5.6, sometimes you may want that `php.exe` is PHP 7.2.  
 This module let's you easily switch the *current* PHP version (that is, the one accessible without specifying the `php.exe` path) with the concept of **PHP Switcher**.  
 First, you install the PHP versions you need:
+
 ```powershell
 Install-Php -Version 5.6 -Architecture x86 -ThreadSafe $true -Path C:\Dev\PHP5.6 -TimeZone UTC
 Install-Php -Version 7.2 -Architecture x86 -ThreadSafe $true -Path C:\Dev\PHP7.2 -TimeZone UTC
 ```
+
 Then you initialize the PHP Switcher, specifying where the *current* PHP version should be available:
+
 ```powershell
 Initialize-PhpSwitcher -Alias C:\Dev\PHP -Scope CurrentUser
 ```
+
 Then, you can add to the PHP Switcher the PHP versions you installed:
 ```powershell
 Add-PhpToSwitcher -Name 5.6 -Path C:\Dev\PHP5.6
 Add-PhpToSwitcher -Name 7.2 -Path C:\Dev\PHP7.2
 ```
+
 You can get the details about the PHP Switcher configuration with the `Get-PhpSwitcher` command:
+
 ```powershell
 Get-PhpSwitcher
 (Get-PhpSwitcher).Targets
 ```
+
 Once you have done that, you can switch the current PHP version as easily as calling the `Switch-Php` command.  
 Here's a sample session:
+
 ```powershell
 PS C:\> Switch-Php 5.6
 PS C:\> php -r 'echo PHP_VERSION;'
@@ -121,22 +130,29 @@ PS C:\> (Get-Command php).Path
 C:\Dev\PHP\php.exe
 PS C:\>
 ```
+
 You can use the `Remove-PhpFromSwitcher` to remove a PHP installation from the PHP Switcher, `Move-PhpSwitcher` to change the directory where `php.exe` will be visible in (`C:\Dev\PHP` in the example above), and `Remove-PhpSwitcher` to remove the PHP Switcher.
 
 If you want to let **Apache** work with PHP, you have to add the `LoadModule` directive to the Apache configuration file, which should point to the appropriate DLL.
 For instance, with PHP 5.6 it is  
+
 ```
 LoadModule php5_module "C:\Dev\PHP5.6\php5apache2_4.dll"
 ```
+
 And for PHP 7.2 it is  
+
 ```
 LoadModule php7_module "C:\Dev\PHP7.2\php7apache2_4.dll"
 ```
+
 In order to simplify switching the PHP version used by Apache, the `Install-Php` command creates a file called `Apache.conf` in the PHP installation directory, containing the right `LoadModule` definition.
 So, in your Apache configuration file, instead of writing the `LoadModule` directive, you can simply write:
+
 ```
 Include "C:\Dev\PHP\Apache.conf"
 ```
+
 That's all: to switch the PHP version used by Apache simply call `Switch-Php` and restart Apache.
 
 ### Getting details about installed PHPs
@@ -299,20 +315,24 @@ Tests require some module (PSScriptAnalyzer, Pester, ...).
 You can run the `test\setup.ps1` PowerShell script to install them.  
 The `test\pester.ps1` script executes all the tests, which are located in the `test\tests` directory.
 You can test a specific case by specifying its name:
+
 ```powershell
 .\test\pester.ps1 Edit-FolderInPath
 ```
+
 Some tests may require to run commands with elevated privileges. These tests are disabled by default: you can enable them by setting the `PHPMANAGER_TEST_RUNAS` environment variable to a non empty value:
+
 ```powershell
 $Env:PHPMANAGER_TEST_RUNAS=1
 .\test\pester.ps1 Edit-FolderInPath
 ```
+
 Some other tests require that [Node.js](https://nodejs.org) is installed and available in the PATH environment variable.
 
 
 ## Do you want to really say thank you?
 
-You can offer me a [montly coffee](https://github.com/sponsors/mlocati) or a [one-time coffee](https://paypal.me/mlocati) :wink:
+You can offer me a [monthly coffee](https://github.com/sponsors/mlocati) or a [one-time coffee](https://paypal.me/mlocati) :wink:
 
 
 ## FAQ
