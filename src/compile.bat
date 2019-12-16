@@ -1,11 +1,9 @@
 @echo off
 setlocal
-bash.exe --version >NUL 2>NUL
+docker.exe --version >NUL 2>NUL
 if errorlevel 1 (
-    echo Please enable Windows Subsystem for Linux. >&2
+    echo Please install Docker for Windows. >&2
     exit /b 1
 )
 
-cd /D "%~dp0"
-
-bash -c "sh ./compile"
+docker run --rm --volume "%~dp0..":/app --workdir /app/src mlocati/powershell-phpmanager-src:latest make

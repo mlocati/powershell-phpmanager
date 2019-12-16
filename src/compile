@@ -1,17 +1,10 @@
 #!/bin/sh
 
 set -o errexit
-if ! test -f /usr/lib/mxe/usr/bin/i686-w64-mingw32.static-gcc -a -f /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-gcc
-then
-    if ! test -f /etc/apt/sources.list.d/mxeapt.list
-    then
-        echo 'Configuring MXE'
-        sudo sh -c "echo 'deb http://pkg.mxe.cc/repos/apt/debian wheezy main' >> /etc/apt/sources.list.d/mxeapt.list"
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D43A795B73B16ABE9643FE1AFD8FFF16DB45C6AB
-    fi
-    echo 'Installing MXE'
-    sudo apt-get update
-    sudo apt-get install --yes mxe-i686-w64-mingw32.static-gcc mxe-x86-64-w64-mingw32.static-gcc
-fi
-echo 'Compiling with MXE'
-make
+
+docker --version || (
+    echo Please install Docker. >&2
+    exit 1
+)
+
+docker run --rm --volume "$(CDPATH= cd -- "$(dirname -- "$0")" && cd .. && pwd)":/app --workdir /app/src mlocati/powershell-phpmanager-src:latest make
