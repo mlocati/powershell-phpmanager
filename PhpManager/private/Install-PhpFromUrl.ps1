@@ -75,8 +75,12 @@
                     if (-Not($InstallVCRedist)) {
                         throw "The Visual C++ $redistName Redistributable seems to be missing: you have to install it manually"
                     }
-                    if (-Not(Get-Module -Name VcRedist) -and -Not(Get-Module -ListAvailable | Where-Object { $_.Name -eq 'VcRedist' })) {
-                        throw "The Visual C++ $redistName Redistributable seems to be missing: you have to manually install it (if you install the VcRedist PowerShell module we could try to install it automatically)"
+                    $vcRedistModule = Get-Module -Name VcRedist
+                    if (-Not($vcRedistModule)) {
+                        $vcRedistModule = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'VcRedist' }
+                        if (-Not($vcRedistModule)) {
+                            throw "The Visual C++ $redistName Redistributable seems to be missing: you have to manually install it (if you install the VcRedist PowerShell module we could try to install it automatically)"
+                        }
                     }
                     $vcListKind = 'Supported'
                     $vcList = Get-VcList -Export $vcListKind | Where-Object { $_.Release -eq $redistName -and $_.Architecture -eq $PhpVersion.Architecture }
@@ -90,7 +94,12 @@
                     Write-Verbose "Downloading the Visual C++ $redistName Redistributable (it's required by this version of PHP)"
                     $temporaryDirectory2 = New-TempDirectory
                     try {
-                        $vcList | Get-VcRedist -Path $temporaryDirectory2
+                        if ($vcRedistModule.Version -lt '2.0') {
+                            $vcRedistCommand = 'Get-VcRedist'
+                        } else {
+                            $vcRedistCommand = 'Save-VcRedist'
+                        }
+                        $vcList | & $vcRedistCommand -Path $temporaryDirectory2
                         Write-Verbose "Installing the Visual C++ $redistName Redistributable"
                         $currentUser = [System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()
                         if ($currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)) {
