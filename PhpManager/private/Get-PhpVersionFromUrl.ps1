@@ -24,7 +24,7 @@
         [string]$Url,
         [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNull()]
-        [ValidateSet('QA', 'Release', 'Archive')]
+        [ValidateSet('QA', 'Release', 'Archive', 'Snapshot')]
         [string] $ReleaseState,
         [Parameter(Mandatory = $false, Position = 2)]
         [string]$PageUrl
@@ -33,18 +33,35 @@
         $result = $null
     }
     process {
-        $match = $Url | Select-String -CaseSensitive -Pattern ('/' + $Script:RX_ZIPARCHIVE + '$')
-        if ($null -eq $match) {
-            throw "Unrecognized PHP ZIP archive url: $Url"
-        }
         $data = @{}
-        $data.Version = $match.Matches.Groups[1].Value;
-        $data.UnstabilityLevel = $match.Matches.Groups[2].Value;
-        $data.UnstabilityVersion = $match.Matches.Groups[3].Value;
-        $data.Architecture = $match.Matches.Groups[6].Value;
-        $data.ThreadSafe = $match.Matches.Groups[4].Value -ne '-nts';
-        $data.VCVersion = $match.Matches.Groups[5].Value;
-        $data.ReleaseState = $ReleaseState;
+        $match = $Url | Select-String -CaseSensitive -Pattern ('/' + $Script:RX_ZIPARCHIVE + '$')
+        if ($null -ne $match) {
+            $groups = $match.Matches[0].Groups
+            $data.Version = $groups['version'].Value
+            $data.UnstabilityLevel = $groups['unstabilityLevel'].Value
+            $data.UnstabilityVersion = $groups['unstabilityVersion'].Value
+            $data.ThreadSafe = $groups['threadSafe'].Value -ne '-nts'
+            $data.VCVersion = $groups['vcVersion'].Value
+            $data.Architecture = $groups['architecture'].Value
+        } else {
+            $match = $Url | Select-String -CaseSensitive -Pattern ($Script:RX_ZIPARCHIVE_SNAPSHOT)
+            if ($null -ne $match) {
+                $groups = $match.Matches[0].Groups
+                if ($groups['version'].Value -eq '') {
+                    $data.Version = 'master'
+                } else {
+                    $data.Version = $groups['version'].Value
+                }
+                $data.UnstabilityLevel = $Script:UNSTABLEPHP_SNAPSHOT
+                $data.UnstabilityVersion = $null
+                $data.ThreadSafe = $groups['threadSafe'].Value -ne 'nts'
+                $data.VCVersion = $groups['vcVersion'].Value
+                $data.Architecture = $groups['architecture'].Value
+            } else {
+                throw "Unrecognized PHP ZIP archive url: $Url"
+            }
+        }
+        $data.ReleaseState = $ReleaseState
         if ($null -ne $PageUrl -and $PageUrl -ne '') {
             $data.DownloadUrl = [Uri]::new([Uri]$PageUrl, $Url).AbsoluteUri
         } else {

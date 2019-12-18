@@ -34,17 +34,30 @@
             $installedVersion = [PhpVersionInstalled]::FromPath($Path)
         }
         $possibleReleaseStates = @()
-        $possibleReleaseStates += $Script:RELEASESTATE_RELEASE
-        if ($installedVersion.UnstabilityLevel -ne '') {
-            $possibleReleaseStates += $Script:RELEASESTATE_QA
+        if ($installedVersion.UnstabilityLevel -eq $Script:UNSTABLEPHP_SNAPSHOT) {
+            $possibleReleaseStates += $Script:RELEASESTATE_SNAPSHOT
+        } else {
+            $possibleReleaseStates += $Script:RELEASESTATE_RELEASE
+            if ($installedVersion.UnstabilityLevel -ne '') {
+                $possibleReleaseStates += $Script:RELEASESTATE_QA
+            }
+            $possibleReleaseStates += $Script:RELEASESTATE_ARCHIVE
         }
-        $possibleReleaseStates += $Script:RELEASESTATE_ARCHIVE
         $compatibleVersions = $null
+        $availableSnapshots = $null
         foreach ($possibleReleaseState in $possibleReleaseStates) {
-            $compatibleVersions = Get-PhpAvailableVersion -State $possibleReleaseState | Where-Object { Get-PhpVersionsCompatibility -A $installedVersion -B $_ }
+            $availableVersions = Get-PhpAvailableVersion -State $possibleReleaseState
+            if ($possibleReleaseStates -eq $Script:RELEASESTATE_SNAPSHOT) {
+                $availableSnapshots = $availableVersions
+            }
+            $compatibleVersions = $availableVersions | Where-Object { Get-PhpVersionsCompatibility -A $installedVersion -B $_ }
             if ($null -ne $compatibleVersions) {
                 break
             }
+        }
+        if (-not($compatibleVersions) -and $installedVersion.UnstabilityLevel -eq $Script:UNSTABLEPHP_SNAPSHOT) {
+            # Let's install "master"
+            $compatibleVersions = $availableSnapshots | Where-Object { $_.Version -eq 'master' -and (Get-PhpVersionsCompatibility -A $installedVersion -B $_ -SkipVersionCheck $true) }
         }
         $bestNewVersion = $null
         if ($null -ne $compatibleVersions) {

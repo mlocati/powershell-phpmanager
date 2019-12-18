@@ -43,7 +43,7 @@ Here you can find a short description of the available commands: in order to get
 ### Installing PHP
 
 Use the `Install-Php` command to install PHP.
-- you can specify a generic version (eg `7`) or a more refined version (eg `7.2` or `7.2.1`). You can also ask to install release candidate versions (eg `7.2.5RC`).
+- you can specify a generic version (eg `7`) or a more refined version (eg `7.2` or `7.2.1`). You can also ask to install release candidate versions (eg `7.2.5RC`), as well as development versions (eg `7.4snapshot` or `master`)
 - you can specify to install a 32-bit or a 64-bit version
 - you can specify to install a Thread-Safe or Non-Thread-Safe version
 - you can specify the default time zone

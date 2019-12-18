@@ -7,7 +7,7 @@
     [ValidateLength(1, [int]::MaxValue)]
     [string] $MajorMinorVersion
     <#
-    The version of PHP, without the alpha/beta/RC state
+    The version of PHP, without the snapshot/alpha/beta/RC state
     #>
     [string]
     [ValidateNotNull()]
@@ -20,7 +20,7 @@
     [ValidateLength(1, [int]::MaxValue)]
     [string] $FullVersion
     <#
-    The unstability level, if any (alpha, beta, RC)
+    The unstability level, if any (snapshot, alpha, beta, RC)
     #>
     [string]
     [ValidateNotNull()]
@@ -68,7 +68,6 @@
     #>
     hidden PhpVersion([hashtable] $data)
     {
-        $this.Version = $data.Version
         if ($data.ContainsKey('UnstabilityLevel') -and $null -ne $data.UnstabilityLevel) {
             $this.UnstabilityLevel = $data.UnstabilityLevel
         } else {
@@ -79,36 +78,46 @@
                 throw "UnstabilityVersion provided without UnstabilityLevel"
             }
             $this.UnstabilityVersion = [int] $data.UnstabilityVersion
-        } else {
+        } elseif ($this.UnstabilityLevel -ne $Script:UNSTABLEPHP_SNAPSHOT)  {
             $this.UnstabilityLevel = $null
         }
-        $dv = $data.Version
-        $cv = $data.Version
-        switch ($this.UnstabilityLevel) {
-            '' {
-                $cv += '.9999999'
-            }
-            $Script:UNSTABLEPHP_RELEASECANDIDATE {
-                $dv += $Script:UNSTABLEPHP_RELEASECANDIDATE + $this.UnstabilityVersion
-                $cv += '.' + (8000000  + $this.UnstabilityVersion)
-            }
-            $Script:UNSTABLEPHP_BETA {
-                $dv += $Script:UNSTABLEPHP_BETA + $this.UnstabilityVersion
-                $cv += '.' + (4000000  + $this.UnstabilityVersion)
-            }
-            $Script:UNSTABLEPHP_ALPHA {
-                $dv += $Script:UNSTABLEPHP_ALPHA + $this.UnstabilityVersion
-                $cv += '.' + (2000000  + $this.UnstabilityVersion)
-            }
-            default {
-                throw 'Unrecognized UnstabilityLevel'
-            }
-        }
-        $cv = [System.Version] $cv
-        $this.MajorMinorVersion = '{0}.{1}' -f $cv.Major,$cv.Minor
         $this.Version = $data.Version
-        $this.FullVersion = $dv
-        $this.ComparableVersion = $cv
+        if ($data.Version -eq 'master') {
+            $this.MajorMinorVersion = 'master'
+            $this.FullVersion = 'master'
+            $this.ComparableVersion = [Version]'99.99'
+        } else {
+            $dv = $data.Version
+            $cv = $data.Version
+            switch ($this.UnstabilityLevel) {
+                '' {
+                    $cv += '.9999999'
+                }
+                $Script:UNSTABLEPHP_RELEASECANDIDATE {
+                    $dv += $Script:UNSTABLEPHP_RELEASECANDIDATE + $this.UnstabilityVersion
+                    $cv += '.' + (8000000  + $this.UnstabilityVersion)
+                }
+                $Script:UNSTABLEPHP_BETA {
+                    $dv += $Script:UNSTABLEPHP_BETA + $this.UnstabilityVersion
+                    $cv += '.' + (4000000  + $this.UnstabilityVersion)
+                }
+                $Script:UNSTABLEPHP_ALPHA {
+                    $dv += $Script:UNSTABLEPHP_ALPHA + $this.UnstabilityVersion
+                    $cv += '.' + (2000000  + $this.UnstabilityVersion)
+                }
+                $Script:UNSTABLEPHP_SNAPSHOT {
+                    $dv += '-dev'
+                    $cv += '.' + (1000000  + $this.UnstabilityVersion)
+                }
+                default {
+                    throw 'Unrecognized UnstabilityLevel'
+                }
+            }
+            $cv = [System.Version] $cv
+            $this.MajorMinorVersion = '{0}.{1}' -f $cv.Major,$cv.Minor
+            $this.FullVersion = $dv
+            $this.ComparableVersion = $cv
+        }
         $this.Architecture = $data.Architecture
         $this.ThreadSafe = $data.ThreadSafe
         $this.VCVersion = $data.VCVersion
@@ -213,8 +222,15 @@ class PhpVersionInstalled : PhpVersion
     [ValidateNotNull()]
     [string] $ExtensionsPath
     <#
+    The API version (eg 20190902 for PHP 7.4.0)
+    #>
+    [ValidateNotNull()]
+    [ValidateRange(1, [int]::MaxValue)]
+    [int] $ApiVersion
+    <#
     Initialize the instance.
     Keys for $data: the ones of PhpVersion plus:
+    - ApiVersion: required
     - ActualFolder: required
     - ExecutablePath: required
     - IniPath: required
@@ -222,6 +238,7 @@ class PhpVersionInstalled : PhpVersion
     #>
     hidden PhpVersionInstalled([hashtable] $data) : base($data)
     {
+        $this.ApiVersion = $data.ApiVersion
         $this.Folder = (Split-Path -LiteralPath $data.ExecutablePath).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
         $this.ActualFolder = $data.ActualFolder.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
         $this.ExecutablePath = $data.ExecutablePath
@@ -264,19 +281,38 @@ class PhpVersionInstalled : PhpVersion
         if (-Not($actualDirectoryPath)) {
             $actualDirectoryPath = $directoryPath
         }
+        $LASTEXITCODE = 0
         $data.ActualFolder = $actualDirectoryPath.TrimEnd($directorySeparator)
-        $executableResult = & $data.ExecutablePath @('-n', '-r', 'echo PHP_VERSION, ''@'', PHP_INT_SIZE * 8;')
-        if (-Not($executableResult)) {
+        $executableResult = & $data.ExecutablePath @('-n', '-r', (@'
+ob_start();
+phpinfo();
+$phpinfo = ob_get_contents();
+ob_clean();
+if (!preg_match('/^PHP Extension\s*=>\s*(\d+)$/m', $phpinfo, $matches)) {
+    fwrite(STDERR, 'Failed to find the PHP Extension API');
+    exit(1);
+}
+echo PHP_VERSION, chr(9), PHP_INT_SIZE * 8, chr(9), $matches[1];
+'@ -replace "`r`n", ' ' -replace "`n", ' ')
+        )
+
+        if ($LASTEXITCODE -ne 0 -or -Not($executableResult)) {
             throw "Failed to execute php.exe: $LASTEXITCODE"
         }
-        $match = $executableResult | Select-String -Pattern "^(\d+\.\d+\.\d+)(?:($Script:UNSTABLEPHP_RX)(\d+))?@(\d+)$"
+        $match = $executableResult | Select-String -Pattern "(?<version>\d+\.\d+\.\d+)(?<stabilityLevel>-dev|(?:$Script:UNSTABLEPHP_RX))?(?<stabilityVersion>\d+)?\t(?<bits>\d+)\t(?<apiVersion>\d+)$"
         if (-not($match)) {
             throw "Unsupported PHP version: $executableResult"
         }
-        $data.Version = $match.Matches.Groups[1].Value
-        $data.UnstabilityLevel = $match.Matches.Groups[2].Value
-        $data.UnstabilityVersion = $match.Matches.Groups[3].Value
-        $data.Architecture = Get-Variable -Scope Script -ValueOnly -Name $('ARCHITECTURE_' + $match.Matches.Groups[4].Value + 'BITS')
+        $groups = $match.Matches[0].Groups
+        $data.Version = $groups['version'].Value
+        if ($groups['stabilityLevel'].Value -eq '-dev') {
+            $data.UnstabilityLevel = $Script:UNSTABLEPHP_SNAPSHOT
+        } else {
+            $data.UnstabilityLevel = $groups['stabilityLevel'].Value
+            $data.UnstabilityVersion = $groups['stabilityVersion'].Value
+        }
+        $data.Architecture = Get-Variable -Scope Script -ValueOnly -Name $('ARCHITECTURE_' +  $groups['bits'].Value + 'BITS')
+        $data.ApiVersion = [int] $groups['apiVersion'].Value
         $executableResult = & $data.ExecutablePath @('-i')
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Thread Safety\s*=>\s*(\w+)'
         $data.ThreadSafe = $match.Matches.Groups[1].Value -eq 'enabled'

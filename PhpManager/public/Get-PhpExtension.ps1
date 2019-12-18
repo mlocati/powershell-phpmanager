@@ -1,7 +1,7 @@
 ﻿function Get-PhpExtension() {
     <#
     .Synopsis
-    Lists the extensions for PHP installation.
+    Lists the extensions for PHP installation, or inspect a DLL file containing a PHP extension.
 
     .Description
     Lists all the extensions found in a PHP installation (Builtin, Enabled and Disabled).

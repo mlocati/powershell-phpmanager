@@ -5,12 +5,12 @@
     Inspects files containing PHP extensions.
 
     .Parameter PhpVersion
-    The instance of PhpVersion for which you want to inspect the extension(s).
+    The instance of PhpVersionInstalled for which you want to inspect the extension(s).
     It can be omitted.
 
     .Parameter Path
     The path of the PHP extension file, or a directory with possible extension files.
-    If omitted we'll inspect all the extensions in the extension directory of PhpVersion.
+    If omitted we'll inspect all the extensions in the extension directory of PhpVersionInstalled.
 
     .Outputs
     System.Array|PSObject
@@ -62,19 +62,16 @@
             }
         }
         if ($somethingToInspect) {
-            $rxIndex = 0
-            $groups = @{}
             $rxGood = '^'
-            $rxGood += 'php:((?:'
+            $rxGood += 'api:(?<apiVersion>(?:0|(?:'
             if ($null -eq $PhpVersion) {
-                $rxGood += '\d+\.\d+(?:\.\d+)*'
+                $rxGood += '\d+'
             } else {
-                $rxGood += '' + $PhpVersion.ComparableVersion.Major + '\.' + $PhpVersion.ComparableVersion.Minor + '(?:\.\d+)*'
+                $rxGood += '' + $PhpVersion.ApiVersion
             }
-            $rxGood += ')?)'
-            $groups['phpVersion'] = ++$rxIndex
+            $rxGood += ')))'
             $rxGood += '\t';
-            $rxGood += 'architecture:('
+            $rxGood += 'architecture:(?<architecture>'
             if ($null -eq $PhpVersion) {
                 $checkArchitectures = @($Script:ARCHITECTURE_32BITS, $Script:ARCHITECTURE_64BITS)
                 $rxGood += $Script:ARCHITECTURE_32BITS + '|' + $Script:ARCHITECTURE_64BITS
@@ -83,28 +80,22 @@
                 $rxGood += $PhpVersion.Architecture
             }
             $rxGood += ')'
-            $groups['architecture'] = ++$rxIndex
             $rxGood += '\t';
-            $rxGood += 'threadSafe:((?:'
+            $rxGood += 'threadSafe:(?<threadSafe>(?:'
             if ($null -eq $PhpVersion) {
                 $rxGood += '0|1'
             } else {
                 $rxGood += [int]$PhpVersion.ThreadSafe
             }
             $rxGood += ')?)'
-            $groups['threadSafe'] = ++$rxIndex
             $rxGood += '\t';
-            $rxGood += 'type:(Php|Zend)'
-            $groups['type'] = ++$rxIndex
+            $rxGood += 'type:(?<type>Php|Zend)'
             $rxGood += '\t';
-            $rxGood += 'name:(.+)'
-            $groups['name'] = ++$rxIndex
+            $rxGood += 'name:(?<name>.+)'
             $rxGood += '\t';
-            $rxGood += 'version:(.*)'
-            $groups['version'] = ++$rxIndex
+            $rxGood += 'version:(?<version>.*)'
             $rxGood += '\t';
-            $rxGood += 'filename:(.+)'
-            $groups['filename'] = ++$rxIndex
+            $rxGood += 'filename:(?<filename>.+)'
             $rxGood += '$'
             foreach ($checkArchitecture in $checkArchitectures) {
                 $inspectorPath = [System.IO.Path]::Combine($PSScriptRoot, 'bin', 'Inspect-PhpExtension-' + $checkArchitecture + '.exe')
@@ -120,19 +111,21 @@
                 $match = $inspectorResult | Select-String -Pattern $rxGood
                 if (-Not($match)) {
                     if ($inspectingSingleFile) {
-                        throw "Failed to inspect extension: $inspectorResult"
+                        throw "Failed to inspect extension: $inspectorResult`n$rxGood"
                     }
                 } else {
+                    $groups = $match.Matches[0].Groups
                     $result1 = [PhpExtension]::new(@{
-                        'Type' = $match.Matches.Groups[$groups['type']].Value;
+                        'Type' = $groups['type'].Value;
                         'State' = $Script:EXTENSIONSTATE_UNKNOWN;
-                        'Name' = $match.Matches.Groups[$groups['name']].Value;
-                        'Handle' = Get-PhpExtensionHandle -Name $match.Matches.Groups[$groups['name']].Value;
-                        'Version' = $match.Matches.Groups[$groups['version']].Value;
-                        'Filename' = $match.Matches.Groups[$groups['filename']].Value;
-                        'PhpVersion' = $match.Matches.Groups[$groups['phpVersion']].Value;
-                        'Architecture' = $match.Matches.Groups[$groups['architecture']].Value;
-                        'ThreadSafe' = $match.Matches.Groups[$groups['threadSafe']].Value;
+                        'Name' = $groups['name'].Value;
+                        'Handle' = Get-PhpExtensionHandle -Name $groups['name'].Value;
+                        'Version' = $groups['version'].Value;
+                        'Filename' = $groups['filename'].Value;
+                        'ApiVersion' = $groups['apiVersion'].Value;
+                        'PhpVersion' = Get-PhpVersionFromApiVersion -ApiVersion $groups['apiVersion'].Value;
+                        'Architecture' = $groups['architecture'].Value;
+                        'ThreadSafe' = $groups['threadSafe'].Value;
                     })
                     if ($inspectingSingleFile) {
                         $result = $result1;

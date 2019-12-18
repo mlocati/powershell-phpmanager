@@ -16,6 +16,8 @@
     - '7.1RC' will install the latest release candidate for PHP 7.1
     - '7.1.17RC' will install the latest release candidate for PHP 7.1.17
     - '7.1.17RC2' will install the exact release candidate for PHP 7.1.17RC2
+    - '7.1snapshot' will install the exact release candidate for PHP 7.1.17RC2
+    - 'master' will install the very latest master snapshot
 
     .Parameter Architecture
     The architecture of the PHP to be installed (x86 for 32-bit, x64 for 64-bit).
@@ -47,7 +49,7 @@
     [OutputType()]
     param (
         [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The PHP version to be installed')]
-        [ValidatePattern('^\d+(\.\d+)?(\.\d+)?((alpha|beta|RC)\d*)?$')]
+        [ValidatePattern('^(master|(\d+\.\d+snapshot)|(\d+(\.\d+)?(\.\d+)?((alpha|beta|RC)\d*)?))$')]
         [string] $Version,
         [Parameter(Mandatory = $true, Position = 1, HelpMessage = 'Architecture of the PHP to be installed (x86 for 32-bit, x64 for 64-bit)')]
         [ValidateSet('x86', 'x64')]
@@ -85,35 +87,46 @@
             }
         }
         # Check $Version format
-        $match = $Version | Select-String -Pattern "^([1-9]\d*)(?:\.(\d+))?(?:\.(\d+))?(?:($Script:UNSTABLEPHP_RX)(\d*))?$"
-        if ($null -eq $match) {
-            throw "The specified PHP version ($Version) is malformed"
-        }
-        # Build the regular expression to match the version, and determine the list of release states
-        $rxSearchVersion = '^'
-        $rxSearchVersion += $match.Matches.Groups[1].Value + '\.'
-        if ($match.Matches.Groups[2].Value -eq '') {
-            $rxSearchVersion += '\d+\.\d+'
+        if ($Version -eq 'master') {
+            $searchReleaseStates = @($Script:RELEASESTATE_SNAPSHOT)
+            $rxSearchVersion = '^master$'
         } else {
-            $rxSearchVersion += [string][int]$match.Matches.Groups[2].Value + '\.'
-            if ($match.Matches.Groups[3].Value -eq '') {
-                $rxSearchVersion += '\d+'
+            $match = $Version | Select-String -Pattern "^(\d+\.\d+)snapshot$"
+            if ($null -ne $match) {
+                $searchReleaseStates = @($Script:RELEASESTATE_SNAPSHOT)
+                $rxSearchVersion = "^$($match.Matches[0].Groups[1].Value -replace '\.', '\.')-dev$"
             } else {
-                $rxSearchVersion += [string][int]$match.Matches.Groups[3].Value
+                $match = $Version | Select-String -Pattern "^([1-9]\d*)(?:\.(\d+))?(?:\.(\d+))?(?:($Script:UNSTABLEPHP_RX)(\d*))?$"
+                if ($null -eq $match) {
+                    throw "The specified PHP version ($Version) is malformed"
+                }
+                # Build the regular expression to match the version, and determine the list of release states
+                $rxSearchVersion = '^'
+                $rxSearchVersion += $match.Matches.Groups[1].Value + '\.'
+                if ($match.Matches.Groups[2].Value -eq '') {
+                    $rxSearchVersion += '\d+\.\d+'
+                } else {
+                    $rxSearchVersion += [string][int]$match.Matches.Groups[2].Value + '\.'
+                    if ($match.Matches.Groups[3].Value -eq '') {
+                        $rxSearchVersion += '\d+'
+                    } else {
+                        $rxSearchVersion += [string][int]$match.Matches.Groups[3].Value
+                    }
+                }
+                if ($match.Matches.Groups[4].Value -eq '') {
+                    $searchReleaseStates = @($Script:RELEASESTATE_RELEASE, $Script:RELEASESTATE_ARCHIVE)
+                } else {
+                    $rxSearchVersion += $match.Matches.Groups[4].Value
+                    if ($match.Matches.Groups[5].Value -eq '') {
+                        $rxSearchVersion += '\d+'
+                    } else {
+                        $rxSearchVersion += [string][int]$match.Matches.Groups[5].Value
+                    }
+                    $searchReleaseStates = @($Script:RELEASESTATE_QA)
+                }
+                $rxSearchVersion += '$'
             }
         }
-        if ($match.Matches.Groups[4].Value -eq '') {
-            $searchReleaseStates = @($Script:RELEASESTATE_RELEASE, $Script:RELEASESTATE_ARCHIVE)
-        } else {
-            $rxSearchVersion += $match.Matches.Groups[4].Value
-            if ($match.Matches.Groups[5].Value -eq '') {
-                $rxSearchVersion += '\d+'
-            } else {
-                $rxSearchVersion += [string][int]$match.Matches.Groups[5].Value
-            }
-            $searchReleaseStates = @($Script:RELEASESTATE_QA)
-        }
-        $rxSearchVersion += '$'
         # Filter the list of available PHP versions, and get the latest one
         $versionToInstall = $null
         foreach ($searchReleaseState in $searchReleaseStates) {
