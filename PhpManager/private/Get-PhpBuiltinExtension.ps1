@@ -36,7 +36,7 @@
                     'Handle' = $extensionHandle;
                     'Type' = $Script:EXTENSIONTYPE_BUILTIN;
                     'State' = $Script:EXTENSIONSTATE_BUILTIN;
-                    'PhpVersion' = $PhpVersion.Version;
+                    'PhpVersion' = $PhpVersion.FullVersion;
                     'Architecture' = $PhpVersion.Architecture;
                     'ThreadSafe' = $PhpVersion.ThreadSafe;
                 })

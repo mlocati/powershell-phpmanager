@@ -18,17 +18,20 @@
         [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The first PhpVersion instance to compare')]
         [ValidateNotNull()]
         [PhpVersion]$A,
-        [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The second PhpVersion instance to compare')]
+        [Parameter(Mandatory = $true, Position = 1, HelpMessage = 'The second PhpVersion instance to compare')]
         [ValidateNotNull()]
-        [PhpVersion]$B
+        [PhpVersion]$B,
+        [Parameter(Mandatory = $false, Position = 2, HelpMessage = 'Skip the check about the version?')]
+        [bool]$SkipVersionCheck = $false
+
     )
     begin {
         $areCompatible = $null
     }
     process {
-        if ($a.Architecture -ne $b.Architecture -or $a.ThreadSafe -ne $b.ThreadSafe) {
+        if ($A.Architecture -ne $B.Architecture -or $A.ThreadSafe -ne $B.ThreadSafe) {
             $areCompatible = $false
-        } elseif ($a.ComparableVersion.Major -ne $b.ComparableVersion.Major -or $a.ComparableVersion.Minor -ne $b.ComparableVersion.Minor) {
+        } elseif (-not($SkipVersionCheck) -and ($A.ComparableVersion.Major -ne $B.ComparableVersion.Major -or $A.ComparableVersion.Minor -ne $B.ComparableVersion.Minor)) {
             $areCompatible = $false
         } else {
             $areCompatible = $true

@@ -7,6 +7,7 @@
     [ValidateNotNull()]
     [ValidateLength(1, [int]::MaxValue)]
     $Type
+
     <#
     The state of the PHP extension
     #>
@@ -14,6 +15,7 @@
     [ValidateNotNull()]
     [ValidateLength(1, [int]::MaxValue)]
     $State
+
     <#
     The name of the PHP extension
     #>
@@ -21,6 +23,7 @@
     [ValidateNotNull()]
     [ValidateLength(1, [int]::MaxValue)]
     $Name
+
     <#
     The handle of the PHP extension
     #>
@@ -28,6 +31,7 @@
     [ValidateNotNull()]
     [ValidateLength(1, [int]::MaxValue)]
     $Handle
+
     <#
     The version of the PHP extension (empty string if not available)
     #>
@@ -63,6 +67,12 @@
     $Filename
 
     <#
+    Is this a thread-safe extension?
+    #>
+    [Nullable[int]]
+    $ApiVersion
+
+    <#
     Initialize the instance.
     Keys for $data:
     - Type: required
@@ -72,6 +82,7 @@
     - PhpVersion: required
     - Architecture: required
     - ThreadSafe: optional
+    - ApiVersion: optional
     - Version: optional
     - Filename: optional
     #>
@@ -100,6 +111,9 @@
         $this.Filename = ''
         if ($data.ContainsKey('Filename') -and $null -ne $data.Filename) {
             $this.Filename = $data.Filename
+        }
+        if ($data.ContainsKey('ApiVersion') -and $data.ApiVersion) {
+            $this.ApiVersion = [int]$data.ApiVersion
         }
     }
 }
