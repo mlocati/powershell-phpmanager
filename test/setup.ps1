@@ -26,6 +26,19 @@ if ($PSVersionTable.PSEdition -ne 'Core') {
         }
     }
     Write-Host " - PSScriptAnalyzer version: $($psScriptAnalyzer.Version.ToString())"
+    $vcRedist = Get-Module -Name VcRedist
+    if (-Not($vcRedist)) {
+        $vcRedist = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'VcRedist' }
+        if ($vcRedist -is [array]) {
+            $vcRedist = $vcRedist[0]
+        }
+        if (-Not($vcRedist)) {
+            Write-Host ' - installing VcRedist'
+            Install-Module -Name VcRedist -Force
+            $vcRedist = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'VcRedist' }
+        }
+    }
+    Write-Host " - VcRedist version: $($vcRedist.Version.ToString())"
 }
 
 $pester = Get-Module -Name Pester | Where-Object { $_.Version -ge '4.3' }
