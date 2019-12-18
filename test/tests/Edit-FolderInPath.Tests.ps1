@@ -91,27 +91,25 @@
         GetPath('System') | Should -BeExactly $preSystem
     }
 
-    if ($isAdministrator -or $runAs) {
-        It 'should set SYSTEM' {
-            $dir = GetFakeDir
-            $preEnv = GetPath('Env')
-            $preUser = GetPath('User')
-            $preSystem = GetPath('System')
-            Edit-FolderInPath -Operation Add -Path $dir -Persist System
-            $postEnv = GetPath('Env')
-            $postUser = GetPath('User')
-            $postSystem = GetPath('System')
-            Edit-FolderInPath -Operation Remove -Path $dir
-            $postEnv | Should -BeExactly $preEnv
-            $postUser | Should -BeExactly $preUser
-            $postSystem | Should -BeExactly "$preSystem$pathSeparator$dir".TrimStart($pathSeparator)
-            GetPath('Env') | Should -BeExactly $preEnv
-            GetPath('User') | Should -BeExactly $preUser
-            GetPath('System') | Should -BeExactly $preSystem
+    It 'should set SYSTEM' {
+        if (-not($isAdministrator -or $runAs)) {
+            Set-ItResult -Skipped -Because 'The current user does not have admin privileges'
         }
-    } else {
-        It 'should set SYSTEM' -Skip {
-        }
+        $dir = GetFakeDir
+        $preEnv = GetPath('Env')
+        $preUser = GetPath('User')
+        $preSystem = GetPath('System')
+        Edit-FolderInPath -Operation Add -Path $dir -Persist System
+        $postEnv = GetPath('Env')
+        $postUser = GetPath('User')
+        $postSystem = GetPath('System')
+        Edit-FolderInPath -Operation Remove -Path $dir
+        $postEnv | Should -BeExactly $preEnv
+        $postUser | Should -BeExactly $preUser
+        $postSystem | Should -BeExactly "$preSystem$pathSeparator$dir".TrimStart($pathSeparator)
+        GetPath('Env') | Should -BeExactly $preEnv
+        GetPath('User') | Should -BeExactly $preUser
+        GetPath('System') | Should -BeExactly $preSystem
     }
 
     It 'should set ENV and USER' {
@@ -132,26 +130,24 @@
         GetPath('System') | Should -BeExactly $preSystem
     }
 
-    if ($isAdministrator -or $runAs) {
-        It 'should set ENV and SYSTEM' {
-            $dir = GetFakeDir
-            $preEnv = GetPath('Env')
-            $preUser = GetPath('User')
-            $preSystem = GetPath('System')
-            Edit-FolderInPath -Operation Add -Path $dir -Persist System -CurrentProcess
-            $postEnv = GetPath('Env')
-            $postUser = GetPath('User')
-            $postSystem = GetPath('System')
-            Edit-FolderInPath -Operation Remove -Path $dir
-            $postEnv | Should -BeExactly "$preEnv$pathSeparator$dir".TrimStart($pathSeparator)
-            $postUser | Should -BeExactly $preUser
-            $postSystem | Should -BeExactly "$preSystem$pathSeparator$dir".TrimStart($pathSeparator)
-            GetPath('Env') | Should -BeExactly $preEnv
-            GetPath('User') | Should -BeExactly $preUser
-            GetPath('System') | Should -BeExactly $preSystem
+    It 'should set ENV and SYSTEM' {
+        if (-not($isAdministrator -or $runAs)) {
+            Set-ItResult -Skipped -Because 'The current user does not have admin privileges'
         }
-    } else {
-        It 'should set ENV and SYSTEM' -Skip {
-        }
+        $dir = GetFakeDir
+        $preEnv = GetPath('Env')
+        $preUser = GetPath('User')
+        $preSystem = GetPath('System')
+        Edit-FolderInPath -Operation Add -Path $dir -Persist System -CurrentProcess
+        $postEnv = GetPath('Env')
+        $postUser = GetPath('User')
+        $postSystem = GetPath('System')
+        Edit-FolderInPath -Operation Remove -Path $dir
+        $postEnv | Should -BeExactly "$preEnv$pathSeparator$dir".TrimStart($pathSeparator)
+        $postUser | Should -BeExactly $preUser
+        $postSystem | Should -BeExactly "$preSystem$pathSeparator$dir".TrimStart($pathSeparator)
+        GetPath('Env') | Should -BeExactly $preEnv
+        GetPath('User') | Should -BeExactly $preUser
+        GetPath('System') | Should -BeExactly $preSystem
     }
 }

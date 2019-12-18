@@ -81,15 +81,13 @@
             Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
             CheckHttps 'www.google.com' 443 | Should -Match '(curl:<.*>)|(openssl:<.*>)'
         }
-        if ($null -ne $localServerProcess) {
-            It 'php should fail connecting to a server certificated with custom CA when no CA certificate is configured' {
-                Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
-                Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
-                CheckHttps 'localhost' $localServerPort | Should -Match '(curl:<.*>)|(openssl:<.*>)'
+        It 'php should fail connecting to a server certificated with custom CA when no CA certificate is configured' {
+            if ($null -eq $localServerProcess) {
+                Set-ItResult -Skipped -Because 'The test web server is not started (NodeJS is missing?)'
             }
-        } else {
-            It 'php should fail connecting to a server certificated with custom CA when no CA certificate is configured' -Skip {
-            }
+            Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
+            Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
+            CheckHttps 'localhost' $localServerPort | Should -Match '(curl:<.*>)|(openssl:<.*>)'
         }
         It 'php should succeed connecting to a server certificated with official CA when only official CA certificates are configured (<source> certs)' -TestCases $sourceTestCases {
             param ($source)
@@ -98,16 +96,14 @@
             Update-PhpCAInfo -Path $phpPath -Source $source
             CheckHttps 'www.google.com'  443 | Should -BeExactly 'curl:ok;openssl:ok'
         }
-        if ($null -ne $localServerProcess) {
-            It 'php should fail connecting to a server certificated with custom CA when only official CA certificates are configured' {
-                Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
-                Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
-                Update-PhpCAInfo -Path $phpPath
-                CheckHttps 'localhost' $localServerPort | Should -Match '(curl:<.*>)|(openssl:<.*>)'
+        It 'php should fail connecting to a server certificated with custom CA when only official CA certificates are configured' {
+            if ($null -eq $localServerProcess) {
+                Set-ItResult -Skipped -Because 'The test web server is not started (NodeJS is missing?)'
             }
-        } else {
-            It 'php should fail connecting to a server certificated with custom CA when only official CA certificates are configured' -Skip {
-            }
+            Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
+            Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
+            Update-PhpCAInfo -Path $phpPath
+            CheckHttps 'localhost' $localServerPort | Should -Match '(curl:<.*>)|(openssl:<.*>)'
         }
         It 'php should succeed connecting to a server certificated with official CA when official CA certificates + custom CA certificate are configured' {
             Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
@@ -115,16 +111,14 @@
             Update-PhpCAInfo -Path $phpPath -CustomCAPath (Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath certs | Join-Path -ChildPath 'ca.crt')
             CheckHttps 'www.google.com'  443 | Should -BeExactly 'curl:ok;openssl:ok'
         }
-        if ($null -ne $localServerProcess) {
-            It 'php should succeed connecting to a server certificated with custom CA when official CA certificates + custom CA certificate are configured' {
-                Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
-                Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
-                Update-PhpCAInfo -Path $phpPath -CustomCAPath (Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath certs | Join-Path -ChildPath 'ca.crt')
-                CheckHttps 'localhost' $localServerPort | Should -BeExactly 'curl:ok;openssl:ok'
+        It 'php should succeed connecting to a server certificated with custom CA when official CA certificates + custom CA certificate are configured' {
+            if ($null -eq $localServerProcess) {
+                Set-ItResult -Skipped -Because 'The test web server is not started (NodeJS is missing?)'
             }
-        } else {
-            It 'php should succeed connecting to a server certificated with custom CA when official CA certificates + custom CA certificate are configured' -Skip {
-            }
+            Set-PhpIniKey -Path $phpPath -Key 'curl.cainfo' -Delete
+            Set-PhpIniKey -Path $phpPath -Key 'openssl.cafile' -Delete
+            Update-PhpCAInfo -Path $phpPath -CustomCAPath (Join-Path -Path $Global:PHPMANAGER_TESTPATH -ChildPath certs | Join-Path -ChildPath 'ca.crt')
+            CheckHttps 'localhost' $localServerPort | Should -BeExactly 'curl:ok;openssl:ok'
         }
     } finally {
         if ($phpInstalled) {
