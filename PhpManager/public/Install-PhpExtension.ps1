@@ -172,6 +172,11 @@
                     throw "Unable to write to the file $($oldExtension.Filename)"
                 }
                 Move-Item -Path $dllPath -Destination $oldExtension.Filename -Force
+                try {
+                    Reset-Acl -Path $oldExtension.Filename
+                } catch {
+                    Write-Debug -Message "Failed to reset the ACL for $($oldExtension.Filename): $($_.Exception.Message)"
+                }
                 if ($oldExtension.State -eq $Script:EXTENSIONSTATE_DISABLED -and -Not($DontEnable)) {
                     Enable-PhpExtension -Extension $oldExtension.Name -Path $phpVersion.ExecutablePath
                 }
@@ -186,6 +191,11 @@
                 }
                 Write-Verbose "Moving ""$dllPath"" to ""$newExtensionFilename"""
                 Move-Item -Path $dllPath -Destination $newExtensionFilename
+                try {
+                    Reset-Acl -Path $newExtensionFilename
+                } catch {
+                    Write-Debug -Message "Failed to reset the ACL for $($newExtensionFilename): $($_.Exception.Message)"
+                }
                 if (-Not($DontEnable)) {
                     Write-Verbose "Enabling extension ""$($newExtension.Name)"" for ""$($phpVersion.ExecutablePath)"""
                     Enable-PhpExtension -Extension $newExtension.Name -Path $phpVersion.ExecutablePath

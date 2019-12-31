@@ -50,9 +50,17 @@
                             $keepZipFile = $false
                             throw
                         }
-                        Get-ChildItem -LiteralPath $tempFolder -Recurse -File -Filter *.dll `
-                            | Where-Object { $_.Name -like 'CORE_RL_*.dll' -or $_.Name -like 'IM_MOD_RL_*.dll' } `
-                            | Move-Item -Force -Destination $PhpVersion.ActualFolder
+                        $items = Get-ChildItem -LiteralPath $tempFolder -Recurse -File -Filter *.dll `
+                            | Where-Object { $_.Name -like 'CORE_RL_*.dll' -or $_.Name -like 'IM_MOD_RL_*.dll' }
+                        foreach ($item in $items) {
+                            $destinationPath = [System.IO.Path]::Combine($PhpVersion.ActualFolder, $item.Name)
+                            Move-Item -LiteralPath $item.FullName -Destination $destinationPath -Force
+                            try {
+                                Reset-Acl -Path $destinationPath
+                            } catch {
+                                Write-Debug -Message "Failed to reset the ACL for $($destinationPath): $($_.Exception.Message)"
+                            }
+                        }
                     } finally {
                         try {
                             Remove-Item -Path $tempFolder -Recurse -Force
