@@ -33,12 +33,12 @@
             'advanced php debugger (apd)' { $handle = 'apd' }
             'nt user api' { $handle = 'ntuser' }
             'the ioncube php loader' { $handle = 'ioncube_loader' }
-            'ioncube loader' { $handle = 'ioncube_loader' }
-            'zephir parser' { $handle = 'zephir_parser' }
             default {
-                if (-Not($handle -match '^[a-z0-9][a-z0-9_\-]+$')) {
+                $replaced = $handle -replace '\s+', '_'
+                if (-Not($replaced -match '^[a-z0-9][a-z0-9_\-]+$')) {
                     throw "Unrecognized PHP extension name: $Name"
                 }
+                $handle = $replaced
             }
         }
     }
