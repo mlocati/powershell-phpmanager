@@ -17,7 +17,7 @@ function Get-PhpVersionFromApiVersion {
     }
     switch ($ApiVersion) {
         # https://github.com/php/php-src/blob/php-7.4.0RC1/Zend/zend_modules.h#L34
-        # https://github.com/php/php-src/blob/php-7.4.0/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-7.4.1/Zend/zend_modules.h#L34
         20190902 {
             return '7.4'
         }
@@ -72,7 +72,7 @@ function Get-PhpVersionFromApiVersion {
             return '5.1'
         }
         # https://github.com/php/php-src/blob/php-5.0.3/Zend/zend_modules.h#L40
-        # https://github.com/php/php-src/blob/php-5.0.4/Zend/zend_modules.h#L41
+        # https://github.com/php/php-src/blob/php-5.0.5/Zend/zend_modules.h#L41
         20041030 {
             return '5.0.3'
         }
