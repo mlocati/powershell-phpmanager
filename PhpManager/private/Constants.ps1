@@ -59,3 +59,5 @@ New-Variable -Option Constant -Scope Script -Name 'CACERT_CHECKSUM_ALGORITHM' -V
 
 New-Variable -Option Constant -Scope Script -Name 'STATUS_DLL_NOT_FOUND' -Value 0xC0000135
 New-Variable -Option Constant -Scope Script -Name 'ENTRYPOINT_NOT_FOUND' -Value 0xC0000139
+
+New-Variable -Option Constant -Scope Script -Name 'PARSE_XDEBUG_WEBSITE' -Value $false

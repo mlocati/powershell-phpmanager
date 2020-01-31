@@ -93,6 +93,8 @@
                         if ($null -ne $availablePackageVersion) {
                             $remoteFileIsZip = $false
                             $finalDllName = 'php_xdebug.dll'
+                        } else {
+                            $finalDllName = $null
                         }
                     }
                     default {

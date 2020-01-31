@@ -36,25 +36,27 @@ function Get-XdebugExtension() {
             $stabilityRxChunk = '(?:RC|alpha|beta)'
         }
     }
-    Write-Verbose 'Analyzing xdebug download page'
-    $downloadPageUrl = 'https://xdebug.org/download'
-    $downloadLinkRx = '^.*/php_xdebug-({0}(?:\.\d+)*){1}\d*-{2}-vc{3}{4}{5}\.dll$' -f @(
-        @('\d+', [System.Text.RegularExpressions.Regex]::Escape($Version))[$Version -ne ''],
-        $stabilityRxChunk,
-        [System.Text.RegularExpressions.Regex]::Escape($PhpVersion.MajorMinorVersion),
-        $PhpVersion.VCVersion,
-        @('-nts', '')[$PhpVersion.ThreadSafe]
-        @('', '-x86_64')[$PhpVersion.Architecture -eq 'x64']
-    )
     $result = $null
-    $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $downloadPageUrl
-    foreach ($link in $webResponse.Links) {
-        if ('Href' -in $link.PSobject.Properties.Name) {
-            $linkUrl = [Uri]::new([Uri]$downloadPageUrl, $link.Href).AbsoluteUri
-            $linkUrlMatch = $linkUrl | Select-String -Pattern $downloadLinkRx
-            if ($null -ne $linkUrlMatch) {
-                $result = @{PackageVersion = $linkUrlMatch.Matches[0].Groups[1].Value; PackageArchiveUrl = $linkUrl }
-                break
+    if ($Script:PARSE_XDEBUG_WEBSITE) {
+        Write-Verbose 'Analyzing xdebug download page'
+        $downloadPageUrl = 'https://xdebug.org/download/historical'
+        $downloadLinkRx = '^.*/php_xdebug-({0}(?:\.\d+)*){1}\d*-{2}-vc{3}{4}{5}\.dll$' -f @(
+            @('\d+', [System.Text.RegularExpressions.Regex]::Escape($Version))[$Version -ne ''],
+            $stabilityRxChunk,
+            [System.Text.RegularExpressions.Regex]::Escape($PhpVersion.MajorMinorVersion),
+            $PhpVersion.VCVersion,
+            @('-nts', '')[$PhpVersion.ThreadSafe]
+            @('', '-x86_64')[$PhpVersion.Architecture -eq 'x64']
+        )
+        $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $downloadPageUrl
+        foreach ($link in $webResponse.Links) {
+            if ('Href' -in $link.PSobject.Properties.Name) {
+                $linkUrl = [Uri]::new([Uri]$downloadPageUrl, $link.Href).AbsoluteUri
+                $linkUrlMatch = $linkUrl | Select-String -Pattern $downloadLinkRx
+                if ($null -ne $linkUrlMatch) {
+                    $result = @{PackageVersion = $linkUrlMatch.Matches[0].Groups[1].Value; PackageArchiveUrl = $linkUrl }
+                    break
+                }
             }
         }
     }
