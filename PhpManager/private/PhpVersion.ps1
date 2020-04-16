@@ -271,11 +271,19 @@ class PhpVersionInstalled : PhpVersion
         }
         $directoryPath = $directory.FullName.TrimEnd($directorySeparator) + $directorySeparator
         $actualDirectoryPath = $null
-        if ($directory.Target -and $directory.Target.Count -gt 0 -and $directory.Target[0]) {
-            try {
-                $actualDirectoryPath = (Get-Item -LiteralPath $directory.Target[0]).FullName.TrimEnd($directorySeparator) + $directorySeparator
-            } catch {
-                Write-Debug $_
+        if ($directory.Target) {
+            $target = $null
+            if ($directory.Target -is [string]) {
+                $target = $directory.Target
+            } elseif ($directory.Target.Count -gt 0) {
+                $target = $directory.Target[0]
+            }
+            if ($target) {
+                try {
+                    $actualDirectoryPath = (Get-Item -LiteralPath $directory.Target[0]).FullName.TrimEnd($directorySeparator) + $directorySeparator
+                } catch {
+                    Write-Debug $_
+                }
             }
         }
         if (-Not($actualDirectoryPath)) {

@@ -58,6 +58,15 @@
             $imagick.Type | Should -BeExactly 'Php'
             $imagick.State | Should -BeExactly 'Disabled'
         }
+        It -Name 'should download and install yaml on PHP <version>' -TestCases $testCases {
+            param ($path, $version)
+            Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'yaml' } | Should -HaveCount 0
+            Install-PhpExtension -Extension yaml -Path $path
+            $yaml = Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'yaml' }
+            $yaml | Should -HaveCount 1
+            $yaml.Type | Should -BeExactly 'Php'
+            $yaml.State | Should -BeExactly 'Enabled'
+        }
         It -Name 'should handle multiple extension versions' {
             $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid
             Install-Php -Version 7.1 -Architecture x64 -ThreadSafe $true -Path $phpPath

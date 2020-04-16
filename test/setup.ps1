@@ -4,6 +4,13 @@ Write-Host " - Windows installation type: $($pcInfo.WindowsInstallationType)"
 Write-Host " - Windows version name: $($pcInfo.WindowsProductName)"
 Write-Host " - PowerShell edition: $($PSVersionTable.PSEdition)"
 Write-Host " - PowerShell version: $($PSVersionTable.PSVersion.ToString())"
+try {
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+} catch {
+  Write-Host 'Failed to configure TLS1.2 for ServicePointManager'
+  Write-Host $_
+}
+
 $nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
 if (-Not($nuget)) {
     Write-Host ' - installing NuGet'
