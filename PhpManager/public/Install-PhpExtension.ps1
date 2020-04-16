@@ -127,6 +127,7 @@
                 }
                 Write-Verbose ("Downloading PECL package {0} {1} from {2}" -f $peclPackageHandle, $availablePackageVersion.PackageVersion, $availablePackageVersion.PackageArchiveUrl)
                 $downloadedFile, $keepDownloadedFile = Get-FileFromUrlOrCache -Url $availablePackageVersion.PackageArchiveUrl
+                $additionalFiles = @()
                 try {
                     if ($remoteFileIsZip) {
                         $tempFolder = New-TempDirectory
@@ -142,6 +143,14 @@
                             throw ("Multiple PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
                         }
                         $dllPath = $phpDlls[0].FullName
+                        switch ($peclPackageHandle) {
+                            'yaml' {
+                                $yamlDll = Join-Path -Path $tempFolder -ChildPath 'yaml.dll'
+                                if (Test-Path -LiteralPath $yamlDll -PathType Leaf) {
+                                    $additionalFiles += $yamlDll
+                                }
+                            }
+                        }
                     }
                     else {
                         $keepDownloadedFile = $true
@@ -179,6 +188,15 @@
                 } catch {
                     Write-Debug -Message "Failed to reset the ACL for $($oldExtension.Filename): $($_.Exception.Message)"
                 }
+                foreach ($additionalFile in $additionalFiles) {
+                    $additionalFileDestination = Join-Path -Path $phpVersion.ActualFolder -ChildPath $(Split-Path -Path $additionalFile -Leaf)
+                    Copy-Item -LiteralPath $additionalFile -Destination $additionalFileDestination -Force
+                    try {
+                        Reset-Acl -Path $additionalFileDestination
+                    } catch {
+                        Write-Debug -Message "Failed to reset the ACL for $($additionalFileDestination): $($_.Exception.Message)"
+                    }
+                }
                 if ($oldExtension.State -eq $Script:EXTENSIONSTATE_DISABLED -and -Not($DontEnable)) {
                     Enable-PhpExtension -Extension $oldExtension.Name -Path $phpVersion.ExecutablePath
                 }
@@ -197,6 +215,15 @@
                     Reset-Acl -Path $newExtensionFilename
                 } catch {
                     Write-Debug -Message "Failed to reset the ACL for $($newExtensionFilename): $($_.Exception.Message)"
+                }
+                foreach ($additionalFile in $additionalFiles) {
+                    $additionalFileDestination = Join-Path -Path $phpVersion.ActualFolder -ChildPath $(Split-Path -Path $additionalFile -Leaf)
+                    Copy-Item -LiteralPath $additionalFile -Destination $additionalFileDestination -Force
+                    try {
+                        Reset-Acl -Path $additionalFileDestination
+                    } catch {
+                        Write-Debug -Message "Failed to reset the ACL for $($additionalFileDestination): $($_.Exception.Message)"
+                    }
                 }
                 if (-Not($DontEnable)) {
                     Write-Verbose "Enabling extension ""$($newExtension.Name)"" for ""$($phpVersion.ExecutablePath)"""
