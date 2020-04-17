@@ -13,6 +13,6 @@
         Get-PeclArchiveUrl -PackageHandle imagick -PackageVersion 3.4.3 -PhpVersion $phpVersion | Should -BeExactly ''
     }
     It 'returns the latest imagick ZIP url for PHP 7.2 (minimum stability: snapshot)' {
-        Get-PeclArchiveUrl -PackageHandle imagick -PackageVersion 3.4.3 -PhpVersion $phpVersion -MinimumStability snapshot | Should -BeLike '*.zip'
+        Get-PeclArchiveUrl -PackageHandle imagick -PackageVersion 3.4.3 -PhpVersion $phpVersion -Stability snapshot | Should -BeLike '*.zip'
     }
 }

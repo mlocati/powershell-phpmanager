@@ -10,8 +10,11 @@
     .Parameter Version
     Specify the version of the extension (it can be for example '2.6.0', '2.6', '2').
 
-    .Parameter MinimumStability
-    The minimum stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
+    .Parameter Stability
+    The stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
+
+    .Parameter StabilityOperator
+    The stability operator: one of '>=' (defailt), or '=='.
 
     .Outputs
     System.Array
@@ -28,19 +31,23 @@
         [Parameter(Mandatory = $false, Position = 2)]
         [ValidateNotNull()]
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
-        [string] $MinimumStability = 'stable'
+        [string] $Stability = 'stable',
+        [Parameter(Mandatory = $false, Position = 3)]
+        [ValidateNotNull()]
+        [ValidateSet('>=', '==')]
+        [string] $StabilityOperator = '>='
     )
     begin {
         $result = @()
     }
     process {
-        switch ($MinimumStability) {
-            $Script:PEARSTATE_SNAPSHOT { $minimumStabilityInt = 0 }
-            $Script:PEARSTATE_DEVEL { $minimumStabilityInt = 1 }
-            $Script:PEARSTATE_ALPHA { $minimumStabilityInt = 2 }
-            $Script:PEARSTATE_BETA { $minimumStabilityInt = 3 }
-            $Script:PEARSTATE_STABLE { $minimumStabilityInt = 4 }
-            default { throw "Unrecognized value of MinimumStability: $MinimumStability" }
+        switch ($Stability) {
+            $Script:PEARSTATE_SNAPSHOT { $wantedStabilityInt = 0 }
+            $Script:PEARSTATE_DEVEL { $wantedStabilityInt = 1 }
+            $Script:PEARSTATE_ALPHA { $wantedStabilityInt = 2 }
+            $Script:PEARSTATE_BETA { $wantedStabilityInt = 3 }
+            $Script:PEARSTATE_STABLE { $wantedStabilityInt = 4 }
+            default { throw "Unrecognized value of Stability: $Stability" }
         }
         if ($null -eq $Version -or $Version -eq '') {
             $rxVersion = $null
@@ -61,7 +68,11 @@
                 $Script:PEARSTATE_STABLE { $stabilityInt = 4 }
                 default { throw ('Unrecognized value of stability read in XML' + $xmlVersion.s) }
             }
-            if ($stabilityInt -ge $minimumStabilityInt) {
+            if (
+                ($StabilityOperator -eq '==' -and $stabilityInt -eq $wantedStabilityInt) `
+                -or `
+                ($StabilityOperator -eq '>=' -and $stabilityInt -ge $wantedStabilityInt) `
+            ) {
                 if ($null -eq $rxVersion -or $xmlVersion.v -match $rxVersion) {
                     $result += $xmlVersion.v
                 }

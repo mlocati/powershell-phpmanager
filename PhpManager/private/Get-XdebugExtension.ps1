@@ -6,8 +6,11 @@ function Get-XdebugExtension() {
     .Parameter Version
     Specify the version of the extension (it can be for example '2.6.0', '2.6', '2').
 
-    .Parameter MinimumStability
-    The minimum stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
+    .Parameter Stability
+    The stability flag of the package: one of 'stable', 'beta', 'alpha', 'devel' or 'snapshot'.
+
+    .Parameter StabilityOperator
+    The stability operator: one of '>=', or '=='.
 
     #>
     [OutputType([PSObject])]
@@ -23,17 +26,35 @@ function Get-XdebugExtension() {
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
-        [string] $MinimumStability
+        [string] $Stability,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [ValidateSet('>=', '==')]
+        [string] $StabilityOperator
     )
-    switch ($MinimumStability) {
+    switch ($Stability) {
         $Script:PEARSTATE_STABLE {
             $stabilityRxChunk = ''
         }
         $Script:PEARSTATE_BETA {
-            $stabilityRxChunk = '(?:RC|beta)'
+            switch ($StabilityOperator) {
+                '==' {
+                    $stabilityRxChunk = '(?:RC|beta)'
+                }
+                default {
+                    $stabilityRxChunk = '(?:RC|beta)?'
+                }
+            }
         }
         default {
-            $stabilityRxChunk = '(?:RC|alpha|beta)'
+            switch ($StabilityOperator) {
+                '==' {
+                    $stabilityRxChunk = '(?:alpha)'
+                }
+                default {
+                    $stabilityRxChunk = '(?:RC|alpha|beta)?'
+                }
+            }
         }
     }
     $result = $null

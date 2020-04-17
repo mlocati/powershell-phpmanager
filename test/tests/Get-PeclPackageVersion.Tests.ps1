@@ -25,7 +25,7 @@
             if ($minimumStability -eq '_DEFAULT_') {
                 $versions = Get-PeclPackageVersion -Handle 'SamplePackage' -Version '2'
             } else {
-                $versions = Get-PeclPackageVersion -Handle 'SamplePackage' -Version '2' -MinimumStability $minimumStability
+                $versions = Get-PeclPackageVersion -Handle 'SamplePackage' -Version '2' -Stability $minimumStability
             }
             Assert-MockCalled -ModuleName PhpManager Invoke-RestMethod -Scope It -Times 1 -Exactly
             $versionsJoined = $versions -join '___'

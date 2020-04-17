@@ -15,6 +15,9 @@
     .Parameter MinimumStability
     The minimum stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
 
+    .Parameter Stability
+    The stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'  - can''t be used alongside -MinimumStability.
+
     .Parameter DontEnable
     Specify this switch to not enable the extension.
 
@@ -40,6 +43,10 @@
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Path,
+        [Parameter(Mandatory = $false, HelpMessage = 'The minimum stability flag of the package: one of ''stable'' (default), ''beta'', ''alpha'', ''devel'' or ''snapshot'' - can''t)')]
+        [ValidateNotNull()]
+        [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
+        [string] $Stability,
         [switch] $DontEnable
     )
     begin {
@@ -69,11 +76,24 @@
                 if ($null -ne $MinimumStability -and $MinimumStability -ne '') {
                     throw 'You can''t specify the -MinimumStability argument if you specify an existing file with the -Extension argument'
                 }
+                if ($null -ne $Stability -and $Stability -ne '') {
+                    throw 'You can''t specify the -Stability argument if you specify an existing file with the -Extension argument'
+                }
                 $dllPath = [System.IO.Path]::GetFullPath($Extension)
             }
             else {
-                if ($null -eq $MinimumStability -or $MinimumStability -eq '') {
-                    $MinimumStability = $Script:PEARSTATE_STABLE
+                if ($null -ne $Stability -and $Stability -ne '') {
+                    if ($null -ne $MinimumStability -and $MinimumStability -ne '') {
+                        throw 'You can''t specify both the -MinimumStability and the -Stability arguments'
+                    }
+                    $WantedStability = $Stability
+                    $WantedStabilityOperator = '=='
+                } elseif ($null -ne $MinimumStability -and $MinimumStability -ne '') {
+                    $WantedStability = $MinimumStability
+                    $WantedStabilityOperator = '>='
+                } else {
+                    $WantedStability = $Script:PEARSTATE_STABLE
+                    $WantedStabilityOperator = '>='
                 }
                 $peclPackages = @(Get-PeclAvailablePackage)
                 $foundPeclPackages = @($peclPackages | Where-Object { $_ -eq $Extension })
@@ -89,7 +109,7 @@
                 $peclPackageHandle = $foundPeclPackages[0]
                 switch ($peclPackageHandle) {
                     'xdebug' {
-                        $availablePackageVersion = Get-XdebugExtension -PhpVersion $phpVersion -Version $Version -MinimumStability $MinimumStability
+                        $availablePackageVersion = Get-XdebugExtension -PhpVersion $phpVersion -Version $Version -Stability $WantedStability -StabilityOperator $WantedStabilityOperator
                         if ($null -ne $availablePackageVersion) {
                             $remoteFileIsZip = $false
                             $finalDllName = 'php_xdebug.dll'
@@ -103,7 +123,7 @@
                     }
                 }
                 if ($null -eq $availablePackageVersion) {
-                    $peclPackageVersions = @(Get-PeclPackageVersion -Handle $peclPackageHandle -Version $Version -MinimumStability $MinimumStability)
+                    $peclPackageVersions = @(Get-PeclPackageVersion -Handle $peclPackageHandle -Version $Version -Stability $WantedStability -StabilityOperator $WantedStabilityOperator)
                     if ($peclPackageVersions.Count -eq 0) {
                         if ($Version -eq '') {
                             throw "The PECL package $peclPackageHandle does not have any version with a $MinimumStability minimum stability"
@@ -111,7 +131,7 @@
                         throw "The PECL package $peclPackageHandle does not have any $Version version with a $MinimumStability minimum stability"
                     }
                     foreach ($peclPackageVersion in $peclPackageVersions) {
-                        $archiveUrl = Get-PeclArchiveUrl -PackageHandle $peclPackageHandle -PackageVersion $peclPackageVersion -PhpVersion $phpVersion -MinimumStability $MinimumStability
+                        $archiveUrl = Get-PeclArchiveUrl -PackageHandle $peclPackageHandle -PackageVersion $peclPackageVersion -PhpVersion $phpVersion -Stability $WantedStability -StabilityOperator $WantedStabilityOperator
                         if ($archiveUrl -eq '') {
                             Write-Verbose ("No Windows DLLs found for PECL package {0} {1} compatible with {2}" -f $peclPackageHandle, $peclPackageVersion, $phpVersion.DisplayName)
                         }

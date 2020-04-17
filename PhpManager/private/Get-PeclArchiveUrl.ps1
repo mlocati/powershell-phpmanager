@@ -13,8 +13,11 @@
     .Parameter PhpVersion
     The PhpVersion instance for which you want the PECL packages.
 
-    .Parameter MinimumStability
-    The minimum stability of the package.
+    .Parameter Stability
+    The stability of the package.
+
+    .Parameter StabilityOperator
+    The stability operator of the package.
 
     .Outputs
     System.Array
@@ -36,7 +39,11 @@
         [Parameter(Mandatory = $false, Position = 3)]
         [ValidateNotNull()]
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
-        [string] $MinimumStability = 'stable'
+        [string] $Stability = 'stable',
+        [Parameter(Mandatory = $false, Position = 4)]
+        [ValidateNotNull()]
+        [ValidateSet('>=', '==')]
+        [string] $StabilityOperator = '>='
     )
     begin {
         Set-NetSecurityProtocolType
@@ -52,8 +59,11 @@
         $rxMatch += '-(VC|vc|vs)' + $PhpVersion.VCVersion
         $rxMatch += '-' + [regex]::Escape($PhpVersion.Architecture)
         $rxMatch += '\.zip$'
-        $urls = @("https://windows.php.net/downloads/pecl/releases/$handleLC/$PackageVersion")
-        if ($MinimumStability -ne $Script:PEARSTATE_STABLE) {
+        $urls = @()
+        if ($Stability -eq $Script:PEARSTATE_STABLE -or $StabilityOperator -eq '>=') {
+            $urls += "https://windows.php.net/downloads/pecl/releases/$handleLC/$PackageVersion"
+        }
+        if ($Stability -ne $Script:PEARSTATE_STABLE) {
             $urls += "https://windows.php.net/downloads/pecl/snaps/$handleLC/$PackageVersion"
         }
         foreach ($url in $urls) {
