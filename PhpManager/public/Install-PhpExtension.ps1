@@ -144,6 +144,12 @@
                         }
                         $dllPath = $phpDlls[0].FullName
                         switch ($peclPackageHandle) {
+                            'couchbase' {
+                                $libcouchbaseDll = Join-Path -Path $tempFolder -ChildPath 'libcouchbase.dll'
+                                if (Test-Path -LiteralPath $libcouchbaseDll -PathType Leaf) {
+                                    $additionalFiles += $libcouchbaseDll
+                                }
+                            }
                             'yaml' {
                                 $yamlDll = Join-Path -Path $tempFolder -ChildPath 'yaml.dll'
                                 if (Test-Path -LiteralPath $yamlDll -PathType Leaf) {

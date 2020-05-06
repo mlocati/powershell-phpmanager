@@ -47,6 +47,7 @@
     Use this switch to enable installing PHP even if the destination directory already exists and it's not empty.
     #>
     [OutputType()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ThreadSafe', Justification = 'False positive as rule does not know that Where-Object operates within the same scope')] # See https://github.com/PowerShell/PSScriptAnalyzer/issues/1472
     param (
         [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The PHP version to be installed')]
         [ValidatePattern('^(master|(\d+\.\d+snapshot)|(\d+(\.\d+)?(\.\d+)?((alpha|beta|RC)\d*)?))$')]

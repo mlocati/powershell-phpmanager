@@ -67,6 +67,20 @@
             $yaml.Type | Should -BeExactly 'Php'
             $yaml.State | Should -BeExactly 'Enabled'
         }
+        It -Name 'should download and install couchbase on PHP <version>' -TestCases $testCases {
+            param ($path, $version)
+            if (-not(Join-Path -Path $Env:windir -ChildPath System32\msvcp140.dll | Test-Path -PathType Leaf)) {
+                if (-not(Join-Path -Path $Env:windir -ChildPath System32\msvcp160.dll | Test-Path -PathType Leaf)) {
+                    Set-ItResult -Skipped -Because 'Missing some required system DLLs'
+                }
+            }
+            Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'couchbase' } | Should -HaveCount 0
+            Install-PhpExtension -Extension couchbase -Path $path
+            $couchbase = Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'couchbase' }
+            $couchbase | Should -HaveCount 1
+            $couchbase.Type | Should -BeExactly 'Php'
+            $couchbase.State | Should -BeExactly 'Enabled'
+        }
         It -Name 'should handle multiple extension versions' {
             $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid
             Install-Php -Version 7.1 -Architecture x64 -ThreadSafe $true -Path $phpPath

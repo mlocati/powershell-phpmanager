@@ -71,13 +71,13 @@
                 $installer = Get-FileFromUrlOrCache -Url $installerUrl -CachedFileName 'composer-installer.php'
             }
             $tempPhar  = [System.IO.Path]::GetTempFileName();
-            $args = @()
-            $args += $installer
-            $args += '--install-dir=' + (Split-Path -Path $tempPhar -Parent)
-            $args += '--filename=' + (Split-Path -Path $tempPhar -Leaf)
-            $args += '2>&1'
+            $arguments = @()
+            $arguments += $installer
+            $arguments += '--install-dir=' + (Split-Path -Path $tempPhar -Parent)
+            $arguments += '--filename=' + (Split-Path -Path $tempPhar -Leaf)
+            $arguments += '2>&1'
             Write-Verbose "Launching Composer installer"
-            $installerResult = & $phpVersion.ExecutablePath $args
+            $installerResult = & $phpVersion.ExecutablePath $arguments
             if ($LASTEXITCODE -ne 0) {
                 throw $installerResult
             }
