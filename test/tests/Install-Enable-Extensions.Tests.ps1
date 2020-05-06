@@ -69,6 +69,11 @@
         }
         It -Name 'should download and install couchbase on PHP <version>' -TestCases $testCases {
             param ($path, $version)
+            if (-not(Join-Path -Path $Env:windir -ChildPath System32\msvcp140.dll | Test-Path -PathType Leaf)) {
+                if (-not(Join-Path -Path $Env:windir -ChildPath System32\msvcp160.dll | Test-Path -PathType Leaf)) {
+                    Set-ItResult -Skipped -Because 'Missing some required system DLLs'
+                }
+            }
             Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'couchbase' } | Should -HaveCount 0
             Install-PhpExtension -Extension couchbase -Path $path
             $couchbase = Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'couchbase' }
