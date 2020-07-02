@@ -13,6 +13,9 @@
     .Parameter MinimumStability
     The minimum stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
 
+    .Parameter MaximumStability
+    The maximum stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
+
     .Outputs
     System.Array
     #>
@@ -28,7 +31,11 @@
         [Parameter(Mandatory = $false, Position = 2)]
         [ValidateNotNull()]
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
-        [string] $MinimumStability = 'stable'
+        [string] $MinimumStability = 'stable',
+        [Parameter(Mandatory = $false, Position = 3)]
+        [ValidateNotNull()]
+        [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
+        [string] $MaximumStability = 'stable'
     )
     begin {
         $result = @()
@@ -41,6 +48,17 @@
             $Script:PEARSTATE_BETA { $minimumStabilityInt = 3 }
             $Script:PEARSTATE_STABLE { $minimumStabilityInt = 4 }
             default { throw "Unrecognized value of MinimumStability: $MinimumStability" }
+        }
+        switch ($MaximumStability) {
+            $Script:PEARSTATE_SNAPSHOT { $maximumStabilityInt = 0 }
+            $Script:PEARSTATE_DEVEL { $maximumStabilityInt = 1 }
+            $Script:PEARSTATE_ALPHA { $maximumStabilityInt = 2 }
+            $Script:PEARSTATE_BETA { $maximumStabilityInt = 3 }
+            $Script:PEARSTATE_STABLE { $maximumStabilityInt = 4 }
+            default { throw "Unrecognized value of MaximumStability: $MaximumStability" }
+        }
+        if ($maximumStabilityInt -lt $minimumStabilityInt) {
+            throw "The maximim stability ($MaximumStability) is lower than the minimum stability ($MinimumStability)"
         }
         if ($null -eq $Version -or $Version -eq '') {
             $rxVersion = $null
@@ -62,8 +80,10 @@
                 default { throw ('Unrecognized value of stability read in XML' + $xmlVersion.s) }
             }
             if ($stabilityInt -ge $minimumStabilityInt) {
-                if ($null -eq $rxVersion -or $xmlVersion.v -match $rxVersion) {
-                    $result += $xmlVersion.v
+                if ($stabilityInt -le $maximumStabilityInt) {
+                    if ($null -eq $rxVersion -or $xmlVersion.v -match $rxVersion) {
+                        $result += $xmlVersion.v
+                    }
                 }
             }
         }

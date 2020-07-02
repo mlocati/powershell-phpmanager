@@ -9,6 +9,9 @@ function Get-XdebugExtension() {
     .Parameter MinimumStability
     The minimum stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
 
+    .Parameter MaximumStability
+    The maximum stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
+
     #>
     [OutputType([PSObject])]
     [OutputType()]
@@ -23,17 +26,48 @@ function Get-XdebugExtension() {
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
-        [string] $MinimumStability
+        [string] $MinimumStability,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
+        [string] $MaximumStability
     )
     switch ($MinimumStability) {
         $Script:PEARSTATE_STABLE {
-            $stabilityRxChunk = ''
+            switch ($MaximumStability) {
+                $Script:PEARSTATE_STABLE {
+                    $stabilityRxChunk = ''
+                }
+                default {
+                    throw "The maximim stability ($MaximumStability) is lower than the minimum stability ($MinimumStability)"
+                }
+            }
         }
         $Script:PEARSTATE_BETA {
-            $stabilityRxChunk = '(?:RC|beta)'
+            switch ($MaximumStability) {
+                $Script:PEARSTATE_STABLE {
+                    $stabilityRxChunk = '(?:RC|beta)?'
+                }
+                $Script:PEARSTATE_BETA {
+                    $stabilityRxChunk = '(?:beta)'
+                }
+                default {
+                    throw "The maximim stability ($MaximumStability) is lower than the minimum stability ($MinimumStability)"
+                }
+            }
         }
         default {
-            $stabilityRxChunk = '(?:RC|alpha|beta)'
+            switch ($MaximumStability) {
+                $Script:PEARSTATE_STABLE {
+                    $stabilityRxChunk = '(?:RC|beta|alpha)?'
+                }
+                $Script:PEARSTATE_BETA {
+                    $stabilityRxChunk = '(?:beta|alpha)'
+                }
+                default {
+                    $stabilityRxChunk = '(?:alpha)'
+                }
+            }
         }
     }
     $result = $null
