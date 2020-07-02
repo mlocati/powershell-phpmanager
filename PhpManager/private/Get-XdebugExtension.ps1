@@ -9,6 +9,9 @@ function Get-XdebugExtension() {
     .Parameter MinimumStability
     The minimum stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
 
+    .Parameter MaximumStability
+    The maximum stability flag of the package: one of 'stable' (default), 'beta', 'alpha', 'devel' or 'snapshot'.
+
     #>
     [OutputType([PSObject])]
     [OutputType()]
@@ -23,41 +26,76 @@ function Get-XdebugExtension() {
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
-        [string] $MinimumStability
+        [string] $MinimumStability,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
+        [string] $MaximumStability
     )
     switch ($MinimumStability) {
         $Script:PEARSTATE_STABLE {
-            $stabilityRxChunk = ''
+            switch ($MaximumStability) {
+                $Script:PEARSTATE_STABLE {
+                    $stabilityRxChunk = ''
+                }
+                default {
+                    throw "The maximim stability ($MaximumStability) is lower than the minimum stability ($MinimumStability)"
+                }
+            }
         }
         $Script:PEARSTATE_BETA {
-            $stabilityRxChunk = '(?:RC|beta)'
+            switch ($MaximumStability) {
+                $Script:PEARSTATE_STABLE {
+                    $stabilityRxChunk = '(?:RC|beta)?'
+                }
+                $Script:PEARSTATE_BETA {
+                    $stabilityRxChunk = '(?:beta)'
+                }
+                default {
+                    throw "The maximim stability ($MaximumStability) is lower than the minimum stability ($MinimumStability)"
+                }
+            }
         }
         default {
-            $stabilityRxChunk = '(?:RC|alpha|beta)'
+            switch ($MaximumStability) {
+                $Script:PEARSTATE_STABLE {
+                    $stabilityRxChunk = '(?:RC|beta|alpha)?'
+                }
+                $Script:PEARSTATE_BETA {
+                    $stabilityRxChunk = '(?:beta|alpha)'
+                }
+                default {
+                    $stabilityRxChunk = '(?:alpha)'
+                }
+            }
         }
     }
     $result = $null
     if ($Script:PARSE_XDEBUG_WEBSITE) {
-        Write-Verbose 'Analyzing xdebug download page'
-        $downloadPageUrl = 'https://xdebug.org/download/historical'
-        $downloadLinkRx = '^.*/php_xdebug-({0}(?:\.\d+)*){1}\d*-{2}-vc{3}{4}{5}\.dll$' -f @(
-            @('\d+', [System.Text.RegularExpressions.Regex]::Escape($Version))[$Version -ne ''],
-            $stabilityRxChunk,
-            [System.Text.RegularExpressions.Regex]::Escape($PhpVersion.MajorMinorVersion),
-            $PhpVersion.VCVersion,
-            @('-nts', '')[$PhpVersion.ThreadSafe]
-            @('', '-x86_64')[$PhpVersion.Architecture -eq 'x64']
-        )
-        $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $downloadPageUrl
-        foreach ($link in $webResponse.Links) {
-            if ('Href' -in $link.PSobject.Properties.Name) {
-                $linkUrl = [Uri]::new([Uri]$downloadPageUrl, $link.Href).AbsoluteUri
-                $linkUrlMatch = $linkUrl | Select-String -Pattern $downloadLinkRx
-                if ($null -ne $linkUrlMatch) {
-                    $result = @{PackageVersion = $linkUrlMatch.Matches[0].Groups[1].Value; PackageArchiveUrl = $linkUrl }
-                    break
+        try {
+            Write-Verbose 'Analyzing xdebug download page'
+            $downloadPageUrl = 'https://xdebug.org/download/historical'
+            $downloadLinkRx = '^.*/php_xdebug-({0}(?:\.\d+)*){1}\d*-{2}-vc{3}{4}{5}\.dll$' -f @(
+                @('\d+', [System.Text.RegularExpressions.Regex]::Escape($Version))[$Version -ne ''],
+                $stabilityRxChunk,
+                [System.Text.RegularExpressions.Regex]::Escape($PhpVersion.MajorMinorVersion),
+                $PhpVersion.VCVersion,
+                @('-nts', '')[$PhpVersion.ThreadSafe]
+                @('', '-x86_64')[$PhpVersion.Architecture -eq 'x64']
+            )
+            $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $downloadPageUrl
+            foreach ($link in $webResponse.Links) {
+                if ('Href' -in $link.PSobject.Properties.Name) {
+                    $linkUrl = [Uri]::new([Uri]$downloadPageUrl, $link.Href).AbsoluteUri
+                    $linkUrlMatch = $linkUrl | Select-String -Pattern $downloadLinkRx
+                    if ($null -ne $linkUrlMatch) {
+                        $result = @{PackageVersion = $linkUrlMatch.Matches[0].Groups[1].Value; PackageArchiveUrl = $linkUrl }
+                        break
+                    }
                 }
             }
+        } catch {
+            Write-Verbose "Error inspecting xdebug website: $_"
         }
     }
     $result

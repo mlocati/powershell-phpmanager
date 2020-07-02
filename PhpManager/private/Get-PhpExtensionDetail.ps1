@@ -63,13 +63,7 @@
         }
         if ($somethingToInspect) {
             $rxGood = '^'
-            $rxGood += 'api:(?<apiVersion>(?:0|(?:'
-            if ($null -eq $PhpVersion) {
-                $rxGood += '\d+'
-            } else {
-                $rxGood += '' + $PhpVersion.ApiVersion
-            }
-            $rxGood += ')))'
+            $rxGood += 'api:(?<apiVersion>\d+)'
             $rxGood += '\t';
             $rxGood += 'architecture:(?<architecture>'
             if ($null -eq $PhpVersion) {
@@ -115,22 +109,29 @@
                     }
                 } else {
                     $groups = $match.Matches[0].Groups
-                    $result1 = [PhpExtension]::new(@{
-                        'Type' = $groups['type'].Value;
-                        'State' = $Script:EXTENSIONSTATE_UNKNOWN;
-                        'Name' = $groups['name'].Value;
-                        'Handle' = Get-PhpExtensionHandle -Name $groups['name'].Value;
-                        'Version' = $groups['version'].Value;
-                        'Filename' = $groups['filename'].Value;
-                        'ApiVersion' = $groups['apiVersion'].Value;
-                        'PhpVersion' = Get-PhpVersionFromApiVersion -ApiVersion $groups['apiVersion'].Value;
-                        'Architecture' = $groups['architecture'].Value;
-                        'ThreadSafe' = $groups['threadSafe'].Value;
-                    })
-                    if ($inspectingSingleFile) {
-                        $result = $result1;
+                    $apiVersion = $groups['apiVersion'].Value
+                    if ($null -ne $PhpVersion -and $apiVersion -ne '0' -and $apiVersion -ne $PhpVersion.ApiVersion) {
+                        if ($inspectingSingleFile) {
+                            throw "The extension uses API $apiVersion whereas PHP uses API $($PhpVersion.ApiVersion)"
+                        }
                     } else {
-                        $result += $result1;
+                        $result1 = [PhpExtension]::new(@{
+                            'Type' = $groups['type'].Value;
+                            'State' = $Script:EXTENSIONSTATE_UNKNOWN;
+                            'Name' = $groups['name'].Value;
+                            'Handle' = Get-PhpExtensionHandle -Name $groups['name'].Value;
+                            'Version' = $groups['version'].Value;
+                            'Filename' = $groups['filename'].Value;
+                            'ApiVersion' = $apiVersion;
+                            'PhpVersion' = Get-PhpVersionFromApiVersion -ApiVersion $groups['apiVersion'].Value;
+                            'Architecture' = $groups['architecture'].Value;
+                            'ThreadSafe' = $groups['threadSafe'].Value;
+                        })
+                        if ($inspectingSingleFile) {
+                            $result = $result1;
+                        } else {
+                            $result += $result1;
+                        }
                     }
                 }
             }

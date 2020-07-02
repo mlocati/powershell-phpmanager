@@ -48,16 +48,16 @@ if ($PSVersionTable.PSEdition -ne 'Core') {
     Write-Host " - VcRedist version: $($vcRedist.Version.ToString())"
 }
 
-$pester = Get-Module -Name Pester | Where-Object { $_.Version -ge '4.5' }
+$pester = Get-Module -Name Pester | Where-Object { $_.Version -ge '4.5' -and $_.Version -le '4.9999.9999' }
 if (-Not($pester)) {
-    $pester = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'Pester' -and $_.Version -ge '4.5' }
+    $pester = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'Pester' -and $_.Version -ge '4.5' -and $_.Version -le '4.9999.9999' }
     if ($pester -is [array]) {
         $pester = $pester[0]
     }
     if (-Not($pester)) {
         Write-Host ' - installing Pester'
-        Install-Module -Name Pester -Force -SkipPublisherCheck
-        $pester = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'Pester' -and $_.Version -ge '4.5' }
+        Install-Module -Name Pester -Force -SkipPublisherCheck -MinimumVersion '4.5' -MaximumVersion '4.9999.9999'
+        $pester = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'Pester' -and $_.Version -ge '4.5' -and $_.Version -le '4.9999.9999' }
     }
 }
 Write-Host " - Pester version: $($pester.Version.ToString())"

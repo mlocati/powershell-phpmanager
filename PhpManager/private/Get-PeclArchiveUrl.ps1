@@ -16,6 +16,9 @@
     .Parameter MinimumStability
     The minimum stability of the package.
 
+    .Parameter MaximumStability
+    The maximum stability of the package.
+
     .Outputs
     System.Array
     #>
@@ -36,7 +39,11 @@
         [Parameter(Mandatory = $false, Position = 3)]
         [ValidateNotNull()]
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
-        [string] $MinimumStability = 'stable'
+        [string] $MinimumStability = 'stable',
+        [Parameter(Mandatory = $false, Position = 4)]
+        [ValidateNotNull()]
+        [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
+        [string] $MaximumStability = 'stable'
     )
     begin {
         Set-NetSecurityProtocolType
@@ -52,7 +59,10 @@
         $rxMatch += '-(VC|vc|vs)' + $PhpVersion.VCVersion
         $rxMatch += '-' + [regex]::Escape($PhpVersion.Architecture)
         $rxMatch += '\.zip$'
-        $urls = @("https://windows.php.net/downloads/pecl/releases/$handleLC/$PackageVersion")
+        $urls = @()
+        if ($MaximumStability -eq $Script:PEARSTATE_STABLE) {
+            $urls += "https://windows.php.net/downloads/pecl/releases/$handleLC/$PackageVersion"
+        }
         if ($MinimumStability -ne $Script:PEARSTATE_STABLE) {
             $urls += "https://windows.php.net/downloads/pecl/snaps/$handleLC/$PackageVersion"
         }
