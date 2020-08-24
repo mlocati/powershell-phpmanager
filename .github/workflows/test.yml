@@ -19,7 +19,7 @@ jobs:
             Remove-Item -Force -Recurse -LiteralPath C:\tools\php
           }
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           fetch-depth: 1
       - name: Setup
@@ -44,7 +44,7 @@ jobs:
             Remove-Item -Force -Recurse -LiteralPath C:\tools\php
           }
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           fetch-depth: 1
       - name: Setup
@@ -56,4 +56,33 @@ jobs:
           $pesterResult = .\test\pester.ps1
           if ($pesterResult.FailedCount -ne 0) {
             throw "$($pesterResult.FailedCount) tests failed!"
+          }
+  docker:
+    strategy:
+      matrix:
+        DOCKER_IMAGE:
+        - nanoserver
+        - windowsservercore
+    name: Docker - ${{ matrix.DOCKER_IMAGE }}
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Setup
+        env:
+          DOCKER_IMAGE: ${{ matrix.DOCKER_IMAGE }}
+        shell: powershell
+        run: '& ".\test\Dockerfile.$Env:DOCKER_IMAGE.ps1"'
+      - name: Test
+        env:
+          DOCKER_IMAGE: ${{ matrix.DOCKER_IMAGE }}
+        shell: powershell
+        run: |
+          $volume="$($Env:GITHUB_WORKSPACE):C:\App"
+          docker run --rm --volume $volume --workdir C:\App --env "PM_TEST_DOCKER=1" phpmanager/test powershell.exe 'Set-Location -LiteralPath C:\App; $pesterResult=.\test\pester.ps1; exit $pesterResult.FailedCount'
+          $failCount = $LASTEXITCODE
+          if ($failCount -ne 0) {
+            throw "$failCount tests failed!"
           }
