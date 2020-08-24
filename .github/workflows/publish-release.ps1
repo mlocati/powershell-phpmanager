@@ -69,7 +69,7 @@ function Publish-PhpManagerToPSGallery
     Write-Host '- importing module'
     Import-Module -Force .\PhpManager
     Write-Host '- publishing'
-    Publish-Module -Repository PSGallery -Path .\PhpManager -NuGetApiKey $Env:PUBLISHKEY_PG -Force
+    Publish-Module -Repository PSGallery -Path .\PhpManager -NuGetApiKey $Env:PUBLISHKEY_PG -Force | Out-Null
 }
 
 function Publish-PhpManagerToGitHubReleases
@@ -97,6 +97,5 @@ function Publish-PhpManagerToGitHubReleases
 
 Write-Host "Publishing version v$Tag"
 $releaseNotes = Get-ReleaseNotes -PublishingTag $Tag
-
-# Publish-PhpManagerToPSGallery -Version $Tag -ReleaseNotes $releaseNotes
-# Publish-PhpManagerToGitHubReleases -Tag $Tag -ReleaseNotes $releaseNotes
+Publish-PhpManagerToPSGallery -Version $Tag -ReleaseNotes $releaseNotes
+Publish-PhpManagerToGitHubReleases -Tag $Tag -ReleaseNotes $releaseNotes
