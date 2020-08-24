@@ -10,9 +10,12 @@ skip_tags: true
 
 skip_commits:
   files:
+    - .github/
+    - .vscode/
     - images/
     - src/
     - .gitignore
+    - CONTRIBUTING.md
     - LICENSE
     - README.md
 
