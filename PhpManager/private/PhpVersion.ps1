@@ -411,12 +411,12 @@ echo PHP_VERSION, chr(9), PHP_INT_SIZE * 8, chr(9), $matches[1];
                 for ($index = 0; $index -lt $numFound; $index++) {
                     Write-Host "$($index + 1). $($found[$index].Folder)`n  $($found[$index].DisplayName)"
                 }
-                $choiche = Read-Host "x. Cancel`n`nYour choiche (1... $numFound, or x)? "
-                if ($choiche -eq 'x') {
+                $choice = Read-Host "x. Cancel`n`nYour choice (1... $numFound, or x)? "
+                if ($choice -eq 'x') {
                     throw 'Operation aborted.'
                 }
                 try {
-                    $resultIndex = [int]$choiche - 1
+                    $resultIndex = [int]$choice - 1
                     if ($resultIndex -lt 0 -or $resultIndex -ge $numFound) {
                         $resultIndex = -1
                     }
