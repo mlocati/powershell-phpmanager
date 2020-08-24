@@ -1,0 +1,23 @@
+name: Publish release
+
+on:
+  create:
+    tags:
+      - "*"
+
+jobs:
+  publish:
+    if: github.event_name == 'create' && github.event.ref_type == 'tag'
+    name: Publish release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Publish
+        env:
+          PUBLISHKEY_PG: ${{ secrets.PUBLISHKEY_PG }}
+          PUBLISHKEY_GH: ${{ secrets.PUBLISHKEY_GH }}
+        shell: powershell
+        run: ./.github/workflows/publish-release.ps1 -Tag ($GITHUB_SHA -replace '^refs/tags/', '')

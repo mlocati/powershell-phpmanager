@@ -6,7 +6,7 @@ branches:
 
 version: "Build {build}"
 
-skip_tags: false
+skip_tags: true
 
 skip_commits:
   files:
@@ -53,48 +53,4 @@ test_script:
       (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path -LiteralPath .\TestsResults.xml))
       if ($failCount -ne 0) {
         throw "$failCount tests failed!"
-      }
-
-deploy_script:
-  - ps: |
-      if (($null -eq $Env:DOCKER_IMAGE -or $Env:DOCKER_IMAGE -eq '') -and $true -eq $Env:APPVEYOR_REPO_TAG -and $Env:APPVEYOR_REPO_TAG_NAME -match '^\d+\.\d+\.\d+$') {
-        $newVersion = $Env:APPVEYOR_REPO_TAG_NAME + '.' + $Env:APPVEYOR_BUILD_NUMBER
-        Write-Host "Publishing new version: $newVersion"
-        $releaseNotes = ''
-        $tags = @(& git tag --list --sort=-version:refname)
-        if ($tags.Count -lt 2) {
-          Write-Host 'Less than 2 tags found: empty release notes'
-        } else {
-          $thisTagIndex = [array]::IndexOf($tags, $Env:APPVEYOR_REPO_TAG_NAME)
-          if ($thisTagIndex -lt 0) {
-            Write-Host 'Unable to find the index of the current tag: empty release notes'
-          }
-          $previousTag = ''
-          for ($tagIndex = $thisTagIndex + 1; $tagIndex -lt $tags.Count; $tagIndex++) {
-            if ($tags[$tagIndex] -match '^\d+\.\d+\.\d+$') {
-              $previousTag = $tags[$tagIndex]
-              break
-            }
-          }
-          if ($previousTag -eq '') {
-            Write-Host 'Unable to find the previously published tag: empty release notes'
-          } else {
-            $rawCommitMessages = @(& git log --format='- %s' --no-merges --reverse ("$previousTag..." + $Env:APPVEYOR_REPO_TAG_NAME) -- .\PhpManager)
-            $commitMessages = @()
-            foreach ($rawCommitMessage in $rawCommitMessages) {
-              if (-Not($rawCommitMessage -imatch '^- \[minor\]')) {
-                $commitMessages += $rawCommitMessage
-              }
-            }
-            if ($commitMessages.Count -lt 1) {
-              Write-Host 'No relevant commit messages found: empty release notes'
-            } else {
-              $releaseNotes = [string]::Join("`n", $commitMessages)
-              Write-Host "Release notes:`n$releaseNotes"
-            }
-          }
-        }
-        Update-ModuleManifest -Path .\PhpManager\PhpManager.psd1 -ModuleVersion $newVersion -ReleaseNotes $releaseNotes
-        Import-Module -Force .\PhpManager
-        Publish-Module -Repository PSGallery -Path .\PhpManager -NuGetApiKey $Env:PsgKey -Force
       }
