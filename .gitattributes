@@ -2,3 +2,4 @@
 /src/ export-ignore
 /test/ export-ignore
 /.* export-ignore
+/MAINTAINERS.md export-ignore
