@@ -70,6 +70,7 @@ function Publish-PhpManagerToPSGallery
     Import-Module -Force .\PhpManager
     Write-Host '- publishing'
     Publish-Module -Repository PSGallery -Path .\PhpManager -NuGetApiKey $Env:PUBLISHKEY_PG -Force | Out-Null
+    Write-Host '- done'
 }
 
 function Publish-PhpManagerToGitHubReleases
@@ -80,12 +81,14 @@ function Publish-PhpManagerToGitHubReleases
         [string]
         $ReleaseNotes
     )
-
+    Write-Host 'Publishing to GitHub Releases'
+    Write-Host '- preparing request data'
     $json = ConvertTo-Json -InputObject @{
         'tag_name' = $Tag;
         'name' = "v${Tag}";
         'body' = $releaseNotes
     }
+    Write-Host '- sending request'
     Invoke-RestMethod `
         -Method 'POST'`
          -Uri 'https://api.github.com/repos/mlocati/powershell-phpmanager/releases' `
@@ -93,6 +96,7 @@ function Publish-PhpManagerToGitHubReleases
          -Headers  @{'Accept' = 'application/vnd.github.v3+json'; 'Authorization' = "token $Env:PUBLISHKEY_GH"} `
          -Body $json `
         | Out-Null
+    Write-Host '- done'
 }
 
 Write-Host "Publishing version v$Tag"
