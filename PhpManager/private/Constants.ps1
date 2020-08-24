@@ -25,6 +25,7 @@ New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RX' -Value "$UNST
 
 New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE' -Value "php-(?<version>\d+\.\d+\.\d+)(?:(?<unstabilityLevel>$UNSTABLEPHP_RX)(?<unstabilityVersion>[1-9]\d*))?(?<threadSafe>-nts)?-Win32-(?:VC|vc|vs)(?<vcVersion>\d{1,2})-(?<architecture>x86|x64)\.zip"
 New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE_SNAPSHOT' -Value "/(?:master|(?:php-(?<version>\d+\.\d+)))/r[0-9a-f]{7,}/php-(?:master|\d+\.\d+)-(?<threadSafe>nts|ts)-windows-(?:VC|vc|vs)(?<vcVersion>\d{1,2})-(?<architecture>x86|x64)-r[0-9a-f]{7,}\.zip$"
+New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE_SNAPSHOT_SHIVAMMATHUR' -Value "/php-(?:master|\d+\.\d+)-(?<threadSafe>nts|ts)-windows-(?:VC|vc|vs)(?<vcVersion>\d{1,2})-(?<architecture>x86|x64).zip$"
 
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_BUILTIN' -Value 'Builtin'
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_UNKNOWN' -Value 'Unknown'
