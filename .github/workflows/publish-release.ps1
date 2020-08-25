@@ -55,8 +55,30 @@ function Get-ReleaseNotes {
     return [string]::Join("`n", $commitMessagesResult)
 }
 
-function Publish-PhpManagerToPSGallery
-{
+function Set-PhpManagerMetadata {
+    param(
+        [string]
+        $Version,
+        [string]
+        $ReleaseNotes
+    )
+    Write-Host 'Configuring module metadata'
+    Update-ModuleManifest -Path .\PhpManager\PhpManager.psd1 `
+        -ModuleVersion $Version `
+        -ReleaseNotes $ReleaseNotes `
+        -Copyright "(c) 2018-$(Get-Date -Format yyyy) Michele Locati. All rights reserved."
+    Write-Host '- done'
+}
+
+function Compress-PhpManager {
+    Write-Host 'Creating release assets'
+    $destinazionZip = .\PhpManager.zip
+    Compress-Archive -Path .\PhpManager -DestinationPath $destinazionZip -Force
+    Write-Host '- done'
+    return $destinazionZip
+}
+
+function Publish-PhpManagerToPSGallery {
     param(
         [string]
         $Version,
@@ -64,8 +86,6 @@ function Publish-PhpManagerToPSGallery
         $ReleaseNotes
     )
     Write-Host 'Publishing to PowerShell Gallery'
-    Write-Host '- updating module manifest'
-    Update-ModuleManifest -Path .\PhpManager\PhpManager.psd1 -ModuleVersion $Version -ReleaseNotes $ReleaseNotes
     Write-Host '- importing module'
     Import-Module -Force .\PhpManager
     Write-Host '- publishing'
@@ -73,33 +93,84 @@ function Publish-PhpManagerToPSGallery
     Write-Host '- done'
 }
 
-function Publish-PhpManagerToGitHubReleases
-{
+function Publish-PhpManagerToGitHubReleases {
     param(
         [string]
         $Tag,
         [string]
-        $ReleaseNotes
+        $ReleaseNotes,
+        [string]
+        $ReleaseZip
     )
     Write-Host 'Publishing to GitHub Releases'
     Write-Host '- preparing request data'
-    $json = ConvertTo-Json -InputObject @{
-        'tag_name' = $Tag;
-        'name' = "v${Tag}";
-        'body' = $releaseNotes
+    $deleteDraft = $true
+    Write-Host '- creating draft release'
+    $release = Invoke-RestMethod `
+        -Method 'POST' `
+        -Uri 'https://api.github.com/repos/mlocati/powershell-phpmanager/releases' `
+        -UserAgent 'mlocati' `
+        -Headers @{
+            'Accept'        = 'application/vnd.github.v3+json';
+            'Authorization' = "token $Env:PUBLISHKEY_GH";
+        } `
+        -Body (ConvertTo-Json -InputObject @{
+            'tag_name' = $Tag;
+            'name'     = "v${Tag}";
+            'body'     = $ReleaseNotes;
+            'draft'    = $true;
+        })
+    try {
+        Write-Host '- adding assets'
+        Invoke-RestMethod `
+            -Method 'POST' `
+            -Uri "https://uploads.github.com/repos/mlocati/powershell-phpmanager/releases/$($release.id)/assets?name=PhpManager.zip" `
+            -UserAgent 'mlocati' `
+            -Headers @{
+                'Accept'        = 'application/vnd.github.v3+json';
+                'Authorization' = "token $Env:PUBLISHKEY_GH";
+                'Content-Type'  = 'application/zip'
+            } `
+            -InFile $ReleaseZip `
+            | Out-Null
+        Write-Host '- marking the release as non draft'
+        Invoke-RestMethod `
+            -Method 'PATCH' `
+            -Uri "https://api.github.com/repos/mlocati/powershell-phpmanager/releases/$($release.id)" `
+            -UserAgent 'mlocati' `
+            -Headers @{
+                'Accept'        = 'application/vnd.github.v3+json';
+                'Authorization' = "token $Env:PUBLISHKEY_GH";
+            } `
+            -Body (ConvertTo-Json -InputObject @{
+                'draft' = $false;
+            }) `
+            | Out-Null
+        $deleteDraft = $false
     }
-    Write-Host '- sending request'
-    Invoke-RestMethod `
-        -Method 'POST'`
-         -Uri 'https://api.github.com/repos/mlocati/powershell-phpmanager/releases' `
-         -UserAgent 'mlocati' `
-         -Headers  @{'Accept' = 'application/vnd.github.v3+json'; 'Authorization' = "token $Env:PUBLISHKEY_GH"} `
-         -Body $json `
-        | Out-Null
+    finally {
+        if ($deleteDraft) {
+            try {
+                Invoke-RestMethod `
+                    -Method 'DELETE' `
+                    -Uri "https://api.github.com/repos/mlocati/powershell-phpmanager/releases/$($release.id)" `
+                    -UserAgent 'mlocati' `
+                    -Headers @{
+                        'Accept'        = 'application/vnd.github.v3+json';
+                        'Authorization' = "token $Env:PUBLISHKEY_GH";
+                    } `
+                    | Out-Null
+            }
+            catch {
+            }
+        }
+    }
     Write-Host '- done'
 }
 
 Write-Host "Publishing version v$Tag"
 $releaseNotes = Get-ReleaseNotes -PublishingTag $Tag
+Set-PhpManagerMetadata -Version $Tag -ReleaseNotes $releaseNotes
+$releaseZip = Compress-PhpManager
 Publish-PhpManagerToPSGallery -Version $Tag -ReleaseNotes $releaseNotes
-Publish-PhpManagerToGitHubReleases -Tag $Tag -ReleaseNotes $releaseNotes
+Publish-PhpManagerToGitHubReleases -Tag $Tag -ReleaseNotes $releaseNotes -ReleaseZip $releaseZip
