@@ -18,10 +18,12 @@ New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_SNAPSHOT' -Value 
 New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_ALPHA' -Value 'alpha'
 # PHP non-stable identifier: Beta
 New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_BETA' -Value 'beta'
-# PHP non-stable identifier: Release candidate
-New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RELEASECANDIDATE' -Value 'RC'
+# PHP non-stable identifier: Release candidate (lower case)
+New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RELEASECANDIDATE_LC' -Value 'rc'
+# PHP non-stable identifier: Release candidate (upper case)
+New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RELEASECANDIDATE_UC' -Value 'RC'
 # PHP non-stable identifiers regex
-New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RX' -Value "$UNSTABLEPHP_ALPHA|$UNSTABLEPHP_BETA|$UNSTABLEPHP_RELEASECANDIDATE"
+New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RX' -Value "$UNSTABLEPHP_ALPHA|$UNSTABLEPHP_BETA|$UNSTABLEPHP_RELEASECANDIDATE_LC|$UNSTABLEPHP_RELEASECANDIDATE_UC"
 
 New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE' -Value "php-(?<version>\d+\.\d+\.\d+)(?:(?<unstabilityLevel>$UNSTABLEPHP_RX)(?<unstabilityVersion>[1-9]\d*))?(?<threadSafe>-nts)?-Win32-(?:VC|vc|vs)(?<vcVersion>\d{1,2})-(?<architecture>x86|x64)\.zip"
 New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE_SNAPSHOT' -Value "/(?:master|(?:php-(?<version>\d+\.\d+)))/r[0-9a-f]{7,}/php-(?:master|\d+\.\d+)-(?<threadSafe>nts|ts)-windows-(?:VC|vc|vs)(?<vcVersion>\d{1,2})-(?<architecture>x86|x64)-r[0-9a-f]{7,}\.zip$"

@@ -93,8 +93,8 @@
                 '' {
                     $cv += '.9999999'
                 }
-                $Script:UNSTABLEPHP_RELEASECANDIDATE {
-                    $dv += $Script:UNSTABLEPHP_RELEASECANDIDATE + $this.UnstabilityVersion
+                $Script:UNSTABLEPHP_RELEASECANDIDATE_LC {
+                    $dv += $Script:UNSTABLEPHP_RELEASECANDIDATE_LC + $this.UnstabilityVersion
                     $cv += '.' + (8000000  + $this.UnstabilityVersion)
                 }
                 $Script:UNSTABLEPHP_BETA {
