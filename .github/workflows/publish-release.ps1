@@ -72,7 +72,7 @@ function Set-PhpManagerMetadata {
 
 function Compress-PhpManager {
     Write-Host 'Creating release assets'
-    $destinazionZip = .\PhpManager.zip
+    $destinazionZip = '.\PhpManager.zip'
     Compress-Archive -Path .\PhpManager -DestinationPath $destinazionZip -Force
     Write-Host '- done'
     return $destinazionZip
