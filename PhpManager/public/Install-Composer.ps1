@@ -16,6 +16,9 @@
     .Parameter Scope
     Install Composer the current user only ('User' - default), or at system-level ('System').
 
+    .Parameter Version
+    Specify this option to install a specific Composer version. It can be a full version (eg 1.10.16) or a major version (eg 1)
+
     .Parameter NoAddToPath
     Specify this option to don't add the Composer install path to the PATH environment variable.
 
@@ -31,6 +34,9 @@
         [Parameter(Mandatory = $false, Position = 2, HelpMessage = 'Install for current user of for any user')]
         [ValidateSet('User', 'System')]
         [string] $Scope,
+        [Parameter(Mandatory = $false, Position = 3, HelpMessage = 'Composer version to be installed')]
+        [ValidatePattern('^\d+(\.\d+\.\d+(\-(alpha|beta|RC)\d*)*)?$')]
+        [string] $Version,
         [switch] $NoAddToPath,
         [switch] $NoCache
     )
@@ -60,6 +66,7 @@
         $installerUrl = 'https://getcomposer.org/installer';
         $installer = ''
         $tempPhar = ''
+        $actualPharUrl = ''
         $pathCreatedHere = $false
         try {
             if ($NoCache) {
@@ -75,13 +82,39 @@
             $arguments += $installer
             $arguments += '--install-dir=' + (Split-Path -Path $tempPhar -Parent)
             $arguments += '--filename=' + (Split-Path -Path $tempPhar -Leaf)
+            if ($Version -ne '') {
+                if ($Version -match '\.') {
+                    $arguments += '--version=' + $Version
+                } else {
+                    $actualPharUrl = "https://getcomposer.org/composer-$Version.phar"
+                    switch ($Version) {
+                        '1' {
+                            $testVersion = '1.10.16'
+                        }
+                        '2' {
+                            $testVersion = '2.0.1'
+                        }
+                        default {
+                            $testVersion = "$Version.0.1"
+                        }
+                    }
+                    $arguments += "--version=$testVersion"
+                    $arguments += '--check'
+                }
+            }
             $arguments += '2>&1'
             Write-Verbose "Launching Composer installer"
             $installerResult = & $phpVersion.ExecutablePath $arguments
             if ($LASTEXITCODE -ne 0) {
                 throw $installerResult
             }
-            Write-Verbose "Composer succeeded"
+            Write-Verbose "Composer installed succeeded"
+            if ($actualPharUrl -ne '') {
+                Write-Verbose "Downloading Composer"
+                Set-NetSecurityProtocolType
+                Write-Verbose "Downloading from $actualPharUrl"
+                Invoke-WebRequest -UseBasicParsing -Uri $actualPharUrl -OutFile $tempPhar
+            }
             Write-Verbose "Installing to $Path"
             If (-Not(Test-Path -LiteralPath $Path)) {
                 New-Item -ItemType Directory -Path $Path | Out-Null
@@ -108,6 +141,9 @@
             Set-Content -Path $destBat -Value $lines
             if (-not($NoAddToPath)) {
                 Write-Verbose 'Adding to PATH'
+                if (-not($Scope)) {
+                    $Scope = 'User'
+                }
                 Edit-FolderInPath -Operation Add -Path $Path -Persist $Scope -CurrentProcess
             }
         } catch {
