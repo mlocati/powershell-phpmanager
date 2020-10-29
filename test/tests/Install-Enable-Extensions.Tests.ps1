@@ -58,6 +58,17 @@
             $imagick.Type | Should -BeExactly 'Php'
             $imagick.State | Should -BeExactly 'Disabled'
         }
+        It -Name 'should download and install msgpack-beta on PHP <version>' -TestCases $testCases {
+            param ($path, $version)
+            if ($version -ne '7.2') {
+                Set-ItResult -Skipped -Because "Not supported on PHP $version"
+            }
+            $msgpack = Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'msgpack' }
+            $msgpack | Should -HaveCount 0
+            Install-PhpExtension -Extension msgpack -Path $path -MinimumStability beta -MaximumStability beta
+            $msgpack = Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'msgpack' }
+            $msgpack | Should -HaveCount 1
+        }
         It -Name 'should download and install yaml on PHP <version>' -TestCases $testCases {
             param ($path, $version)
             Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'yaml' } | Should -HaveCount 0
