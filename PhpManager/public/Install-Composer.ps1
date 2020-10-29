@@ -66,7 +66,6 @@
         $installerUrl = 'https://getcomposer.org/installer';
         $installer = ''
         $tempPhar = ''
-        $actualPharUrl = ''
         $pathCreatedHere = $false
         try {
             if ($NoCache) {
@@ -75,7 +74,7 @@
                 Write-Verbose "Downloading from $installerUrl"
                 Invoke-WebRequest -UseBasicParsing -Uri $installerUrl -OutFile $installer
             } else {
-                $installer = Get-FileFromUrlOrCache -Url $installerUrl -CachedFileName 'composer-installer.php'
+                $installer, $foo = Get-FileFromUrlOrCache -Url $installerUrl -CachedFileName 'composer-installer.php'
             }
             $tempPhar  = [System.IO.Path]::GetTempFileName();
             $arguments = @()
@@ -86,35 +85,16 @@
                 if ($Version -match '\.') {
                     $arguments += '--version=' + $Version
                 } else {
-                    $actualPharUrl = "https://getcomposer.org/composer-$Version.phar"
-                    switch ($Version) {
-                        '1' {
-                            $testVersion = '1.10.16'
-                        }
-                        '2' {
-                            $testVersion = '2.0.1'
-                        }
-                        default {
-                            $testVersion = "$Version.0.1"
-                        }
-                    }
-                    $arguments += "--version=$testVersion"
-                    $arguments += '--check'
+                    $arguments += '--' + $Version
                 }
             }
             $arguments += '2>&1'
-            Write-Verbose "Launching Composer installer"
+            Write-Verbose ('Launching Composer installer with: ' + ($arguments -join ' '))
             $installerResult = & $phpVersion.ExecutablePath $arguments
             if ($LASTEXITCODE -ne 0) {
                 throw $installerResult
             }
             Write-Verbose "Composer installed succeeded"
-            if ($actualPharUrl -ne '') {
-                Write-Verbose "Downloading Composer"
-                Set-NetSecurityProtocolType
-                Write-Verbose "Downloading from $actualPharUrl"
-                Invoke-WebRequest -UseBasicParsing -Uri $actualPharUrl -OutFile $tempPhar
-            }
             Write-Verbose "Installing to $Path"
             If (-Not(Test-Path -LiteralPath $Path)) {
                 New-Item -ItemType Directory -Path $Path | Out-Null
