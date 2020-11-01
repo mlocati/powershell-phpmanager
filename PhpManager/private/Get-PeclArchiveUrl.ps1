@@ -23,6 +23,7 @@
     System.Array
     #>
     [OutputType([string])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'MaximumStability', Justification = 'Not used for now, but may be used in future')]
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
@@ -60,9 +61,7 @@
         $rxMatch += '-' + [regex]::Escape($PhpVersion.Architecture)
         $rxMatch += '\.zip$'
         $urls = @()
-        if ($MaximumStability -eq $Script:PEARSTATE_STABLE -or $MaximumStability -eq $Script:PEARSTATE_BETA) {
-            $urls += "https://windows.php.net/downloads/pecl/releases/$handleLC/$PackageVersion"
-        }
+        $urls += "https://windows.php.net/downloads/pecl/releases/$handleLC/$PackageVersion"
         if ($MinimumStability -ne $Script:PEARSTATE_STABLE) {
             $urls += "https://windows.php.net/downloads/pecl/snaps/$handleLC/$PackageVersion"
         }
