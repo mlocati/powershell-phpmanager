@@ -69,6 +69,30 @@
             $msgpack = Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'msgpack' }
             $msgpack | Should -HaveCount 1
         }
+        It -Name 'should download and install pdo_sqlsrv-5.9.0-preview on PHP <version>' -TestCases $testCases {
+            param ($path, $version)
+            if ($version -ne '7.2') {
+                Set-ItResult -Skipped -Because "Not supported on PHP $version"
+            }
+            if (-not(Get-ChildItem -Path "$($Env:WinDir)\System32" -Filter msodbcsql*.dll)) {
+                Set-ItResult -Skipped -Because "Missing required system libraries"
+            }
+            Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'pdo_sqlsrv' } | Should -HaveCount 0
+            Install-PhpExtension -Extension pdo_sqlsrv -Version 5.9.0 -MinimumStability devel -MaximumStability devel -Path $path
+            Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'pdo_sqlsrv' } | Should -HaveCount 1
+        }
+        It -Name 'should download and install sqlsrv-5.9.0-preview on PHP <version>' -TestCases $testCases {
+            param ($path, $version)
+            if ($version -ne '7.2') {
+                Set-ItResult -Skipped -Because "Not supported on PHP $version"
+            }
+            if (-not(Get-ChildItem -Path "$($Env:WinDir)\System32" -Filter msodbcsql*.dll)) {
+                Set-ItResult -Skipped -Because "Missing required system libraries"
+            }
+            Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'sqlsrv' } | Should -HaveCount 0
+            Install-PhpExtension -Extension sqlsrv -Version 5.9.0 -MinimumStability devel -MaximumStability devel -Path $path
+            Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'sqlsrv' } | Should -HaveCount 1
+        }
         It -Name 'should download and install yaml on PHP <version>' -TestCases $testCases {
             param ($path, $version)
             Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'yaml' } | Should -HaveCount 0
