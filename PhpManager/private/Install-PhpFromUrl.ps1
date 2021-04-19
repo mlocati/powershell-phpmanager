@@ -140,7 +140,11 @@
                         $apacheFile = [System.IO.Path]::Combine($Path, 'Apache' + $match.Matches[0].Groups[2].Value + '.conf')
                         $apacheFileVersion = [System.Version](($match.Matches[0].Groups[2].Value -replace '_', '.') + '.0.0')
                         if (-Not(Test-Path -LiteralPath $apacheFile)) {
-                            $moduleName = 'php' + $match.Matches[0].Groups[1].Value + '_module'
+                            if ($match.Matches[0].Groups[1].Value -match '^[1-7]($|_)') {
+                                $moduleName = 'php' + $match.Matches[0].Groups[1].Value + '_module'
+                            } else {
+                                $moduleName = 'php_module'
+                            }
                             $fullName = $apacheDll.FullName
                             Set-Content -LiteralPath $apacheFile -Value "LoadModule $moduleName ""$fullName"""
                         }
