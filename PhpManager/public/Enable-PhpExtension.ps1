@@ -125,6 +125,7 @@
                 if (-Not($found)) {
                     $newIniLines += "$iniKey=$newIniValue"
                 }
+                Install-PhpExtensionPrerequisite -PhpVersion $phpVersion -Extension $extensionToEnable
                 Set-PhpIniLine -Path $iniPath -Lines $newIniLines
                 $extensionToEnable.State = $Script:EXTENSIONSTATE_ENABLED
                 Write-Verbose ('The extension ' + $extensionToEnable.Name + ' v' + $extensionToEnable.Version + ' has been enabled')
