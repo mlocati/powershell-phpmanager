@@ -25,7 +25,7 @@
     The path of the PHP installation.
     If omitted we'll use the one found in the PATH environment variable.
 
-    .Parameter NoDependncies
+    .Parameter NoDependencies
     Skip the installation of extension dependencies (youl'll have to manually call Install-PhpExtensionPrerequisite before calling Install-PhpExtension).
     #>
     [OutputType()]
@@ -51,7 +51,7 @@
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Path,
         [switch] $DontEnable,
-        [switch] $NoDependncies
+        [switch] $NoDependencies
     )
     begin {
     }
@@ -226,7 +226,7 @@
             }
             else {
                 Write-Verbose ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
-                if (-not($NoDependncies)) {
+                if (-not($NoDependencies)) {
                     Install-PhpExtensionPrerequisite -Extension $newExtension.Handle -PhpPath $phpVersion.ActualFolder
                 }
                 if ($null -eq $finalDllName) {

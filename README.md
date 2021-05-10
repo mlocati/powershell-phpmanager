@@ -264,7 +264,7 @@ Install-PhpExtension imagick -MinimumStability snapshot
 
 Some extensions require additional dependencies (for example `imagick`).
 By default, `Install-PhpExtension` automatically installs these dependencies in the directory where PHP is installed.
-If you want to install them in another directory, you have to call the `Install-PhpExtensionPrerequisite` command, and specify the `-NoDependncies` option for `Install-PhpExtension`.
+If you want to install them in another directory, you have to call the `Install-PhpExtensionPrerequisite` command, and specify the `-NoDependencies` option for `Install-PhpExtension`.
 
 PS: `Install-PhpExtension` can also be used to upgrade (or downgrade) a PHP extension to the most recent version available online.
 
