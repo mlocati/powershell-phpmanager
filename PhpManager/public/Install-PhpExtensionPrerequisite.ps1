@@ -39,7 +39,7 @@
             $phpVersion = [PhpVersionInstalled]::FromEnvironmentOne()
             Write-Verbose "Using PHP found in $($phpVersion.ActualFolder)"
         } else {
-            $phpVersion = [PhpVersionInstalled]::FromPath($Path)
+            $phpVersion = [PhpVersionInstalled]::FromPath($PhpPath)
         }
         if ($null -eq $InstallPath -or $InstallPath -eq '') {
             $InstallPath = $phpVersion.ActualFolder
