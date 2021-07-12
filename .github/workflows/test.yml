@@ -57,3 +57,27 @@ jobs:
           if ($pesterResult.FailedCount -ne 0) {
             throw "$($pesterResult.FailedCount) tests failed!"
           }
+  docker:
+    strategy:
+      matrix:
+        docker-image:
+          - nanoserver
+          - windowsservercore
+    name: Docker (${{ matrix.docker-image }})
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Prepare files for Docker image
+        run: .\test\Prepare-Dockerfile.ps1 "${{ matrix.docker-image }}"
+      - name: Build Docker image
+        run: docker build --tag phpmanager/test .\test\docker-build
+      - name: Test
+        run: |
+          docker run --rm --volume "$($Env:GITHUB_WORKSPACE):C:\App" --workdir C:\App --env "PM_TEST_DOCKER=1" phpmanager/test powershell.exe 'pesterResult=.\test\pester.ps1; exit $pesterResult.FailedCount'
+          $failCount = $LASTEXITCODE
+          if ($failCount -ne 0) {
+            throw "$failCount tests failed!"
+          }
