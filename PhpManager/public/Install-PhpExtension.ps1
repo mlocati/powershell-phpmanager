@@ -167,6 +167,12 @@
                                     $additionalFiles += $libcouchbaseDll
                                 }
                             }
+                            'imagick' {
+                                if ($phpVersion.FullVersion -ge [System.Version]'8.0.0') {
+                                    $additionalFiles += @(Get-ChildItem -Path $tempFolder\CORE_RL_*.dll -File -Depth 1)
+                                    $additionalFiles += @(Get-ChildItem -Path $tempFolder\IM_MOD_RL_*.dll -File -Depth 1)
+                                }
+                            }
                             'yaml' {
                                 $yamlDll = Join-Path -Path $tempFolder -ChildPath 'yaml.dll'
                                 if (Test-Path -LiteralPath $yamlDll -PathType Leaf) {
