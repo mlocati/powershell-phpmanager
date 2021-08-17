@@ -22,6 +22,9 @@
     begin {
     }
     process {
+        if ($phpVersion.FullVersion -ge [System.Version]'8.0.0') {
+            return
+        }
         $rxSearch = '/ImageMagick-[\d\.\-]+-(VC|vc|vs)' + $PhpVersion.VCVersion + '-' + $PhpVersion.Architecture + '\.zip$'
         $pageUrl = 'https://windows.php.net/downloads/pecl/deps/'
         Set-NetSecurityProtocolType
