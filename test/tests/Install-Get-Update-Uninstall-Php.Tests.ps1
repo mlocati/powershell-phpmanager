@@ -59,7 +59,7 @@
             }
         }
     }
-    It 'should install/get/update/remove PHP 7.3-dev' {
+    It 'should install/get/update/remove PHP 7.4-dev' {
         if ($isNanoServer) {
             Set-ItResult -Skipped -Because 'it does not seems possible to install the Visual C++ 2019 Redistributables on Windows Nano Server'
         }
@@ -67,17 +67,17 @@
             Remove-Item -LiteralPath $phpPath -Recurse -Force
         }
         try {
-            Install-Php -Version 7.3snapshot -Architecture x64 -ThreadSafe $true -Path $phpPath -InstallVC
+            Install-Php -Version 7.4snapshot -Architecture x64 -ThreadSafe $true -Path $phpPath -InstallVC
             $initialPhpVersion = Get-Php -Path $phpPath
             $initialPhpVersion | Should -Not -BeNullOrEmpty
             $initialPhpVersion.GetType().FullName | Should -BeExactly 'PhpVersionInstalled'
             $initialPhpVersion.Version | Should -BeOfType [string]
-            $initialPhpVersion.Version | Should -MatchExactly '^7\.3\.\d+$'
-            $initialPhpVersion.MajorMinorVersion | Should -BeExactly '7.3'
+            $initialPhpVersion.Version | Should -MatchExactly '^7\.4\.\d+$'
+            $initialPhpVersion.MajorMinorVersion | Should -BeExactly '7.4'
             $initialPhpVersion.ComparableVersion | Should -BeOfType [version]
             $initialPhpVersion.UnstabilityLevel | Should -BeExactly 'snapshot'
             $initialPhpVersion.UnstabilityVersion | Should -BeNullOrEmpty
-            $initialPhpVersion.FullVersion | Should -MatchExactly '^7\.3\.\d+-dev$'
+            $initialPhpVersion.FullVersion | Should -MatchExactly '^7\.4\.\d+-dev$'
             $initialPhpVersion.Architecture | Should -BeExactly 'x64'
             $initialPhpVersion.ThreadSafe | Should -BeExactly $true
             $initialPhpVersion.VCVersion | Should -BeOfType [int]
@@ -91,11 +91,11 @@
             $updatedPhpVersion | Should -Not -BeNullOrEmpty
             $updatedPhpVersion.GetType().FullName | Should -BeExactly 'PhpVersionInstalled'
             $updatedPhpVersion.Version | Should -BeOfType [string]
-            $initialPhpVersion.Version | Should -MatchExactly '^7\.3\.\d+$'
+            $initialPhpVersion.Version | Should -MatchExactly '^7\.4\.\d+$'
             $updatedPhpVersion.ComparableVersion | Should -BeOfType [version]
             $initialPhpVersion.UnstabilityLevel | Should -BeExactly 'snapshot'
             $updatedPhpVersion.UnstabilityVersion | Should -BeNullOrEmpty
-            $initialPhpVersion.FullVersion | Should -MatchExactly '^7\.3\.\d+-dev$'
+            $initialPhpVersion.FullVersion | Should -MatchExactly '^7\.4\.\d+-dev$'
             $updatedPhpVersion.Architecture | Should -BeExactly $initialPhpVersion.Architecture
             $updatedPhpVersion.ThreadSafe | Should -BeExactly $initialPhpVersion.ThreadSafe
             $updatedPhpVersion.VCVersion | Should -BeExactly $initialPhpVersion.VCVersion
