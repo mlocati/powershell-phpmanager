@@ -50,6 +50,10 @@
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Path,
+        [Parameter(Mandatory = $false, Position = 4, HelpMessage = 'The path where additional files (DLL, ...) will be installed; if omitted we''ll use the directory where PHP resides')]
+        [ValidateNotNull()]
+        [ValidateLength(1, [int]::MaxValue)]
+        [string] $AdditionalFilesPath,
         [switch] $DontEnable,
         [switch] $NoDependencies
     )
@@ -67,6 +71,11 @@
         }
         if (-Not(Test-Path -LiteralPath $phpVersion.ExtensionsPath -PathType Container)) {
             throw "The PHP extension directory ""$($phpVersion.ExtensionsPath)"" configured in your php.ini does not exist. You may need to create it, or fix the extension_dir setting in the php.ini file."
+        }
+        if ($null -eq $AdditionalFilesPath -or $AdditionalFilesPath -eq '') {
+            $AdditionalFilesPath = $phpVersion.ActualFolder
+        } elseif (-Not(Test-Path -LiteralPath $AdditionalFilesPath -PathType Container)) {
+            throw "The directory ""$AdditionalFilesPath"" where additional files should be saved does not exist."
         }
         if ($null -eq $Version) {
             $Version = ''
@@ -219,7 +228,7 @@
                     Write-Debug -Message "Failed to reset the ACL for $($oldExtension.Filename): $($_.Exception.Message)"
                 }
                 foreach ($additionalFile in $additionalFiles) {
-                    $additionalFileDestination = Join-Path -Path $phpVersion.ActualFolder -ChildPath $(Split-Path -Path $additionalFile -Leaf)
+                    $additionalFileDestination = Join-Path -Path $AdditionalFilesPath -ChildPath $(Split-Path -Path $additionalFile -Leaf)
                     Copy-Item -LiteralPath $additionalFile -Destination $additionalFileDestination -Force
                     try {
                         Reset-Acl -Path $additionalFileDestination
@@ -234,7 +243,7 @@
             else {
                 Write-Verbose ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
                 if (-not($NoDependencies)) {
-                    Install-PhpExtensionPrerequisite -Extension $newExtension.Handle -PhpPath $phpVersion.ActualFolder
+                    Install-PhpExtensionPrerequisite -Extension $newExtension.Handle -InstallPath $AdditionalFilesPath -PhpPath $phpVersion.ActualFolder
                 }
                 if ($null -eq $finalDllName) {
                     $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($dllPath))
@@ -249,7 +258,7 @@
                     Write-Debug -Message "Failed to reset the ACL for $($newExtensionFilename): $($_.Exception.Message)"
                 }
                 foreach ($additionalFile in $additionalFiles) {
-                    $additionalFileDestination = Join-Path -Path $phpVersion.ActualFolder -ChildPath $(Split-Path -Path $additionalFile -Leaf)
+                    $additionalFileDestination = Join-Path -Path $AdditionalFilesPath -ChildPath $(Split-Path -Path $additionalFile -Leaf)
                     Copy-Item -LiteralPath $additionalFile -Destination $additionalFileDestination -Force
                     try {
                         Reset-Acl -Path $additionalFileDestination
