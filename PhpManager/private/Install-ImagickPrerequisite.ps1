@@ -51,7 +51,7 @@
                     $keepZipFile = $false
                     throw
                 }
-                $items = Get-ChildItem -LiteralPath $tempFolder -Recurse -File -Filter *.dll ` | Where-Object { $_.Name -like 'CORE_RL_*.dll' -or $_.Name -like 'IM_MOD_RL_*.dll' }
+                $items = Get-ChildItem -LiteralPath $tempFolder -Recurse -File -Filter *.dll ` | Where-Object { $_.Name -like 'CORE_RL_*.dll' -or $_.Name -like 'IM_MOD_RL_*.dll' -or $_.Name -like 'FILTER_*.dll' }
                 foreach ($item in $items) {
                     $destinationPath = [System.IO.Path]::Combine($InstallPath, $item.Name)
                     Move-Item -LiteralPath $item.FullName -Destination $destinationPath -Force
