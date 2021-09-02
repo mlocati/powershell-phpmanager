@@ -307,7 +307,7 @@ echo PHP_VERSION, chr(9), PHP_INT_SIZE * 8, chr(9), $matches[1];
         if ($LASTEXITCODE -ne 0 -or -Not($executableResult)) {
             throw "Failed to execute php.exe: $LASTEXITCODE"
         }
-        $match = $executableResult | Select-String -Pattern "(?<version>\d+\.\d+\.\d+)(?<stabilityLevel>-dev|(?:$Script:UNSTABLEPHP_RX))?(?<stabilityVersion>\d+)?\t(?<bits>\d+)\t(?<apiVersion>\d+)$"
+        $match = $executableResult | Select-String -Pattern "(?<version>\d+\.\d+\.\d+)(?<stabilityLevel>-dev|(?:$Script:UNSTABLEPHP_RX))?(?<stabilityVersion>\d+)?(-dev)?\t(?<bits>\d+)\t(?<apiVersion>\d+)$"
         if (-not($match)) {
             throw "Unsupported PHP version: $executableResult"
         }
