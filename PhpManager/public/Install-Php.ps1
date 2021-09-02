@@ -97,7 +97,7 @@
                 $searchReleaseStates = @($Script:RELEASESTATE_SNAPSHOT)
                 $rxSearchVersion = "^$($match.Matches[0].Groups[1].Value -replace '\.', '\.')-dev$"
             } else {
-                $match = $Version | Select-String -Pattern "^([1-9]\d*)(?:\.(\d+))?(?:\.(\d+))?(?:($Script:UNSTABLEPHP_RX)(\d*)(?:-dev)?)?$"
+                $match = $Version | Select-String -Pattern "^([1-9]\d*)(?:\.(\d+))?(?:\.(\d+))?(?:($Script:UNSTABLEPHP_RX)(\d*))?$"
                 if ($null -eq $match) {
                     throw "The specified PHP version ($Version) is malformed"
                 }
