@@ -42,15 +42,15 @@
         [ValidateNotNull()]
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
         [string] $MinimumStability,
-        [Parameter(Mandatory = $false, Position = 4, HelpMessage = 'The maximum stability flag of the package: one of ''stable'' (default), ''beta'', ''alpha'', ''devel'' or ''snapshot'')')]
+        [Parameter(Mandatory = $false, Position = 3, HelpMessage = 'The maximum stability flag of the package: one of ''stable'' (default), ''beta'', ''alpha'', ''devel'' or ''snapshot'')')]
         [ValidateNotNull()]
         [ValidateSet('stable', 'beta', 'alpha', 'devel', 'snapshot')]
         [string] $MaximumStability,
-        [Parameter(Mandatory = $false, Position = 3, HelpMessage = 'The path to the PHP installation; if omitted we''ll use the one found in the PATH environment variable')]
+        [Parameter(Mandatory = $false, Position = 4, HelpMessage = 'The path to the PHP installation; if omitted we''ll use the one found in the PATH environment variable')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Path,
-        [Parameter(Mandatory = $false, Position = 4, HelpMessage = 'The path where additional files (DLL, ...) will be installed; if omitted we''ll use the directory where PHP resides')]
+        [Parameter(Mandatory = $false, Position = 5, HelpMessage = 'The path where additional files (DLL, ...) will be installed; if omitted we''ll use the directory where PHP resides')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
         [string] $AdditionalFilesPath,
