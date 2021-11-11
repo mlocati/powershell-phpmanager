@@ -26,19 +26,24 @@
             return
         }
         $rxSearch = '/ImageMagick-[\d\.\-]+-(VC|vc|vs)' + $PhpVersion.VCVersion + '-' + $PhpVersion.Architecture + '\.zip$'
-        $pageUrl = 'https://windows.php.net/downloads/pecl/deps/'
         Set-NetSecurityProtocolType
-        $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $pageUrl
-        $zipUrl = $null
-        foreach ($link in $webResponse.Links) {
-            $fullUrl = [Uri]::new([Uri]$pageUrl, $link.Href).AbsoluteUri
-            if ($fullUrl -match $rxSearch) {
-                $zipUrl = $fullUrl
+        $pageUrls = @('https://windows.php.net/downloads/pecl/deps/', 'https://windows.php.net/downloads/pecl/deps/archives/')
+        foreach ($pageUrl in $pageUrls) {
+            $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $pageUrl
+            $zipUrl = $null
+            foreach ($link in $webResponse.Links) {
+                $fullUrl = [Uri]::new([Uri]$pageUrl, $link.Href).AbsoluteUri
+                if ($fullUrl -match $rxSearch) {
+                    $zipUrl = $fullUrl
+                }
+            }
+            if ($null -ne $zipUrl) {
                 break
             }
         }
         if ($null -eq $zipUrl) {
-            throw ('Unable to find the imagick package dependencies on {0} for {1}' -f $pageUrl, $PhpVersion.DisplayName)
+            $pageUrlsJoined = $pageUrls -join ', '
+            throw "Unable to find the imagick package dependencies for $($PhpVersion.DisplayName) in $pageUrlsJoined"
         }
         Write-Verbose "Downloading and extracting $zipUrl"
         $zipFile, $keepZipFile = Get-FileFromUrlOrCache -Url $zipUrl
