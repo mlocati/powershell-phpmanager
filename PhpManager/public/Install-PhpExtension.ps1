@@ -113,6 +113,17 @@
                     }
                 }
                 $peclPackageHandle = $foundPeclPackages[0]
+                if ($Version -eq '') {
+                    switch ($peclPackageHandle) {
+                        'imagick' {
+                            if ($phpVersion.ComparableVersion -ge '7.3.0' -and $phpVersion.ComparableVersion -lt '8.0.0') {
+                                # With Imagick 3.6.0+ we have:
+                                # PHP Warning:  Version warning: Imagick was compiled against ImageMagick version 1799 but version 1808 is loaded. Imagick will run but may behave surprisingly in Unknown on line 0
+                                $Version = '3.5.1'
+                            }
+                        }
+                    }
+                }
                 switch ($peclPackageHandle) {
                     'xdebug' {
                         $availablePackageVersion = Get-XdebugExtension -PhpVersion $phpVersion -Version $Version -MinimumStability $MinimumStability -MaximumStability $MaximumStability
