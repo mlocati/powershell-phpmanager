@@ -50,9 +50,6 @@
             $wantedExtensionHandle = Get-PhpExtensionHandle -Name $wantedExtension
             Write-Verbose "Checking prerequisites for $wantedExtensionHandle"
             switch ($wantedExtensionHandle) {
-                imagick {
-                    Install-ImagickPrerequisite -PhpVersion $phpVersion -InstallPath $InstallPath
-                }
                 default {
                     Write-Verbose "No prerequisites needed for $wantedExtensionHandle"
                 }
