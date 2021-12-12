@@ -116,6 +116,15 @@
             $couchbase.Type | Should -BeExactly 'Php'
             $couchbase.State | Should -BeExactly 'Enabled'
         }
+        It -Name 'should download and install decimal on PHP <version>' -TestCases $testCases {
+            param ($path, $version)
+            Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'decimal' } | Should -HaveCount 0
+            Install-PhpExtension -Extension decimal -Path $path
+            $decimal = Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'decimal' }
+            $decimal | Should -HaveCount 1
+            $decimal.Type | Should -BeExactly 'Php'
+            $decimal.State | Should -BeExactly 'Enabled'
+        }
         It -Name 'should handle multiple extension versions' {
             $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid
             Install-Php -Version 7.1 -Architecture x64 -ThreadSafe $true -Path $phpPath

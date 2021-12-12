@@ -176,6 +176,12 @@
                                     $additionalFiles += $libcouchbaseDll
                                 }
                             }
+                            'decimal' {
+                                $libmpdecDll = Join-Path -Path $tempFolder -ChildPath 'libmpdec.dll'
+                                if (Test-Path -LiteralPath $libmpdecDll -PathType Leaf) {
+                                    $additionalFiles += $libmpdecDll
+                                }
+                            }
                             'imagick' {
                                 $additionalFiles += @(Get-ChildItem -Path $tempFolder\CORE_*.dll -File -Depth 1)
                                 $additionalFiles += @(Get-ChildItem -Path $tempFolder\IM_*.dll -File -Depth 1)
