@@ -294,6 +294,12 @@ You can install [Composer](https://getcomposer.org/) with the command `Install-C
 `Install-Composer` is able to add `composer` to the path, so that you can execute it from any location.
 Type `Get-Help -Detailed Install-Composer` for more details.
 
+### Configuring OpenSSL
+
+If you need to use the OpenSSL PHP extension for key generation or certificate signing functions, [you will need a valid `openssl.cnf` file](https://www.php.net/manual/en/openssl.installation.php).
+`Set-OpenSSLConf` will set the `OPENSSL_CONF` environment variable (for the current process, and optionally for the current user or local machine).
+`Set-OpenSSLConf` will look for `openssl.cnf` in some common places, but you can also provide the path to that file.
+
 ### Inspecting a PHP extension DLL file
 
 `Get-PhpExtension` is able to inspect a DLL file of a PHP extension:
