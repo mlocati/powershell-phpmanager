@@ -1,4 +1,4 @@
-﻿function Invoke-BroadcaseEnvChanged
+﻿function Invoke-BroadcastEnvChanged
 {
     <#
     .Synopsis

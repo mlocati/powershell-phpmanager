@@ -95,7 +95,7 @@
         }
         if ($needDirectRegistryAccess -and $haveToBroadcast) {
             try {
-                Invoke-BroadcaseEnvChanged
+                Invoke-BroadcastEnvChanged
             } catch {
                 Write-Debug -Message $_
             }
