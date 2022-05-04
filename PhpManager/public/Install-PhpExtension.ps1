@@ -187,6 +187,16 @@
                                 $additionalFiles += @(Get-ChildItem -Path $tempFolder\IM_*.dll -File -Depth 1)
                                 $additionalFiles += @(Get-ChildItem -Path $tempFolder\FILTER_*.dll -File -Depth 1)
                             }
+                            'memcached' {
+                                $libmemcachedDll = Join-Path -Path $tempFolder -ChildPath 'libmemcached.dll'
+                                $libhashkitDll = Join-Path -Path $tempFolder -ChildPath 'libhashkit.dll'
+                                if (Test-Path -LiteralPath $libmemcachedDll -PathType Leaf) {
+                                    $additionalFiles += $libmemcachedDll
+                                }
+                                if (Test-Path -LiteralPath $libhashkitDll -PathType Leaf) {
+                                    $additionalFiles += $libhashkitDll
+                                }
+                            }
                             'yaml' {
                                 $yamlDll = Join-Path -Path $tempFolder -ChildPath 'yaml.dll'
                                 if (Test-Path -LiteralPath $yamlDll -PathType Leaf) {
