@@ -18,6 +18,6 @@ jobs:
       - name: Publish
         env:
           PUBLISHKEY_PG: ${{ secrets.PUBLISHKEY_PG }}
-          PUBLISHKEY_GH: ${{ secrets.PUBLISHKEY_GH }}
+          PUBLISHKEY_GH: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: ./.github/workflows/publish-release.ps1 -Tag ($Env:GITHUB_REF -replace '^refs/tags/', '')
