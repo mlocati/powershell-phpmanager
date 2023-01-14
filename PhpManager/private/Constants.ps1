@@ -60,6 +60,7 @@ New-Variable -Option Constant -Scope Script -Name 'CACERT_PEM_URL' -Value 'https
 New-Variable -Option Constant -Scope Script -Name 'CACERT_CHECKSUM_URL' -Value 'https://curl.haxx.se/ca/cacert.pem.sha256'
 New-Variable -Option Constant -Scope Script -Name 'CACERT_CHECKSUM_ALGORITHM' -Value 'SHA256'
 
+New-Variable -Option Constant -Scope Script -Name 'STATUS_INVALID_IMAGE_FORMAT' -Value 0xC000007B
 New-Variable -Option Constant -Scope Script -Name 'STATUS_DLL_NOT_FOUND' -Value 0xC0000135
 New-Variable -Option Constant -Scope Script -Name 'ENTRYPOINT_NOT_FOUND' -Value 0xC0000139
 

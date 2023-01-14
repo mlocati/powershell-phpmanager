@@ -55,7 +55,7 @@
                     $exeOutput = $_.Exception.Message
                 }
                 $exeExitCode = $LASTEXITCODE
-                if ($exeExitCode -eq $Script:STATUS_DLL_NOT_FOUND -or $exeExitCode -eq $Script:ENTRYPOINT_NOT_FOUND -or $exeOutput -match 'vcruntime.*is not compatible with this PHP build') {
+                if ($exeExitCode -eq $Script:STATUS_DLL_NOT_FOUND -or $exeExitCode -eq $Script:ENTRYPOINT_NOT_FOUND  -or $exeExitCode -eq $Script:STATUS_INVALID_IMAGE_FORMAT -or $exeOutput -match 'vcruntime.*is not compatible with this PHP build') {
                     switch ($PhpVersion.VCVersion) {
                         6 { $redistName = '6' } # PHP 5.2, PHP 5.3
                         7 { $redistName = '2002' }
