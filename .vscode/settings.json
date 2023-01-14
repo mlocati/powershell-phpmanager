@@ -10,7 +10,11 @@
     },
     "[markdown]": {
         "editor.wordWrap": "on",
-        "editor.quickSuggestions": false,
+        "editor.quickSuggestions": {
+            "comments": "off",
+            "strings": "off",
+            "other": "off"
+        },
         "files.trimTrailingWhitespace": false
     },
     "[powershell]": {
