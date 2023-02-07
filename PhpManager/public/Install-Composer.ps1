@@ -70,9 +70,8 @@
         try {
             if ($NoCache) {
                 $installer = [System.IO.Path]::GetTempFileName();
-                Set-NetSecurityProtocolType
                 Write-Verbose "Downloading from $installerUrl"
-                Invoke-WebRequest -UseBasicParsing -Uri $installerUrl -OutFile $installer
+                Get-WebResource -Uri $installerUrl -OutFile $installer
             } else {
                 $installer, $foo = Get-FileFromUrlOrCache -Url $installerUrl -CachedFileName 'composer-installer.php'
             }

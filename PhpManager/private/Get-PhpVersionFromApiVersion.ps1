@@ -99,7 +99,7 @@ function Get-PhpVersionFromApiVersion {
     $masterApiVersion = Get-Variable -Name 'MASTER_APIVERSION' -ValueOnly -Scope Script
     if ($null -eq $masterApiVersion) {
         try {
-            $match = Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/php/php-src/master/Zend/zend_modules.h' | Select-String -Pattern '(?m)^\s*#define\s+ZEND_MODULE_API_NO\s+(\d+)\s*$' -CaseSensitive
+            $match = Get-WebResource -Uri 'https://raw.githubusercontent.com/php/php-src/master/Zend/zend_modules.h' | Select-String -Pattern '(?m)^\s*#define\s+ZEND_MODULE_API_NO\s+(\d+)\s*$' -CaseSensitive
             if ($null -eq $match) {
                 $masterApiVersion = $false
             }
@@ -116,7 +116,7 @@ function Get-PhpVersionFromApiVersion {
         $masterPhpVersion = Get-Variable -Name 'MASTER_PHPVERSION' -ValueOnly -Scope Script
         if ($null -eq $masterPhpVersion) {
             try {
-                $match = Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/php/php-src/master/main/php_version.h' | Select-String -Pattern '(?m)^\s*#define\s+PHP_VERSION\s+"(\d+(\.\d+)+[^"]*)"\s*$' -CaseSensitive
+                $match = Get-WebResource -Uri 'https://raw.githubusercontent.com/php/php-src/master/main/php_version.h' | Select-String -Pattern '(?m)^\s*#define\s+PHP_VERSION\s+"(\d+(\.\d+)+[^"]*)"\s*$' -CaseSensitive
                 if ($null -eq $match) {
                     $masterPhpVersion = $false
                 }

@@ -10,15 +10,14 @@
         [bool] $SkipChecksumCheck = $false
     )
     begin {
-        Set-NetSecurityProtocolType
         $result = $null
     }
     process {
         Write-Verbose "Downloading CACert file from $Script:CACERT_PEM_URL"
-        $cacertBytes = $(Invoke-WebRequest -UseBasicParsing -Uri $Script:CACERT_PEM_URL).Content
+        $cacertBytes = $(Get-WebResource -Uri $Script:CACERT_PEM_URL).Content
         if (-not($SkipChecksumCheck)) {
             Write-Verbose "Downloading checksum file from $Script:CACERT_CHECKSUM_URL"
-            $checksum = [System.Text.Encoding]::ASCII.GetString($(Invoke-WebRequest -UseBasicParsing -Uri $Script:CACERT_CHECKSUM_URL).Content)
+            $checksum = [System.Text.Encoding]::ASCII.GetString($(Get-WebResource -Uri $Script:CACERT_CHECKSUM_URL).Content)
             Write-Verbose "Checking CACert file"
             $stream = New-Object System.IO.MemoryStream
             try {

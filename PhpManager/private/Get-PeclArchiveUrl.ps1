@@ -47,7 +47,6 @@
         [string] $MaximumStability = 'stable'
     )
     begin {
-        Set-NetSecurityProtocolType
         $result = ''
     }
     process {
@@ -67,7 +66,7 @@
         }
         foreach ($url in $urls) {
             try {
-                $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $url
+                $webResponse = Get-WebResource -Uri $url
             } catch {
                 if ($_.Exception) {
                     if ($_.Exception.GetType().FullName -eq 'System.Net.WebException' -and $_.Exception.Response -and $_.Exception.Response.StatusCode -eq 404) {
