@@ -50,7 +50,7 @@
                         return 8
                     }
                     Write-Verbose "Fetching snapshots version list from $urlList"
-                    foreach ($versionLink in (Invoke-WebRequest -UseBasicParsing -Uri $urlList -Verbose:$false).Links) {
+                    foreach ($versionLink in (Get-WebResource -Uri $urlList).Links) {
                         if (-not($versionLink | Get-Member -Name 'HREF')) {
                             continue
                         }
@@ -71,7 +71,7 @@
                         $missingArtifactFlags = $missingArtifactFlags -bor (Get-ArtifactFlag $true 'x86')
                         $missingArtifactFlags = $missingArtifactFlags -bor (Get-ArtifactFlag $true 'x64')
                         Write-Verbose "Fetching snapshots build list for $versionSlug from $snapshotsUrl"
-                        $buildLinks = (Invoke-WebRequest -UseBasicParsing -Uri "$snapshotsUrl/" -Verbose:$false).Links
+                        $buildLinks = (Get-WebResource -Uri "$snapshotsUrl/").Links
                         for ($buildLinkIndex = $buildLinks.Count - 1; $buildLinkIndex -ge 0 -and $missingArtifactFlags -ne 0; $buildLinkIndex--) {
                             $buildLink = $buildLinks[$buildLinkIndex]
                             if (-not($buildLink | Get-Member -Name 'HREF')) {
@@ -83,7 +83,7 @@
                             }
                             $artifactsUrl = [Uri]::new([Uri]"$snapshotsUrl/", $buildLink.Href).AbsoluteUri.TrimEnd('/')
                             Write-Verbose "Fetching snapshots artifact list from $artifactsUrl"
-                            foreach ($artifactsLink in (Invoke-WebRequest -UseBasicParsing -Uri "$artifactsUrl/" -Verbose:$false).Links) {
+                            foreach ($artifactsLink in (Get-WebResource -Uri "$artifactsUrl/").Links) {
                                 if (-not($artifactsLink | Get-Member -Name 'HREF')) {
                                     continue
                                 }
@@ -109,8 +109,7 @@
                     }
                 }
                 default {
-                    Set-NetSecurityProtocolType
-                    $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $urlList
+                    $webResponse = Get-WebResource -Uri $urlList
                     foreach ($link in $webResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {
                         $result += Get-PhpVersionFromUrl -Url $link.Href -ReleaseState $State -PageUrl $urlList
                     }

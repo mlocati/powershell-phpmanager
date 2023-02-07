@@ -83,7 +83,7 @@ function Get-XdebugExtension() {
                 @('-nts', '')[$PhpVersion.ThreadSafe]
                 @('', '-x86_64')[$PhpVersion.Architecture -eq 'x64']
             )
-            $webResponse = Invoke-WebRequest -UseBasicParsing -Uri $downloadPageUrl
+            $webResponse = Get-WebResource -Uri $downloadPageUrl
             foreach ($link in $webResponse.Links) {
                 if ('Href' -in $link.PSobject.Properties.Name) {
                     $linkUrl = [Uri]::new([Uri]$downloadPageUrl, $link.Href).AbsoluteUri
