@@ -17,27 +17,48 @@
     begin {
         Set-NetSecurityProtocolType
         $result = $null
+        $BreakingStatusCodes = @(
+            401, # Unauthorized
+            402, # Payment Required
+            403, # Forbidden
+            404, # Not Found
+            405, # Method Not Allowed
+            407, # Proxy Authentication Required
+            413, # Payload Too Large
+            414, # URI Too Long
+            415, # Unsupported Media Type
+            426, # Upgrade Required
+            431, # Request Header Fields Too Large
+            451, # Unavailable For Legal Reasons
+            501, # Not Implemented
+            505  # HTTP Version Not Supported
+        )
     }
     process {
         if ($null -eq $OutFile) {
             $OutFile = '';
         }
-        for ($cycle = 0; $cycle -lt $Retries; $cycle++) {
+        for ($cycle = 1; $cycle -le $Retries; $cycle++) {
             try {
                 if ($OutFile -eq '') {
                     $result = Invoke-WebRequest -Uri $Uri -UseBasicParsing -Verbose:$false
                 } else {
-                    $result = Invoke-WebRequest -Uri $Uri -UseBasicParsing -OutFile $OutFile -Verbose:$false
+                    $result = Invoke-WebRequest -Uri $Uri -UseBasicParsing -Verbose:$false -OutFile $OutFile
                 }
                 break
-            } catch [System.ComponentModel.Win32Exception] {
-                if ($cycle -lt $Retries) {
-                    if ($_.ErrorCode -eq 0x80090304) { # The Local Security Authority cannot be contacted
-                        Write-Verbose "Downloading from {$Uri} failed with error $($_.Message): retrying..."
-                        continue
-                    }
+            } catch [System.Net.WebException] {
+                if ($cycle -eq $Retries) {
+                    throw
                 }
-                throw $_
+                if ($_.Exception -and $_.Exception.Response -and $BreakingStatusCodes.Contains([int]$_.Exception.Response.StatusCode)) {
+                    throw
+                }
+                Write-Verbose "Downloading from $Uri failed, retrying..."
+            } catch {
+                if ($cycle -eq $Retries) {
+                    throw
+                }
+                Write-Verbose "Downloading from $Uri failed, retrying..."
             }
         }
     }
