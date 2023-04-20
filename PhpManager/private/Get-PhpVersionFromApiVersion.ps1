@@ -16,22 +16,27 @@ function Get-PhpVersionFromApiVersion {
         return ''
     }
     switch ($ApiVersion) {
+        # https://github.com/php/php-src/blob/327c95237c96c517bd72671404686b9f5c2af8bb/Zend/zend_modules.h (8.3.0alpha1)
+        20220830 {
+            return '8.3'
+        }
         # https://github.com/php/php-src/blob/php-8.2.0RC1/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-8.2.5/Zend/zend_modules.h#L34
         20220829 {
             return '8.2'
         }
         # https://github.com/php/php-src/blob/php-8.1.0RC1/Zend/zend_modules.h#L34
-        # https://github.com/php/php-src/blob/php-8.1.10/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-8.1.18/Zend/zend_modules.h#L34
         20210902 {
             return '8.1'
         }
         # https://github.com/php/php-src/blob/php-8.0.0rc1/Zend/zend_modules.h#L34
-        # https://github.com/php/php-src/blob/php-8.0.23/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-8.0.28/Zend/zend_modules.h#L34
         20200930 {
             return '8.0'
         }
         # https://github.com/php/php-src/blob/php-7.4.0RC1/Zend/zend_modules.h#L34
-        # https://github.com/php/php-src/blob/php-7.4.30/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-7.4.33/Zend/zend_modules.h#L34
         20190902 {
             return '7.4'
         }
