@@ -20,6 +20,7 @@
     [System.Array]
     #>
     [OutputType([string], [bool])]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingBrokenHashAlgorithms','')]
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNull()]
