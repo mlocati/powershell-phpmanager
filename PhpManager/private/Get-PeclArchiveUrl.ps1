@@ -50,7 +50,7 @@
         $result = ''
     }
     process {
-        # https://github.com/php/web-pecl/blob/467593b248d4603a3dee2ecc3e61abfb7434d24d/include/pear-win-package.php
+        # https://github.com/php/web-pecl/blob/d46cbd98fc5ce90ec2a45bef5ee4f6c9db3898b7/src/PackageDll.php
         $handleLC = $PackageHandle.ToLowerInvariant();
         $rxMatch = '/php_' + [regex]::Escape($PackageHandle)
         $rxMatch += '-' + [regex]::Escape($PackageVersion)
@@ -60,9 +60,9 @@
         $rxMatch += '-' + [regex]::Escape($PhpVersion.Architecture)
         $rxMatch += '\.zip$'
         $urls = @()
-        $urls += "https://windows.php.net/downloads/pecl/releases/$handleLC/$PackageVersion"
+        $urls += "https://downloads.php.net/~windows/pecl/releases/$handleLC/$PackageVersion/"
         if ($MinimumStability -ne $Script:PEARSTATE_STABLE) {
-            $urls += "https://windows.php.net/downloads/pecl/snaps/$handleLC/$PackageVersion"
+            $urls += "https://downloads.php.net/~windows/pecl/snaps/$handleLC/$PackageVersion/"
         }
         foreach ($url in $urls) {
             try {
