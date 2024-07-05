@@ -26,7 +26,7 @@
         [ValidatePattern('^[A-Za-z][A-Za-z0-9_\-]*$')]
         [string] $Handle,
         [Parameter(Mandatory = $false, Position = 1)]
-        [ValidatePattern('^(\d+(\.\d+){0,2})?$')]
+        [ValidatePattern('^(\d+(\.\d+){0,3})?$')]
         [string] $Version,
         [Parameter(Mandatory = $false, Position = 2)]
         [ValidateNotNull()]
