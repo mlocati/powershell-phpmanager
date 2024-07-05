@@ -36,7 +36,7 @@
         [string] $Extension,
         [Parameter(Mandatory = $false, Position = 1, HelpMessage = 'Specify the version of the extension (it can be for example ''2.6.0'', ''2.6'', ''2'')')]
         [ValidateNotNull()]
-        [ValidatePattern('^\d+(\.\d+){0,2}$')]
+        [ValidatePattern('^\d+(\.\d+){0,3}$')]
         [string] $Version,
         [Parameter(Mandatory = $false, Position = 2, HelpMessage = 'The minimum stability flag of the package: one of ''stable'' (default), ''beta'', ''alpha'', ''devel'' or ''snapshot'')')]
         [ValidateNotNull()]
