@@ -16,18 +16,22 @@ function Get-PhpVersionFromApiVersion {
         return ''
     }
     switch ($ApiVersion) {
+        # https://github.com/php/php-src/blob/php-8.4.0alpha1/Zend/zend_modules.h#L34
+        20230901 {
+            return '8.4'
+        }
         # https://github.com/php/php-src/blob/php-8.3.0RC1/Zend/zend_modules.h#L34
-        # https://github.com/php/php-src/blob/php-8.3.7/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-8.3.9/Zend/zend_modules.h#L34
         20230831 {
             return '8.3'
         }
         # https://github.com/php/php-src/blob/php-8.2.0RC1/Zend/zend_modules.h#L34
-        # https://github.com/php/php-src/blob/php-8.2.19/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-8.2.21/Zend/zend_modules.h#L34
         20220829 {
             return '8.2'
         }
         # https://github.com/php/php-src/blob/php-8.1.0RC1/Zend/zend_modules.h#L34
-        # https://github.com/php/php-src/blob/php-8.1.28/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-8.1.29/Zend/zend_modules.h#L34
         20210902 {
             return '8.1'
         }
