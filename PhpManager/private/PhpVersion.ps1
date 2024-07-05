@@ -324,7 +324,7 @@ echo PHP_VERSION, chr(9), PHP_INT_SIZE * 8, chr(9), $matches[1];
         $executableResult = & $data.ExecutablePath @('-i')
         $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Thread Safety\s*=>\s*(\w+)'
         $data.ThreadSafe = $match.Matches.Groups[1].Value -eq 'enabled'
-        $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Compiler\s*=>\s*MSVC([\d]{1,2})'
+        $match = $executableResult | Select-String -CaseSensitive -Pattern '^[ \t]*Compiler\s*=>\s*MSVC ?([\d]{1,2})'
         if ($null -ne $match) {
             $data.VCVersion = $match.Matches.Groups[1].Value
         } elseif ([System.Version]$data.Version -le [System.Version]'5.2.9999') {
