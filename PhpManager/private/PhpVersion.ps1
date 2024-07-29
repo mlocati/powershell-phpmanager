@@ -338,6 +338,7 @@ echo PHP_VERSION, chr(9), PHP_INT_SIZE * 8, chr(9), $matches[1];
             switch ($vcYear) {
                 '2017' { $data.VCVersion = 15 }
                 '2019' { $data.VCVersion = 16 }
+                '2022' { $data.VCVersion = 17 }
                 default { throw "Failed to recognize VCVersion from Visual C++ $vcYear" }
             }
         }
