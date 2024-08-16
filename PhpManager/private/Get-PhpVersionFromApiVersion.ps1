@@ -17,16 +17,17 @@ function Get-PhpVersionFromApiVersion {
     }
     switch ($ApiVersion) {
         # https://github.com/php/php-src/blob/php-8.4.0alpha1/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-8.4.0beta3/Zend/zend_modules.h#L34
         20230901 {
             return '8.4'
         }
         # https://github.com/php/php-src/blob/php-8.3.0RC1/Zend/zend_modules.h#L34
-        # https://github.com/php/php-src/blob/php-8.3.9/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-8.3.10/Zend/zend_modules.h#L34
         20230831 {
             return '8.3'
         }
         # https://github.com/php/php-src/blob/php-8.2.0RC1/Zend/zend_modules.h#L34
-        # https://github.com/php/php-src/blob/php-8.2.21/Zend/zend_modules.h#L34
+        # https://github.com/php/php-src/blob/php-8.2.22/Zend/zend_modules.h#L34
         20220829 {
             return '8.2'
         }
