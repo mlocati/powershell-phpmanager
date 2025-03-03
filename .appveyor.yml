@@ -22,10 +22,6 @@ skip_commits:
 environment:
   PsgKey:
     secure: tlhLuUS6x8FcP159+X/EIBDlj9m+u5KCTTuqwzsiNHlPX6K4AolpaZcfAP4ClOdB
-  matrix:
-    - DOCKER_IMAGE:
-    - DOCKER_IMAGE: nanoserver
-    - DOCKER_IMAGE: windowsservercore
 
 cache:
   - test\download-cache -> .appveyor.yml
@@ -36,23 +32,11 @@ cache:
 build: off
 
 install:
-  - ps: |
-      if ($null -eq $Env:DOCKER_IMAGE -or $Env:DOCKER_IMAGE -eq '') {
-        .\test\setup.ps1
-      } else {
-        & ".\test\Dockerfile.$Env:DOCKER_IMAGE.ps1"
-      }
-
+  - ps: .\test\setup.ps1
 test_script:
   - ps: |
-      if ($null -eq $Env:DOCKER_IMAGE -or $Env:DOCKER_IMAGE -eq '') {
-        $pesterResult = .\test\pester.ps1
-        $failCount = $pesterResult.FailedCount
-      } else {
-        $volume="$($Env:APPVEYOR_BUILD_FOLDER):C:\App"
-        docker run --rm --volume $volume --workdir C:\App --env "PM_TEST_DOCKER=1" phpmanager/test powershell.exe 'Set-Location -LiteralPath C:\App; $pesterResult=.\test\pester.ps1; exit $pesterResult.FailedCount'
-        $failCount = $LASTEXITCODE
-      }
+      $pesterResult = .\test\pester.ps1
+      $failCount = $pesterResult.FailedCount
       (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path -LiteralPath .\TestsResults.xml))
       if ($failCount -ne 0) {
         throw "$failCount tests failed!"
