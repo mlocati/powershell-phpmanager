@@ -59,6 +59,12 @@
             throw "7-Zip executable not found at $sevenZipPath"
         }
         $sevenZipResult = & $sevenZipPath $sevenZipArguments
+        if ($null -eq $LASTEXITCODE) {
+            if ($sevenZipResult) {
+                throw "Extraction with 7-zip didn't set LASTEXITCODE; its output is $sevenZipResult"
+            }
+            throw "Extraction with 7-zip didn't set LASTEXITCODE"
+        }
         if ($LASTEXITCODE -ne 0) {
             if ($createdHere) {
                 try {
