@@ -55,6 +55,9 @@
         }
         $sevenZipArguments += $ArchivePath
         $sevenZipPath = [System.IO.Path]::Combine($PSScriptRoot, 'bin', "7za-$sevenZipArchitecture.exe")
+        If (-Not(Test-Path -LiteralPath $sevenZipPath -PathType Leaf)) {
+            throw "7-Zip executable not found at $sevenZipPath"
+        }
         $sevenZipResult = & $sevenZipPath $sevenZipArguments
         if ($LASTEXITCODE -ne 0) {
             if ($createdHere) {
