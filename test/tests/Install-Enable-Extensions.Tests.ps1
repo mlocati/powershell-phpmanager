@@ -7,6 +7,7 @@
     <# I don't know how to setup the VCRedist 2017 on nanoserver: let's skip PHP 7.2 on it #>
     if (Join-Path -Path $Env:windir -ChildPath System32\imm32.dll | Test-Path -PathType Leaf) {
         $testCases += @{version = '7.2'; path = (Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid)}
+        $testCases += @{version = '8.3'; path = (Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid)}
     }
     foreach ($testCase in $testCases) {
         if (Test-Path -LiteralPath $testCase.path) {
