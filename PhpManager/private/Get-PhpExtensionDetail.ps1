@@ -53,7 +53,7 @@
             }
             if (Test-Path -Path $folder -PathType Container) {
                 $subFiles = Get-ChildItem -Path $folder -Filter '*.dll' | Select-Object -ExpandProperty 'FullName'
-                $somethingToInspect = $subFiles.Count -gt 0
+                $somethingToInspect = $null -ne $subFiles -and $subFiles.Count -gt 0
                 if ($somethingToInspect) {
                     $inspectorParameters += $subFiles
                 }
