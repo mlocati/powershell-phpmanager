@@ -170,6 +170,12 @@
                         }
                         $dllPath = $phpDlls[0].FullName
                         switch ($peclPackageHandle) {
+                            'amqp' {
+                                $tmp = Get-ChildItem -Path $tempFolder\rabbit*.dll -File -Depth 1
+                                if ($tmp) {
+                                    $additionalFiles += $tmp
+                                }
+                            }
                             'couchbase' {
                                 $libcouchbaseDll = Join-Path -Path $tempFolder -ChildPath 'libcouchbase.dll'
                                 if (Test-Path -LiteralPath $libcouchbaseDll -PathType Leaf) {
