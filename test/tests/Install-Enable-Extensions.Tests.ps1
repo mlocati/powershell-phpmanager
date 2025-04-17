@@ -126,6 +126,24 @@
             $decimal.Type | Should -BeExactly 'Php'
             $decimal.State | Should -BeExactly 'Enabled'
         }
+        It -Name 'should download and install amqp on PHP <version>' -TestCases $testCases {
+            param ($path, $version)
+            Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'amqp' } | Should -HaveCount 0
+            if ([Version]$version -ge [Version]'7.4') {
+                $amqpVersion = '2.1.2'
+            } elseif ([Version]$version -ge [Version]'7.3') {
+                $amqpVersion = '1.11.0'
+            } elseif ([Version]$version -ge [Version]'7.2') {
+                $amqpVersion = '1.10.2'
+            } else {
+                $amqpVersion = '1.9.4'
+            }
+            Install-PhpExtension -Extension amqp -Path $path -Version $amqpVersion
+            $amqp = Get-PhpExtension -Path $path | Where-Object { $_.Handle -eq 'amqp' }
+            $amqp | Should -HaveCount 1
+            $amqp.Type | Should -BeExactly 'Php'
+            $amqp.State | Should -BeExactly 'Enabled'
+        }
         It -Name 'should handle multiple extension versions' {
             $phpPath = Join-Path -Path $Global:PHPMANAGER_TESTINSTALLS -ChildPath (New-Guid).Guid
             Install-Php -Version 7.1 -Architecture x64 -ThreadSafe $true -Path $phpPath
