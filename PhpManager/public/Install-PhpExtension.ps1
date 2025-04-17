@@ -158,57 +158,26 @@
                     if ($remoteFileIsZip) {
                         $tempFolder = New-TempDirectory
                         Expand-ArchiveWith7Zip -ArchivePath $downloadedFile -DestinationPath $tempFolder
-                        $phpDlls = @(Get-ChildItem -Path $tempFolder\php_*.dll -File -Depth 0)
-                        if ($phpDlls.Count -eq 0) {
-                            $phpDlls = @(Get-ChildItem -Path $tempFolder\php_*.dll -File -Depth 1)
+                        $dllFiles = Get-ChildItem -Path $tempFolder\*.dll -File -Depth 0
+                        if (-not($dllFiles)) {
+                            $dllFiles = Get-ChildItem -Path $tempFolder\*.dll -File -Depth 1
+                            if (-not($dllFiles)) {
+                                $dllFiles = @()
+                            }
                         }
-                        if ($phpDlls.Count -eq 0) {
+                        $dllPath = $null
+                        foreach ($dllFile in $dllFiles) {
+                            if ($dllFile.Name -like "php_*.dll") {
+                                if ($dllPath) {
+                                    throw ("Multiple PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
+                                }
+                                $dllPath = $dllFile.FullName
+                            } else {
+                                $additionalFiles += $dllFile.FullName
+                            }
+                        }
+                        if (-not($dllPath)) {
                             throw ("No PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
-                        }
-                        if ($phpDlls.Count -ne 1) {
-                            throw ("Multiple PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
-                        }
-                        $dllPath = $phpDlls[0].FullName
-                        switch ($peclPackageHandle) {
-                            'amqp' {
-                                $tmp = Get-ChildItem -Path $tempFolder\rabbit*.dll -File -Depth 1
-                                if ($tmp) {
-                                    $additionalFiles += $tmp
-                                }
-                            }
-                            'couchbase' {
-                                $libcouchbaseDll = Join-Path -Path $tempFolder -ChildPath 'libcouchbase.dll'
-                                if (Test-Path -LiteralPath $libcouchbaseDll -PathType Leaf) {
-                                    $additionalFiles += $libcouchbaseDll
-                                }
-                            }
-                            'decimal' {
-                                $libmpdecDll = Join-Path -Path $tempFolder -ChildPath 'libmpdec.dll'
-                                if (Test-Path -LiteralPath $libmpdecDll -PathType Leaf) {
-                                    $additionalFiles += $libmpdecDll
-                                }
-                            }
-                            'imagick' {
-                                $additionalFiles += @(Get-ChildItem -Path $tempFolder\CORE_*.dll -File -Depth 1)
-                                $additionalFiles += @(Get-ChildItem -Path $tempFolder\IM_*.dll -File -Depth 1)
-                                $additionalFiles += @(Get-ChildItem -Path $tempFolder\FILTER_*.dll -File -Depth 1)
-                            }
-                            'memcached' {
-                                $libmemcachedDll = Join-Path -Path $tempFolder -ChildPath 'libmemcached.dll'
-                                $libhashkitDll = Join-Path -Path $tempFolder -ChildPath 'libhashkit.dll'
-                                if (Test-Path -LiteralPath $libmemcachedDll -PathType Leaf) {
-                                    $additionalFiles += $libmemcachedDll
-                                }
-                                if (Test-Path -LiteralPath $libhashkitDll -PathType Leaf) {
-                                    $additionalFiles += $libhashkitDll
-                                }
-                            }
-                            'yaml' {
-                                $yamlDll = Join-Path -Path $tempFolder -ChildPath 'yaml.dll'
-                                if (Test-Path -LiteralPath $yamlDll -PathType Leaf) {
-                                    $additionalFiles += $yamlDll
-                                }
-                            }
                         }
                     }
                     else {
