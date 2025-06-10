@@ -83,6 +83,7 @@
         $tempFolder = $null
         $finalDllName = $null
         $additionalFiles = @()
+        $newExtensions = @()
         try {
             if (Test-Path -Path $Extension -PathType Leaf) {
                 if ($Version -ne '') {
@@ -95,7 +96,7 @@
                     throw 'You can''t specify the -MaximumStability argument if you specify an existing file with the -Extension argument'
                 }
                 $dllPath = [System.IO.Path]::GetFullPath($Extension)
-                $newExtension = Get-PhpExtensionDetail -PhpVersion $phpVersion -Path $dllPath
+                $newExtensions += Get-PhpExtensionDetail -PhpVersion $phpVersion -Path $dllPath
                 $moveDll = $false
             }
             else {
@@ -165,8 +166,17 @@
                                 $dllFiles = @()
                             }
                         }
+                        $additionalExtensionsDll = @()
+                        $dllNames = $dllFiles | Where-Object -Property Name -Like "php_*.dll" | Select-Object -ExpandProperty Name
+                        if ($dllNames -is [array] -and $dllNames.Length -eq 2 -and $dllNames -contains 'php_http.dll' -and $dllNames -contains 'php_raphf.dll') {
+                            $newExtensions +=  Get-PhpExtensionDetail -PhpVersion $phpVersion -Path $(Join-Path -Path $tempFolder -ChildPath 'php_raphf.dll')
+                            $additionalExtensionsDll += 'php_raphf.dll'
+                        }
                         $dllPath = $null
                         foreach ($dllFile in $dllFiles) {
+                            if ($additionalExtensionsDll -contains $dllFile.Name) {
+                                continue
+                            }
                             if ($dllFile.Name -like "php_*.dll") {
                                 if ($dllPath) {
                                     throw ("Multiple PHP DLL found in archive downloaded from {0}" -f $availablePackageVersion.PackageArchiveUrl)
@@ -184,7 +194,7 @@
                         $keepDownloadedFile = $true
                         $dllPath = $downloadedFile
                     }
-                    $newExtension = Get-PhpExtensionDetail -PhpVersion $phpVersion -Path $dllPath
+                    $newExtensions += Get-PhpExtensionDetail -PhpVersion $phpVersion -Path $dllPath
                     $moveDll = $true
                 }
                 catch {
@@ -202,73 +212,76 @@
                     }
                 }
             }
-            $oldExtension = Get-PhpExtension -Path $phpVersion.ExecutablePath | Where-Object { $_.Handle -eq $newExtension.Handle }
-            if ($null -ne $oldExtension) {
-                if ($oldExtension.Type -eq $Script:EXTENSIONTYPE_BUILTIN) {
-                    Write-Verbose ("'{0}' is a builtin extension" -f $oldExtension.Name)
-                }
-                Write-Verbose ("Upgrading extension '{0}' from version {1} to version {2}" -f $oldExtension.Name, $oldExtension.Version, $newExtension.Version)
-                if (-Not(Test-IsFileWritable($oldExtension.Filename))) {
-                    throw "Unable to write to the file $($oldExtension.Filename)"
-                }
-                if ($moveDll) {
-                    Move-Item -Path $dllPath -Destination $oldExtension.Filename -Force
-                } else {
-                    Copy-Item -Path $dllPath -Destination $oldExtension.Filename -Force
-                }
-                try {
-                    Reset-Acl -Path $oldExtension.Filename
-                } catch {
-                    Write-Debug -Message "Failed to reset the ACL for $($oldExtension.Filename): $($_.Exception.Message)"
-                }
-                foreach ($additionalFile in $additionalFiles) {
-                    $additionalFileDestination = Join-Path -Path $AdditionalFilesPath -ChildPath $(Split-Path -Path $additionalFile -Leaf)
-                    Copy-Item -LiteralPath $additionalFile -Destination $additionalFileDestination -Force
+            foreach ($newExtension in $newExtensions) {
+                $oldExtension = Get-PhpExtension -Path $phpVersion.ExecutablePath | Where-Object { $_.Handle -eq $newExtension.Handle }
+                if ($null -ne $oldExtension) {
+                    if ($oldExtension.Type -eq $Script:EXTENSIONTYPE_BUILTIN) {
+                        Write-Verbose ("'{0}' is a builtin extension" -f $oldExtension.Name)
+                    }
+                    Write-Verbose ("Upgrading extension '{0}' from version {1} to version {2}" -f $oldExtension.Name, $oldExtension.Version, $newExtension.Version)
+                    if (-Not(Test-IsFileWritable($oldExtension.Filename))) {
+                        throw "Unable to write to the file $($oldExtension.Filename)"
+                    }
+                    if ($moveDll) {
+                        Move-Item -Path $newExtension.Filename -Destination $oldExtension.Filename -Force
+                    } else {
+                        Copy-Item -Path $newExtension.Filename -Destination $oldExtension.Filename -Force
+                    }
                     try {
-                        Reset-Acl -Path $additionalFileDestination
+                        Reset-Acl -Path $oldExtension.Filename
                     } catch {
-                        Write-Debug -Message "Failed to reset the ACL for $($additionalFileDestination): $($_.Exception.Message)"
+                        Write-Debug -Message "Failed to reset the ACL for $($oldExtension.Filename): $($_.Exception.Message)"
+                    }
+                    foreach ($additionalFile in $additionalFiles) {
+                        $additionalFileDestination = Join-Path -Path $AdditionalFilesPath -ChildPath $(Split-Path -Path $additionalFile -Leaf)
+                        Copy-Item -LiteralPath $additionalFile -Destination $additionalFileDestination -Force
+                        try {
+                            Reset-Acl -Path $additionalFileDestination
+                        } catch {
+                            Write-Debug -Message "Failed to reset the ACL for $($additionalFileDestination): $($_.Exception.Message)"
+                        }
+                    }
+                    if ($oldExtension.State -eq $Script:EXTENSIONSTATE_DISABLED -and -Not($DontEnable)) {
+                        Enable-PhpExtension -Extension $oldExtension.Name -Path $phpVersion.ExecutablePath
                     }
                 }
-                if ($oldExtension.State -eq $Script:EXTENSIONSTATE_DISABLED -and -Not($DontEnable)) {
-                    Enable-PhpExtension -Extension $oldExtension.Name -Path $phpVersion.ExecutablePath
-                }
-            }
-            else {
-                Write-Verbose ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
-                if (-not($NoDependencies)) {
-                    Install-PhpExtensionPrerequisite -Extension $newExtension.Handle -InstallPath $AdditionalFilesPath -PhpPath $phpVersion.ActualFolder
-                }
-                if ($null -eq $finalDllName) {
-                    $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($dllPath))
-                } else {
-                    $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($finalDllName))
-                }
-                if ($moveDll) {
-                    Write-Verbose "Moving ""$dllPath"" to ""$newExtensionFilename"""
-                    Move-Item -Path $dllPath -Destination $newExtensionFilename
-                } else {
-                    Write-Verbose "Copying ""$dllPath"" to ""$newExtensionFilename"""
-                    Copy-Item -Path $dllPath -Destination $newExtensionFilename
-                }
-                try {
-                    Reset-Acl -Path $newExtensionFilename
-                } catch {
-                    Write-Debug -Message "Failed to reset the ACL for $($newExtensionFilename): $($_.Exception.Message)"
-                }
-                foreach ($additionalFile in $additionalFiles) {
-                    $additionalFileDestination = Join-Path -Path $AdditionalFilesPath -ChildPath $(Split-Path -Path $additionalFile -Leaf)
-                    Copy-Item -LiteralPath $additionalFile -Destination $additionalFileDestination -Force
+                else {
+                    Write-Verbose ("Installing new extension '{0}' version {1}" -f $newExtension.Name, $newExtension.Version)
+                    if (-not($NoDependencies)) {
+                        Install-PhpExtensionPrerequisite -Extension $newExtension.Handle -InstallPath $AdditionalFilesPath -PhpPath $phpVersion.ActualFolder
+                    }
+                    if ($null -eq $finalDllName) {
+                        $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($newExtension.Filename))
+                    } else {
+                        $newExtensionFilename = [System.IO.Path]::Combine($phpVersion.ExtensionsPath, [System.IO.Path]::GetFileName($finalDllName))
+                    }
+                    if ($moveDll) {
+                        Write-Verbose "Moving ""$($newExtension.Filename)"" to ""$newExtensionFilename"""
+                        Move-Item -Path $newExtension.Filename -Destination $newExtensionFilename
+                    } else {
+                        Write-Verbose "Copying ""$($newExtension.Filename)"" to ""$newExtensionFilename"""
+                        Copy-Item -Path $newExtension.Filename -Destination $newExtensionFilename
+                    }
                     try {
-                        Reset-Acl -Path $additionalFileDestination
+                        Reset-Acl -Path $newExtensionFilename
                     } catch {
-                        Write-Debug -Message "Failed to reset the ACL for $($additionalFileDestination): $($_.Exception.Message)"
+                        Write-Debug -Message "Failed to reset the ACL for $($newExtensionFilename): $($_.Exception.Message)"
+                    }
+                    foreach ($additionalFile in $additionalFiles) {
+                        $additionalFileDestination = Join-Path -Path $AdditionalFilesPath -ChildPath $(Split-Path -Path $additionalFile -Leaf)
+                        Copy-Item -LiteralPath $additionalFile -Destination $additionalFileDestination -Force
+                        try {
+                            Reset-Acl -Path $additionalFileDestination
+                        } catch {
+                            Write-Debug -Message "Failed to reset the ACL for $($additionalFileDestination): $($_.Exception.Message)"
+                        }
+                    }
+                    if (-Not($DontEnable)) {
+                        Write-Verbose "Enabling extension ""$($newExtension.Name)"" for ""$($phpVersion.ExecutablePath)"""
+                        Enable-PhpExtension -Extension $newExtension.Name -Path $phpVersion.ExecutablePath
                     }
                 }
-                if (-Not($DontEnable)) {
-                    Write-Verbose "Enabling extension ""$($newExtension.Name)"" for ""$($phpVersion.ExecutablePath)"""
-                    Enable-PhpExtension -Extension $newExtension.Name -Path $phpVersion.ExecutablePath
-                }
+                $additionalFiles = @()
             }
         }
         finally {

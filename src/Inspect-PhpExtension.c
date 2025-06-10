@@ -142,7 +142,14 @@ void parseDll(HMODULE hModule, extensionInfo* extensionInfo)
 
 void parseFile(LPCSTR filename, LPCSTR architecture)
 {
-    HMODULE hModule = LoadLibraryEx(filename, NULL, DONT_RESOLVE_DLL_REFERENCES);
+    DWORD rc;
+    TCHAR fullpath[MAX_PATH];
+    rc = GetFullPathName(filename, MAX_PATH, fullpath, NULL);
+    if (rc == 0 || rc > MAX_PATH) {
+        printf("Unable to determine the absolute path of the file %s\n", filename);
+        return;
+    }
+    HMODULE hModule = LoadLibraryEx(fullpath, NULL, DONT_RESOLVE_DLL_REFERENCES);
     if (hModule == NULL) {
         printf("Unable to open the DLL.\n");
     } else {
@@ -162,7 +169,7 @@ void parseFile(LPCSTR filename, LPCSTR architecture)
                 extensionInfo.type,
                 extensionInfo.name == NULL ? "" : extensionInfo.name,
                 extensionInfo.version == NULL ? "" : extensionInfo.version,
-                filename
+                fullpath
             );
         }
         FreeLibrary(hModule);
