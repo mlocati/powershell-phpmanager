@@ -1,6 +1,6 @@
-﻿New-Variable -Option Constant -Scope Script -Name 'URL_LIST_QA' -Value 'https://windows.php.net/downloads/qa/'
-New-Variable -Option Constant -Scope Script -Name 'URL_LIST_RELEASE' -Value 'https://windows.php.net/downloads/releases/'
-New-Variable -Option Constant -Scope Script -Name 'URL_LIST_ARCHIVE' -Value 'https://windows.php.net/downloads/releases/archives/'
+﻿New-Variable -Option Constant -Scope Script -Name 'URL_LIST_QA' -Value 'https://downloads.php.net/~windows/qa/'
+New-Variable -Option Constant -Scope Script -Name 'URL_LIST_RELEASE' -Value 'https://downloads.php.net/~windows/releases/'
+New-Variable -Option Constant -Scope Script -Name 'URL_LIST_ARCHIVE' -Value 'https://downloads.php.net/~windows/releases/archives/'
 New-Variable -Option Constant -Scope Script -Name 'URL_LIST_SNAPSHOT' -Value 'https://windows.php.net/downloads/snaps/'
 
 New-Variable -Option Constant -Scope Script -Name 'RELEASESTATE_UNKNOWN' -Value ''
