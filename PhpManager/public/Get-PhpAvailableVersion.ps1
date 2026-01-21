@@ -88,7 +88,7 @@
                                     continue
                                 }
                                 $artifactUrl = [Uri]::new([Uri]"$artifactsUrl/", $artifactsLink.HREF).AbsoluteUri
-                                if (-not($artifactUrl -match $Script:RX_ZIPARCHIVE_SNAPSHOT)) {
+                                if (-not($artifactUrl -match ('(^|/)' + $Script:RX_ZIPARCHIVE_SNAPSHOT + '$'))) {
                                     continue
                                 }
                                 $artifactVersion = Get-PhpVersionFromUrl -Url $artifactUrl -ReleaseState $State
@@ -110,7 +110,7 @@
                 }
                 default {
                     $webResponse = Get-WebResource -Uri $urlList
-                    foreach ($link in $webResponse.Links | Where-Object -Property 'Href' -Match ('/' + $Script:RX_ZIPARCHIVE + '$')) {
+                    foreach ($link in $webResponse.Links | Where-Object -Property 'Href' -Match ('(^|/)' + $Script:RX_ZIPARCHIVE + '$')) {
                         $result += Get-PhpVersionFromUrl -Url $link.Href -ReleaseState $State -PageUrl $urlList
                     }
                 }
