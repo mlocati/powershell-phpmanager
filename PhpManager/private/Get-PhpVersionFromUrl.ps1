@@ -34,7 +34,7 @@
     }
     process {
         $data = @{}
-        $match = $Url | Select-String -CaseSensitive -Pattern ('/' + $Script:RX_ZIPARCHIVE + '$')
+        $match = $Url | Select-String -CaseSensitive -Pattern ('(^|/)' + $Script:RX_ZIPARCHIVE + '$')
         if ($null -ne $match) {
             $groups = $match.Matches[0].Groups
             $data.Version = $groups['version'].Value
@@ -44,9 +44,9 @@
             $data.VCVersion = $groups['vcVersion'].Value
             $data.Architecture = $groups['architecture'].Value
         } else {
-            $match = $Url | Select-String -CaseSensitive -Pattern ($Script:RX_ZIPARCHIVE_SNAPSHOT)
+            $match = $Url | Select-String -CaseSensitive -Pattern ('(^|/)' + $Script:RX_ZIPARCHIVE_SNAPSHOT + '$')
             if ($null -eq $match) {
-                $match = $Url | Select-String -CaseSensitive -Pattern ($Script:RX_ZIPARCHIVE_SNAPSHOT_SHIVAMMATHUR)
+                $match = $Url | Select-String -CaseSensitive -Pattern ('(^|/)' + $Script:RX_ZIPARCHIVE_SNAPSHOT_SHIVAMMATHUR + '$')
             }
             if ($null -ne $match) {
                 $groups = $match.Matches[0].Groups

@@ -1,6 +1,6 @@
-﻿New-Variable -Option Constant -Scope Script -Name 'URL_LIST_QA' -Value 'https://windows.php.net/downloads/qa/'
-New-Variable -Option Constant -Scope Script -Name 'URL_LIST_RELEASE' -Value 'https://windows.php.net/downloads/releases/'
-New-Variable -Option Constant -Scope Script -Name 'URL_LIST_ARCHIVE' -Value 'https://windows.php.net/downloads/releases/archives/'
+﻿New-Variable -Option Constant -Scope Script -Name 'URL_LIST_QA' -Value 'https://downloads.php.net/~windows/qa/'
+New-Variable -Option Constant -Scope Script -Name 'URL_LIST_RELEASE' -Value 'https://downloads.php.net/~windows/releases/'
+New-Variable -Option Constant -Scope Script -Name 'URL_LIST_ARCHIVE' -Value 'https://downloads.php.net/~windows/releases/archives/'
 New-Variable -Option Constant -Scope Script -Name 'URL_LIST_SNAPSHOT' -Value 'https://windows.php.net/downloads/snaps/'
 
 New-Variable -Option Constant -Scope Script -Name 'RELEASESTATE_UNKNOWN' -Value ''
@@ -26,8 +26,8 @@ New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RELEASECANDIDATE_
 New-Variable -Option Constant -Scope Script -Name 'UNSTABLEPHP_RX' -Value "$UNSTABLEPHP_ALPHA|$UNSTABLEPHP_BETA|$UNSTABLEPHP_RELEASECANDIDATE_LC|$UNSTABLEPHP_RELEASECANDIDATE_UC"
 
 New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE' -Value "php-(?<version>\d+\.\d+\.\d+)(?:(?<unstabilityLevel>$UNSTABLEPHP_RX)(?<unstabilityVersion>[1-9]\d*))?(?<threadSafe>-nts)?-Win32-(?:VC|vc|vs)(?<vcVersion>\d{1,2})-(?<architecture>x86|x64)\.zip"
-New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE_SNAPSHOT' -Value "/(?:master|(?:php-(?<version>\d+\.\d+)))/r[0-9a-f]{7,}/php-(?:master|\d+\.\d+)-(?<threadSafe>nts|ts)-windows-(?:VC|vc|vs)(?<vcVersion>\d{1,2})-(?<architecture>x86|x64)-r[0-9a-f]{7,}\.zip$"
-New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE_SNAPSHOT_SHIVAMMATHUR' -Value "/php-(?:master|\d+\.\d+)-(?<threadSafe>nts|ts)-windows-(?:VC|vc|vs)(?<vcVersion>\d{1,2})-(?<architecture>x86|x64).zip$"
+New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE_SNAPSHOT' -Value "(?:master|(?:php-(?<version>\d+\.\d+)))/r[0-9a-f]{7,}/php-(?:master|\d+\.\d+)-(?<threadSafe>nts|ts)-windows-(?:VC|vc|vs)(?<vcVersion>\d{1,2})-(?<architecture>x86|x64)-r[0-9a-f]{7,}\.zip"
+New-Variable -Option Constant -Scope Script -Name 'RX_ZIPARCHIVE_SNAPSHOT_SHIVAMMATHUR' -Value "php-(?:master|\d+\.\d+)-(?<threadSafe>nts|ts)-windows-(?:VC|vc|vs)(?<vcVersion>\d{1,2})-(?<architecture>x86|x64).zip"
 
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_BUILTIN' -Value 'Builtin'
 New-Variable -Option Constant -Scope Script -Name 'EXTENSIONSTATE_UNKNOWN' -Value 'Unknown'
