@@ -102,10 +102,10 @@
                         }
                     }
                     if ($true) {
-                        $result += Get-PhpVersionFromUrl -Url 'https://github.com/shivammathur/php-builder-windows/releases/download/master/php-master-nts-windows-vs16-x64.zip' -ReleaseState $State
-                        $result += Get-PhpVersionFromUrl -Url 'https://github.com/shivammathur/php-builder-windows/releases/download/master/php-master-ts-windows-vs16-x64.zip' -ReleaseState $State
-                        $result += Get-PhpVersionFromUrl -Url 'https://github.com/shivammathur/php-builder-windows/releases/download/master/php-master-nts-windows-vs16-x86.zip' -ReleaseState $State
-                        $result += Get-PhpVersionFromUrl -Url 'https://github.com/shivammathur/php-builder-windows/releases/download/master/php-master-ts-windows-vs16-x86.zip' -ReleaseState $State
+                        $result += Get-PhpVersionFromUrl -Url 'https://github.com/shivammathur/php-builder-windows/releases/download/master/php-master-nts-windows-vs18-x64.zip' -ReleaseState $State
+                        $result += Get-PhpVersionFromUrl -Url 'https://github.com/shivammathur/php-builder-windows/releases/download/master/php-master-ts-windows-vs18-x64.zip' -ReleaseState $State
+                        $result += Get-PhpVersionFromUrl -Url 'https://github.com/shivammathur/php-builder-windows/releases/download/master/php-master-nts-windows-vs18-x86.zip' -ReleaseState $State
+                        $result += Get-PhpVersionFromUrl -Url 'https://github.com/shivammathur/php-builder-windows/releases/download/master/php-master-ts-windows-vs18-x86.zip' -ReleaseState $State
                     }
                 }
                 default {

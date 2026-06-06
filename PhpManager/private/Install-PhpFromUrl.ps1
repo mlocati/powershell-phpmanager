@@ -69,6 +69,7 @@
                         15 { $redistName = '2017' } # PHP 7.2, PHP 7.3
                         16 { $redistName = '2019' } # PHP 7.4, PHP 8.0, PHP 8.1, PHP 8.2, PHP 8.3
                         17 { $redistName = '2022' } # PHP 8.4, PHP 8.5
+                        18 { $redistName = '2026' } # PHP 8.6
                         default {
                             throw ('The Visual C++ ' + $PhpVersion.VCVersion + ' Redistributable seems to be missing: you have to install it manually (we can''t recognize its version)')
                         }
