@@ -52,6 +52,9 @@
         }
         $needDirectRegistryAccess = [System.Environment]::GetEnvironmentVariable[0].OverloadDefinitions.Count -lt 2
         if ($User) {
+            if (-not(Test-Path -LiteralPath 'HKCU:\Environment')) {
+                New-Item -Path 'HKCU:\Environment' -Force | Out-Null
+            }
             if ($needDirectRegistryAccess) {
                 New-ItemProperty -Path 'HKCU:\Environment' -Name $Name -Value $Value -PropertyType ExpandString -Force | Out-Null
             } else {
