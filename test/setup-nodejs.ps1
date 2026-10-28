@@ -11,5 +11,5 @@ Expand-Archive -LiteralPath C:\nodejs.zip -DestinationPath 'C:\Program Files'
 Remove-Item -LiteralPath C:\nodejs.zip
 Rename-Item -LiteralPath "C:\Program Files\node-v$version" -NewName 'C:\Program Files\NodeJS'
 $newPath = "$Env:Path;C:\Program Files\NodeJS"
-setx.exe Path $newPath /m
+[Environment]::SetEnvironmentVariable('Path', $newPath, 'Machine')
 $Env:Path = $newPath

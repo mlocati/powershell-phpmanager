@@ -1,10 +1,13 @@
 # escape=`
 
-FROM mcr.microsoft.com/windows/nanoserver:10.0.14393.2007
+# Nano Server has no PowerShell: use the image published by the PowerShell team
+FROM mcr.microsoft.com/powershell:lts-nanoserver-ltsc2022
 
-SHELL ["powershell", "-Command"]
+USER ContainerAdministrator
 
-COPY vcruntime140.dll C:/Windows/System32/
+SHELL ["pwsh", "-Command"]
+
+COPY *.dll C:/Windows/System32/
 
 COPY setup-nodejs.ps1 C:/
 RUN C:\setup-nodejs.ps1
