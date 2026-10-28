@@ -40,6 +40,7 @@
             $data.Version = $groups['version'].Value
             $data.UnstabilityLevel = $groups['unstabilityLevel'].Value
             $data.UnstabilityVersion = $groups['unstabilityVersion'].Value
+            $data.Build = $groups['build'].Value
             $data.ThreadSafe = $groups['threadSafe'].Value -ne '-nts'
             $data.VCVersion = $groups['vcVersion'].Value
             $data.Architecture = $groups['architecture'].Value
@@ -57,6 +58,7 @@
                 }
                 $data.UnstabilityLevel = $Script:UNSTABLEPHP_SNAPSHOT
                 $data.UnstabilityVersion = $null
+                $data.Build = 0
                 $data.ThreadSafe = $groups['threadSafe'].Value -ne 'nts'
                 $data.VCVersion = $groups['vcVersion'].Value
                 $data.Architecture = $groups['architecture'].Value
