@@ -18,7 +18,7 @@ Describe 'Get-PhpVersionFromUrl' {
     }
     It 'parses a release candidate with build number' {
         $v = Get-PhpVersionFromUrl -Url 'php-8.6.0RC4-2-nts-Win32-vs18-x64.zip' -ReleaseState QA
-        $v.FullVersion | Should -BeExactly '8.6.0RC4'
+        $v.FullVersion | Should -BeExactly '8.6.0rc4'
         $v.Build | Should -Be 2
     }
     It 'prefers higher build numbers of the same version' {
