@@ -29,7 +29,7 @@
             Remove-Item -LiteralPath $composerPath -Recurse -Force
         }
         try {
-            Install-Php -Version 7.1.0 -Architecture x64 -ThreadSafe $true -Path $phpPath
+            Install-Php -Version 8.0.0 -Architecture x64 -ThreadSafe $true -Path $phpPath
             Enable-PhpExtension -Extension curl,openssl -Path $phpPath
             Update-PhpCAInfo -Path $phpPath
             Install-Composer -Path $composerPath -PhpPath $phpPath -Scope User -NoAddToPath -NoCache
