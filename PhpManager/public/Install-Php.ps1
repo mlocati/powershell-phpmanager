@@ -135,7 +135,7 @@
             foreach ($compatibleVersion in $compatibleVersions) {
                 if ($null -eq $versionToInstall) {
                     $versionToInstall = $compatibleVersion
-                } elseif ($compatibleVersions -gt $versionToInstall) {
+                } elseif ($compatibleVersion -gt $versionToInstall) {
                     $versionToInstall = $compatibleVersion
                 }
             }

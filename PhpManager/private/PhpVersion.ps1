@@ -30,6 +30,10 @@
     #>
     [Nullable[int]] $UnstabilityVersion
     <#
+    The Windows build number of a release (eg 1 for php-8.5.12-1-...zip), 0 if not specified, $null if unknown (eg for installed versions)
+    #>
+    [Nullable[int]] $Build
+    <#
     A string used to display the details of the version
     #>
     [ValidateNotNull()]
@@ -62,6 +66,7 @@
     - Version: required
     - UnstabilityLevel: optional
     - UnstabilityVersion: optional
+    - Build: optional
     - Architecture: required
     - ThreadSafe: required
     - VCVersion: required
@@ -80,6 +85,13 @@
             $this.UnstabilityVersion = [int] $data.UnstabilityVersion
         } elseif ($this.UnstabilityLevel -ne $Script:UNSTABLEPHP_SNAPSHOT)  {
             $this.UnstabilityLevel = $null
+        }
+        if ($data.ContainsKey('Build') -and $null -ne $data.Build) {
+            if ($data.Build -eq '') {
+                $this.Build = 0
+            } else {
+                $this.Build = [int] $data.Build
+            }
         }
         $this.Version = $data.Version
         if ($data.Version -eq 'master') {
@@ -121,7 +133,11 @@
         $this.Architecture = $data.Architecture
         $this.ThreadSafe = $data.ThreadSafe
         $this.VCVersion = $data.VCVersion
-        $dn = 'PHP ' + $this.FullVersion + ' ' + $this.Architecture
+        $dn = 'PHP ' + $this.FullVersion
+        if ($this.Build -gt 0) {
+            $dn += '-' + $this.Build
+        }
+        $dn += ' ' + $this.Architecture
         if ($this.Architecture -eq $Script:ARCHITECTURE_32BITS) {
             $dn += ' (32-bit)'
         } elseif ($this.Architecture -eq $Script:ARCHITECTURE_64BITS) {
@@ -144,6 +160,9 @@
             $cmp = -1
         } elseif ($this.ComparableVersion -gt $that.ComparableVersion) {
             $cmp = 1
+        } elseif ($null -ne $this.Build -and $null -ne $that.Build -and $this.Build -ne $that.Build) {
+            # The build number is unknown for installed versions: compare it only between downloadable ones
+            $cmp = if ($this.Build -lt $that.Build) { -1 } else { 1 }
         } else {
             if ($this.Architecture -gt $that.Architecture) {
                 $cmp = -1
