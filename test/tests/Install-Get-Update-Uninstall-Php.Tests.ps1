@@ -8,13 +8,13 @@
             Remove-Item -LiteralPath $phpPath -Recurse -Force
         }
         try {
-            Install-Php -Version 7.1.0 -Architecture x64 -ThreadSafe $true -Path $phpPath
+            Install-Php -Version 8.0.0 -Architecture x64 -ThreadSafe $true -Path $phpPath
             $initialPhpVersion = Get-Php -Path $phpPath
             $initialPhpVersion | Should -Not -BeNullOrEmpty
             $initialPhpVersion.GetType().FullName | Should -BeExactly 'PhpVersionInstalled'
             $initialPhpVersion.Version | Should -BeOfType [string]
-            $initialPhpVersion.Version | Should -BeExactly '7.1.0'
-            $initialPhpVersion.MajorMinorVersion | Should -BeExactly '7.1'
+            $initialPhpVersion.Version | Should -BeExactly '8.0.0'
+            $initialPhpVersion.MajorMinorVersion | Should -BeExactly '8.0'
             $initialPhpVersion.ComparableVersion | Should -BeOfType [version]
             $initialPhpVersion.UnstabilityLevel | Should -BeNullOrEmpty
             $initialPhpVersion.UnstabilityVersion | Should -BeNullOrEmpty
@@ -33,7 +33,7 @@
             $updatedPhpVersion | Should -Not -BeNullOrEmpty
             $updatedPhpVersion.GetType().FullName | Should -BeExactly 'PhpVersionInstalled'
             $updatedPhpVersion.Version | Should -BeOfType [string]
-            $updatedPhpVersion.Version | Should -Match '^7\.1\.'
+            $updatedPhpVersion.Version | Should -Match '^8\.0\.'
             $updatedPhpVersion.ComparableVersion | Should -BeOfType [version]
             $updatedPhpVersion.ComparableVersion | Should -BeGreaterThan $initialPhpVersion.ComparableVersion
             $updatedPhpVersion.UnstabilityLevel | Should -BeNullOrEmpty
@@ -177,13 +177,13 @@
             Remove-Item -LiteralPath $phpPath -Recurse -Force
         }
         try {
-            Install-Php -Version 7.1.0 -Architecture x64 -ThreadSafe $true -Path $phpPath
+            Install-Php -Version 8.0.0 -Architecture x64 -ThreadSafe $true -Path $phpPath
             Get-PhpIniKey -Key display_errors -Path $phpPath | Should -BeNullOrEmpty
             Uninstall-Php -Path $phpPath
-            Install-Php -Version 7.1.0 -Architecture x64 -ThreadSafe $true -Path $phpPath -InitialPhpIni Development
+            Install-Php -Version 8.0.0 -Architecture x64 -ThreadSafe $true -Path $phpPath -InitialPhpIni Development
             Get-PhpIniKey -Key display_errors -Path $phpPath | Should -BeExactly 'On'
             Uninstall-Php -Path $phpPath
-            Install-Php -Version 7.1.0 -Architecture x64 -ThreadSafe $true -Path $phpPath -InitialPhpIni Production
+            Install-Php -Version 8.0.0 -Architecture x64 -ThreadSafe $true -Path $phpPath -InitialPhpIni Production
             Get-PhpIniKey -Key display_errors -Path $phpPath | Should -BeExactly 'Off'
         } finally {
             try {
