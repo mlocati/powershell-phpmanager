@@ -25,6 +25,7 @@
         [ValidateLength(1, [int]::MaxValue)]
         [string] $Name,
         [Parameter(Mandatory = $true, Position = 1)]
+        [AllowEmptyString()]
         [string] $Value,
         [Parameter(Mandatory = $false, Position = 2)]
         [ValidateNotNull()]
