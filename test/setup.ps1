@@ -1,7 +1,10 @@
-﻿Write-Host "Setting up test dependencies"
-$pcInfo = Get-ComputerInfo
-Write-Host " - Windows installation type: $($pcInfo.WindowsInstallationType)"
-Write-Host " - Windows version name: $($pcInfo.WindowsProductName)"
+﻿$ErrorActionPreference = 'Stop'
+
+Write-Host "Setting up test dependencies"
+# Get-ComputerInfo is not available on Nano Server
+$winInfo = Get-ItemProperty -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
+Write-Host " - Windows installation type: $($winInfo.InstallationType)"
+Write-Host " - Windows version name: $($winInfo.ProductName)"
 Write-Host " - PowerShell edition: $($PSVersionTable.PSEdition)"
 Write-Host " - PowerShell version: $($PSVersionTable.PSVersion.ToString())"
 try {
@@ -56,8 +59,11 @@ if (-Not($pester)) {
     }
     if (-Not($pester)) {
         Write-Host ' - installing Pester'
-        Install-Module -Name Pester -Force -SkipPublisherCheck -MinimumVersion '4.5' -MaximumVersion '4.9999.9999'
+        Install-Module -Name Pester -Force -SkipPublisherCheck -Scope AllUsers -MinimumVersion '4.5' -MaximumVersion '4.9999.9999'
         $pester = Get-Module -ListAvailable | Where-Object { $_.Name -eq 'Pester' -and $_.Version -ge '4.5' -and $_.Version -le '4.9999.9999' }
+        if (-Not($pester)) {
+            throw 'Failed to install Pester'
+        }
     }
 }
 Write-Host " - Pester version: $($pester.Version.ToString())"

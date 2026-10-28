@@ -74,7 +74,7 @@ jobs:
         run: docker build --tag phpmanager/test .\test\docker-build
       - name: Test
         run: |
-          docker run --rm --user ContainerAdministrator --volume "$($Env:GITHUB_WORKSPACE):C:\App" --workdir C:\App --env "PM_TEST_DOCKER=1" phpmanager/test ${{ matrix.shell }} -Command '$pesterResult = .\test\pester.ps1; exit $pesterResult.FailedCount'
+          docker run --rm --user ContainerAdministrator --volume "$($Env:GITHUB_WORKSPACE):C:\App" --workdir C:\App --env "PM_TEST_DOCKER=1" phpmanager/test ${{ matrix.shell }} -Command '$pesterResult = .\test\pester.ps1; if ($null -eq $pesterResult) { exit 1 }; exit $pesterResult.FailedCount'
           $failCount = $LASTEXITCODE
           if ($failCount -ne 0) {
             throw "$failCount tests failed!"
