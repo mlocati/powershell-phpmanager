@@ -71,7 +71,10 @@
             } else {
                 $originalPath = [System.Environment]::GetEnvironmentVariable('Path', $target)
             }
-            if ($null -eq $originalPath -or $originalPath -eq '') {
+            if ($null -eq $originalPath) {
+                $originalPath = ''
+            }
+            if ($originalPath -eq '') {
                 $parts = @()
             } else {
                 $parts = $originalPath.Split($pathSeparator)
