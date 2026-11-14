@@ -102,14 +102,20 @@
                             $vcRedistCommand = 'Save-VcRedist'
                         }
                         $vcList | & $vcRedistCommand -Path $temporaryDirectory2
+                        $vcRedistParameters = @{}
+                        if ((Get-Command Install-VcRedist).Parameters.ContainsKey('Path')) {
+                            $vcRedistParameters.Path = $temporaryDirectory2
+                        }
                         Write-Verbose "Installing the Visual C++ $redistName Redistributable"
                         $currentUser = [System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()
                         if ($currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)) {
-                            $vcList | Install-VcRedist -Path $temporaryDirectory2
+                            $vcList | Install-VcRedist @vcRedistParameters
                         } else {
-                            $exeCommand = "Get-VcList -Export $vcListKind"
-                            $exeCommand += " | Where-Object { `$_.Release -eq '$redistName' -and `$_.Architecture -eq '" + $PhpVersion.Architecture + "' }"
-                            $exeCommand += " | Install-VcRedist -Path '" + ($temporaryDirectory2 -replace "'", "''") + "'"
+                            $vcListPath = Join-Path -Path $temporaryDirectory2 -ChildPath 'vcredist.xml'
+                            $vcList | Export-Clixml -LiteralPath $vcListPath
+                            $exeCommand = "`$vcRedistParameters = @{}; if ((Get-Command Install-VcRedist).Parameters.ContainsKey('Path')) {"
+                            $exeCommand += " `$vcRedistParameters.Path = '" + ($temporaryDirectory2 -replace "'", "''") + "' }; "
+                            $exeCommand += "Import-Clixml -LiteralPath '" + ($vcListPath -replace "'", "''") + "' | Install-VcRedist @vcRedistParameters"
                             Start-Process -FilePath 'powershell.exe' -ArgumentList "-Command ""$exeCommand""" -Verb RunAs -Wait
                         }
                     } finally {
